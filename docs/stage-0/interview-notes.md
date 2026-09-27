@@ -256,3 +256,39 @@ A BIOS-to-UEFI or UEFI-to-BIOS mismatch is a different, harder failure.
 **Short answer:** Each has a different job and a different blast radius. The source VM must stay a clean, unmodified reference. The learning VM is where experiments and package installs happen. A conversion host needs disk access and conversion tooling. Mixing them contaminates the baseline or quietly makes an architecture decision.
 
 **Detail:** In the lab, `kvm-learning-01` (KVM/QEMU/libvirt installed, nested virtualization on) was powered off after the source baseline and never touched `legacy-source-vm`. The conversion-host decision stays explicitly deferred (local helper, AWS helper or another runtime) instead of being made implicitly by reusing the learning VM.
+
+---
+
+## Stage 1D additions: VMware source artifacts
+
+Answers below are backed by the read-only Stage 1D investigation of `legacy-source-vm` (see [Stage 1D record](../stage-1/stage-1d-vmware-source-artifacts.md)).
+
+### 33. "What files make up a VMware VM, and which ones does a migration need?"
+
+**Short answer:** A `.vmx` (configuration), an `.nvram` (firmware variables), the virtual disk (a descriptor `.vmdk` plus its data extent), a few small metadata files (`.vmxf`, `.vmsd`), and runtime files (`.vswp`, locks, logs). A migration needs the disk **contents**. The `.vmx` is only a reference for writing the target VM definition, and the `.nvram` is not moved at all.
+
+**Detail:** In the lab folder there are 14 files, 7.5G in total. About 4.1 GiB of that is swap that exists only while the VM runs, and 3.4 GiB is the allocated disk data. The target KubeVirt VM is a new object: its spec is written from the `.vmx` facts (CPU, RAM, EFI, disk bus, NIC, optionally MAC), its disk is imported from the extent, and its firmware state is created fresh. It then boots through the ESP fallback loader.
+
+### 34. "What is inside a VMDK on ESXi?"
+
+**Short answer:** Usually two files. A small text descriptor (`createType="vmfs"`, CID, extent list, `ddb.*` bookkeeping) and a `-flat.vmdk` extent that is simply the raw disk sectors. Thin provisioning is done by VMFS (holes in the flat file), not by the VMDK format.
+
+**Detail:** The lab disk's descriptor is 541 bytes and names one extent of 83,886,080 sectors. The flat file has a logical size of 40 GiB but only 3,487 1 MiB blocks allocated (`vmkfstools -D`: `nb 3487`). `parentCID=ffffffff` shows there is no snapshot chain. The descriptor's `adapterType` and `virtualHWVersion` are creation-time hints and do not describe the running VM. Other layouts exist: Workstation's `monolithicSparse`, the `2gbsparse` export format, OVF's `streamOptimized`. Never assume one; read the descriptor.
+
+### 35. "How do you get a VM's disk off a free ESXi host?"
+
+**Short answer:** Without vCenter and with a restricted API, use the host's SSH: power the VM off cleanly, then `scp` the descriptor and flat extent, or first `vmkfstools -i ... -d 2gbsparse` to a staging folder and copy the compact result. Verify with a checksum on both ends.
+
+**Detail:** In the lab, `scp` streamed at about 137 MiB/s, so the raw 40 GiB copy takes about 5 minutes. A `2gbsparse` export would move only about 3.5 GiB, but it re-encodes the container and needs a VMDK-aware tool to verify. The HTTPS `/folder` file service also works with an authenticated session, but brings no advantage over the existing SSH key. OVF export depends on the API and was not pursued. Tools like MTV/Forklift use VDDK or NFC and assume vCenter or a licensed API.
+
+### 36. "Why can't you just copy a running VM's disk?"
+
+**Short answer:** Two reasons. VMFS holds an exclusive lock on an open disk, so you cannot even read it. And if you could, the copy would be taken from a live, changing filesystem: crash-consistent at best. Hot copies need a snapshot, which freezes the base disk and redirects writes to a delta.
+
+**Detail:** In the lab, a 1 MiB `dd` read of the running flat file failed with "Device or resource busy", and the HTTPS file service returned HTTP 500 for it. Snapshots are forbidden for this source VM, so the only consistent option is a cold copy after a graceful guest shutdown. Warm migration tools use snapshots plus changed block tracking (CBT); CBT is off on this VM.
+
+### 37. "How do you prove that acquiring the disk did not change the source?"
+
+**Short answer:** With the VM powered off, hash the flat extent on the host before and after the copy, and compare the copy's hash with it. Cheap supporting checks: descriptor checksum and CID, file size and mtime, VMFS allocation (`nb`), `.vmx`/`.nvram` checksums, power-state history and snapshot count.
+
+**Detail:** A full 40 GiB hash costs about 5.5 minutes per pass on the lab host. The cheap checks are strong indicators but not proof. The hash proves copy fidelity, not filesystem consistency; that comes from the clean shutdown. Once the source is powered on again, its disk changes legitimately (journal, logs), so "unchanged" can only be claimed for the powered-off window. After conversion, disk hashes no longer apply: verify the migrated VM at guest and application level (FS UUIDs, machine-id, SSH host keys, the nginx page hash).

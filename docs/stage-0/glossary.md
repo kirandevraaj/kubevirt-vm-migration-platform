@@ -67,6 +67,25 @@ Terms as observed on the migration source VM `legacy-source-vm` (see [Stage 1C r
 | **open-vm-tools** | Open-source VMware Tools for Linux: guest info, graceful shutdown, time and quiescing. VMware-only. | 13.0.10, running, `guestToolsUnmanaged` | Useless on KVM; replaced by qemu-guest-agent |
 | **cloud-init disabled marker** | The file `/etc/cloud/cloud-init.disabled`, which stops cloud-init from running at boot. The Ubuntu installer writes it after an install without a real datasource. | `status: disabled`, DataSourceNone | Keeps network config and SSH keys from being regenerated |
 
+## VMware source artifact terms (Stage 1D)
+
+Terms as observed in the datastore folder of `legacy-source-vm` (see [Stage 1D record](../stage-1/stage-1d-vmware-source-artifacts.md)). General VMDK terms (descriptor, extent, sparse) are in [Disks and conversion](#disks-and-conversion).
+
+| Term | Definition | Seen in the lab |
+|---|---|---|
+| **.vmx** | Text file with the VM's configuration: CPU, memory, firmware, controllers, NICs, MAC, UUIDs, and which descriptor each virtual disk uses. Metadata only; it holds no disk data. | 2,458 bytes; `scsi0:0.fileName = "legacy-source-vm.vmdk"` |
+| **.nvram** | Binary file holding the VM's firmware variable store (for UEFI: boot entries, Secure Boot mode). Separate from the virtual disk, so it does not travel with a disk copy. | 270,840 bytes, header `MRVN` |
+| **.vmxf / .vmsd** | Extended configuration file and snapshot database. Both are VMware metadata. | 47-byte empty XML / 0 bytes (no snapshots) |
+| **.vswp** | Swap file backing the VM's memory, created at power-on and deleted at power-off. Runtime only. | 4 GiB guest swap plus 82 MiB VMX swap |
+| **createType** | Descriptor field naming the VMDK layout: `vmfs` (ESXi descriptor + flat extent), `monolithicSparse`, `twoGbMaxExtentSparse`, `streamOptimized` and others. | `createType="vmfs"` |
+| **Flat extent** | The `-flat.vmdk` data file of a `vmfs` VMDK: raw disk sectors from byte 0, with no header. | `legacy-source-vm-flat.vmdk`, 42,949,672,960 bytes |
+| **CID / parentCID** | Content ID of a VMDK, changed on the first write after the disk is opened. `parentCID=ffffffff` means no parent (no snapshot chain). Useful as a cheap "was it written?" indicator. | `CID=7475b330`, `parentCID=ffffffff` |
+| **Thin (on VMFS)** | Unwritten regions of the flat file are VMFS holes that read as zeros. Logical size is the full capacity; allocated blocks are what `du` and `vmkfstools -D` (`nb`) show. A plain file copy writes the zeros. | 40 GiB logical, 3,487 x 1 MiB blocks allocated |
+| **2gbsparse** | `vmkfstools -d 2gbsparse` output (`twoGbMaxExtentSparse`): descriptor plus sparse extents of at most 2 GB that store only written grains. A portable, compact export format. | Scratch test: 24 MiB written -> 25 MB extent, lossless round trip |
+| **VMFS file lock** | On-disk lock that VMFS takes on open files. A running VM holds an exclusive lock (`mode 1`) on its disk, so even a read-only open from the shell fails. | Hot `dd` read: "Device or resource busy" |
+| **Cold copy** | Copying a VM's disk after a clean guest shutdown, when the disk is closed and consistent. The only snapshot-free way to acquire a VMware disk. | Designed in Stage 1D, not executed |
+| **Datastore file service (`/folder`)** | hostd HTTPS endpoint for datastore file download and upload: `/folder/<path>?dcPath=ha-datacenter&dsName=<datastore>`. Needs an authenticated session. | 401 without a session; 200 for the descriptor with one; 500 for the locked extent |
+
 ## Disks and conversion
 
 | Term | Definition |

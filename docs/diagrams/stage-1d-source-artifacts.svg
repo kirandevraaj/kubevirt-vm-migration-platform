@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="960" viewBox="0 0 1160 960" role="img" aria-labelledby="title desc">
+  <title id="title">Stage 1D: what legacy-source-vm is made of on the ESXi datastore, and the future conversion boundary</title>
+  <desc id="desc">The ESXi VM legacy-source-vm consists of VM metadata (.vmx, .vmxf, .vmsd), firmware state (.nvram), a disk artifact (a 541-byte descriptor plus a 40 GiB thin flat extent), and guest state that lives inside the flat extent (GPT, ESP, ext4, Ubuntu, nginx, netplan, filesystem UUIDs). Runtime-only files exist while the VM is powered on. A future, not yet started path takes the VMDK artifact through a conversion step (conversion host deferred) to a KubeVirt/CDI target. Stage 1D performed no copy or conversion.</desc>
+  <style>
+    .h { font: 700 20px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+    .c { font: 700 15px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+    .t { font: 600 13px 'Segoe UI', Arial, sans-serif; fill: #111827; }
+    .s { font: 11.5px 'Segoe UI', Arial, sans-serif; fill: #374151; }
+    .l { font: 700 13px 'Segoe UI', Arial, sans-serif; fill: #ffffff; }
+    .n { font: 12px 'Segoe UI', Arial, sans-serif; fill: #334155; }
+    .box { stroke: #334155; stroke-width: 1.3; }
+    .dash { stroke: #64748b; stroke-width: 1.5; stroke-dasharray: 7 5; fill: #f8fafc; }
+    .arr { stroke: #475569; stroke-width: 1.6; fill: none; marker-end: url(#a); }
+  </style>
+  <defs>
+    <marker id="a" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker>
+  </defs>
+  <rect width="1160" height="960" fill="#ffffff"/>
+  <text x="580" y="32" text-anchor="middle" class="h">Stage 1D: the VMware source VM as datastore artifacts (OBSERVED 2026-09-27, read-only)</text>
+
+  <!-- ESXi VM container -->
+  <rect x="30" y="54" width="700" height="800" rx="10" class="box" fill="#dbeafe"/>
+  <text x="48" y="80" class="c">ESXi VM: legacy-source-vm (Vmid 2), powered on</text>
+  <text x="48" y="98" class="s">folder [migration-datastore] legacy-source-vm/  on VMFS-6.82, 1 MiB file blocks</text>
+
+  <!-- VM METADATA -->
+  <rect x="50" y="110" width="660" height="118" rx="8" class="box" fill="#eff6ff"/>
+  <rect x="50" y="110" width="660" height="26" rx="8" fill="#2563eb"/>
+  <text x="64" y="128" class="l">VM METADATA (describes the virtual machine, not the disk contents)</text>
+  <rect x="64" y="144" width="300" height="74" rx="6" class="box" fill="#ffffff"/>
+  <text x="76" y="162" class="t">legacy-source-vm.vmx (2,458 B)</text>
+  <text x="76" y="178" class="s">2 vCPU, 4096 MB, firmware=efi, hw 21</text>
+  <text x="76" y="193" class="s">scsi0=pvscsi, scsi0:0 -> legacy-source-vm.vmdk</text>
+  <text x="76" y="208" class="s">ethernet0=vmxnet3, MAC 00:0c:29:0f:3d:15</text>
+  <rect x="376" y="144" width="156" height="74" rx="6" class="box" fill="#ffffff"/>
+  <text x="388" y="162" class="t">.vmxf (47 B)</text>
+  <text x="388" y="178" class="s">extended config,</text>
+  <text x="388" y="193" class="s">empty Foundry XML</text>
+  <rect x="544" y="144" width="152" height="74" rx="6" class="box" fill="#ffffff"/>
+  <text x="556" y="162" class="t">.vmsd (0 B)</text>
+  <text x="556" y="178" class="s">snapshot database:</text>
+  <text x="556" y="193" class="s">empty, no snapshots</text>
+
+  <!-- FIRMWARE STATE -->
+  <rect x="50" y="240" width="660" height="80" rx="8" class="box" fill="#f5f3ff"/>
+  <rect x="50" y="240" width="660" height="26" rx="8" fill="#7c3aed"/>
+  <text x="64" y="258" class="l">FIRMWARE STATE (separate from the guest disk)</text>
+  <text x="64" y="286" class="t">legacy-source-vm.nvram (270,840 B, header "MRVN")</text>
+  <text x="64" y="304" class="s">UEFI variables: Boot0005 "Ubuntu" -> \EFI\ubuntu\shimx64.efi, Secure Boot off. Not inside the VMDK.</text>
+
+  <!-- DISK ARTIFACT -->
+  <rect x="50" y="332" width="660" height="400" rx="8" class="box" fill="#fffbeb"/>
+  <rect x="50" y="332" width="660" height="26" rx="8" fill="#d97706"/>
+  <text x="64" y="350" class="l">DISK ARTIFACT (the VMDK = descriptor + extent)</text>
+  <rect x="64" y="366" width="632" height="66" rx="6" class="box" fill="#ffffff"/>
+  <text x="76" y="384" class="t">virtual disk metadata: legacy-source-vm.vmdk (541 B text descriptor)</text>
+  <text x="76" y="400" class="s">createType="vmfs", CID=7475b330, parentCID=ffffffff (no parent, no snapshot chain)</text>
+  <text x="76" y="416" class="s">RW 83886080 VMFS "legacy-source-vm-flat.vmdk"; ddb.thinProvisioned=1, ddb.uuid, geometry, adapterType hint</text>
+  <rect x="64" y="442" width="632" height="278" rx="6" class="box" fill="#fef3c7"/>
+  <text x="76" y="460" class="t">virtual disk data: legacy-source-vm-flat.vmdk</text>
+  <text x="76" y="476" class="s">raw 512-byte sectors, 42,949,672,960 B logical; thin on VMFS: 3,487 x 1 MiB blocks allocated</text>
+  <text x="76" y="492" class="s">exclusively locked while the VM runs (hot 1 MiB read: "Device or resource busy")</text>
+
+  <!-- GUEST STATE inside flat -->
+  <rect x="80" y="504" width="600" height="204" rx="6" class="box" fill="#dcfce7"/>
+  <rect x="80" y="504" width="600" height="24" rx="6" fill="#16a34a"/>
+  <text x="92" y="521" class="l">GUEST STATE (lives inside the flat extent bytes)</text>
+  <text x="92" y="546" class="t">GPT, disk GUID ebeb0ebf-...14a1</text>
+  <text x="92" y="564" class="s">sda1 ESP vfat, FS UUID C340-CD01 (shim, grub, fallback BOOTX64.EFI)</text>
+  <text x="92" y="580" class="s">sda2 ext4, FS UUID db8b3bb3-e776-42e8-902e-89124606b2f6 (/)</text>
+  <text x="92" y="604" class="t">Ubuntu 24.04.5, kernel 6.8.0-142</text>
+  <text x="92" y="622" class="s">nginx 1.24.0 + /var/www/html/index.html (sha256 b9826e18...0046)</text>
+  <text x="92" y="638" class="s">netplan /etc/netplan/50-cloud-init.yaml: ens192, 192.168.50.31/24</text>
+  <text x="92" y="654" class="s">fstab / root= / GRUB by FS UUID; machine-id; SSH host keys</text>
+  <text x="92" y="678" class="t">This is what a migration must actually preserve.</text>
+  <text x="92" y="696" class="s">Everything else in this picture is VMware packaging around it.</text>
+
+  <!-- RUNTIME -->
+  <rect x="50" y="744" width="660" height="96" rx="8" class="box" fill="#e5e7eb"/>
+  <rect x="50" y="744" width="660" height="26" rx="8" fill="#64748b"/>
+  <text x="64" y="762" class="l">RUNTIME ONLY (exists while powered on, or logs; never migrated)</text>
+  <text x="64" y="790" class="s">legacy-source-vm-f22835aa.vswp (4 GiB guest memory swap), vmx-...-1.vswp (82 MiB), .vmx.lck,</text>
+  <text x="64" y="806" class="s">legacy-source-vm.scoreboard, legacy-source-vm-1.scoreboard, vmware.log, vmware-1.log,</text>
+  <text x="64" y="822" class="s">.vmx~ (hostd backup copy of the .vmx)</text>
+
+  <!-- Stage 1D did -->
+  <rect x="760" y="54" width="370" height="170" rx="8" class="box" fill="#fef9c3"/>
+  <text x="774" y="78" class="t">What Stage 1D did (read-only)</text>
+  <text x="774" y="98" class="s">inspected .vmx, descriptor, file layout, VMFS locks</text>
+  <text x="774" y="114" class="s">copied only small metadata files (hashes match)</text>
+  <text x="774" y="130" class="s">proved the running disk cannot be read (lock)</text>
+  <text x="774" y="146" class="s">tested vmkfstools clone formats on a 256 MiB</text>
+  <text x="774" y="162" class="s">scratch disk, then deleted it</text>
+  <text x="774" y="182" class="t">No shutdown, no source disk copy,</text>
+  <text x="774" y="200" class="t">no conversion, no snapshot</text>
+
+  <!-- Future boundary -->
+  <rect x="760" y="244" width="370" height="440" rx="8" class="dash"/>
+  <text x="774" y="268" class="t">FUTURE BOUNDARY - NOT STARTED IN STAGE 1D</text>
+
+  <rect x="784" y="284" width="322" height="92" rx="6" class="dash" style="fill:#fef3c7"/>
+  <text x="798" y="306" class="t">VMDK artifact (acquired copy)</text>
+  <text x="798" y="324" class="s">descriptor + flat extent, taken by a cold copy</text>
+  <text x="798" y="340" class="s">after a graceful shutdown (designed in Stage 1D,</text>
+  <text x="798" y="356" class="s">needs separate approval)</text>
+
+  <path d="M945,378 L945,418" class="arr"/>
+
+  <rect x="784" y="422" width="322" height="100" rx="6" class="dash"/>
+  <text x="798" y="444" class="t">future conversion</text>
+  <text x="798" y="462" class="s">VMDK -> raw/qcow2; guest adapted for virtio</text>
+  <text x="798" y="478" class="s">(netplan match, drivers, VMware Tools)</text>
+  <text x="798" y="500" class="t">conversion host: DEFERRED</text>
+  <text x="798" y="516" class="s">kvm-learning-01 is not it</text>
+
+  <path d="M945,524 L945,564" class="arr"/>
+
+  <rect x="784" y="568" width="322" height="100" rx="6" class="dash"/>
+  <text x="798" y="590" class="t">KubeVirt / CDI target</text>
+  <text x="798" y="608" class="s">CDI imports the disk image into a PVC (DataVolume)</text>
+  <text x="798" y="624" class="s">VirtualMachine spec re-expresses CPU, RAM, EFI,</text>
+  <text x="798" y="640" class="s">disk bus, NIC and (optionally) MAC</text>
+  <text x="798" y="656" class="s">new UEFI variable store; boots via fallback path</text>
+
+  <path d="M710,560 C 740,560 740,330 780,330" class="arr" stroke-dasharray="6 4"/>
+
+  <!-- Not moved -->
+  <rect x="760" y="700" width="370" height="140" rx="8" class="box" fill="#f1f5f9"/>
+  <text x="774" y="722" class="t">Not moved as files</text>
+  <text x="774" y="742" class="s">.vmx: settings re-expressed in the VM spec</text>
+  <text x="774" y="758" class="s">.nvram: not moved; firmware state is recreated</text>
+  <text x="774" y="774" class="s">descriptor ddb.* (uuid, CID, geometry): discarded</text>
+  <text x="774" y="790" class="s">.vmxf, .vmsd, swap, locks, logs: discarded</text>
+  <text x="774" y="814" class="t">Only the disk bytes (guest state) travel.</text>
+  <text x="774" y="830" class="s">The target is a new VM, not a copied VMware VM.</text>
+
+  <!-- Legend -->
+  <rect x="30" y="872" width="1100" height="74" rx="8" fill="#f8fafc" stroke="#94a3b8"/>
+  <text x="46" y="894" class="t">Legend</text>
+  <rect x="110" y="883" width="14" height="14" fill="#2563eb"/><text x="130" y="895" class="n">VM metadata</text>
+  <rect x="230" y="883" width="14" height="14" fill="#7c3aed"/><text x="250" y="895" class="n">firmware state</text>
+  <rect x="360" y="883" width="14" height="14" fill="#d97706"/><text x="380" y="895" class="n">disk artifact</text>
+  <rect x="480" y="883" width="14" height="14" fill="#16a34a"/><text x="500" y="895" class="n">guest state</text>
+  <rect x="590" y="883" width="14" height="14" fill="#64748b"/><text x="610" y="895" class="n">runtime only</text>
+  <text x="46" y="920" class="n">Solid boxes exist now (OBSERVED). Dashed boxes are future steps that have not started. Sizes from ls/stat and vmkfstools -D on ESXi, 14:00 to 14:03 UTC.</text>
+  <text x="46" y="938" class="n">Stage 1D did not copy, convert or shut down the source VM.</text>
+</svg>
