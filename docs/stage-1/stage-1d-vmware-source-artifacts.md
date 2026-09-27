@@ -7,6 +7,7 @@
 | Date | 2026-09-27 (all times UTC; lab work 14:00 to 14:03) |
 | Result | **All gates D1 to D10 PASS**. Source artifacts characterized read-only; cold-copy procedure designed, **not executed** |
 | Diagram | [stage-1d-source-artifacts.svg](../diagrams/stage-1d-source-artifacts.svg) |
+| Correction | The claim that the descriptor `CID` tracks disk writes was disproved by the Stage 1E acquisition and is corrected below ([Stage 1E section 10](stage-1e-cold-acquisition.md#10-correction-to-stage-1d-the-descriptor-cid-is-not-a-write-indicator-here)) |
 | Related | [Stage 1 index](README.md), [Stage 1C record](stage-1c-migration-source.md) (the source VM and its baseline), [CDI storage model](../stage-0/cdi-storage-model.md#vmdk-vmware) |
 
 Labels: **OBSERVED** = seen in this lab by a command we ran. **INFERRED** = reasoned from observations or documentation, not directly tested. **NOT TESTED** = deliberately not done.
@@ -89,7 +90,7 @@ Read with `cat` on the `.vmx`, `vim-cmd vmsvc/get.config` / `get.filelayout`, an
 | Capacity | 42,949,672,960 bytes (40 GiB) |
 | Allocation | `thinProvisioned = True`, `eagerlyScrub = False`; `diskMode = persistent`; no parent (no snapshot chain); `sharing = None` |
 | Disk UUID | `6000C295-f147-b6a3-1fb2-1bd9e7ae2d9c` (same as descriptor `ddb.uuid`) |
-| Content ID (API, live) | `e499afe839e682ad2038f5b55c84c946`. It differs from the descriptor's on-disk `ddb.longContentID` (`dc2d48eb...7475b330`) because the running VM has written to the disk since it was opened. The descriptor is updated when the disk is closed (INFERRED from VMware disk behavior). |
+| Content ID (API, live) | `e499afe839e682ad2038f5b55c84c946`. It differs from the descriptor's on-disk `ddb.longContentID` (`dc2d48eb...7475b330`) because the running VM has written to the disk since it was opened. Corrected after Stage 1E: the on-disk descriptor was **not** updated at shutdown (`CID` stayed `7475b330`), so for this `vmfs` disk the descriptor `CID` does not track writes. |
 
 ### 4.3 Firmware / NVRAM state
 
@@ -182,7 +183,7 @@ ddb.virtualHWVersion = "14"
 
 1. **Both files, together:** the descriptor and the flat extent. The descriptor alone contains no data. The flat extent alone is a usable raw image, but tools that expect a VMDK need the descriptor, and the extent name inside it must match.
 2. The **full logical size** (42,949,672,960 bytes). A target smaller than 40 GiB would truncate the GPT backup header at the end of the disk.
-3. The **disk must be closed**: VM powered off, lock released, descriptor `CID` final.
+3. The **disk must be closed**: VM powered off, lock released.
 4. Nothing else in the folder is needed to reproduce the disk contents. The `.vmx` and `.nvram` are needed only as *reference* for building the target VM definition.
 5. INFERRED from QEMU documentation, not tested here: `qemu-img` reads both `vmfs` (descriptor + flat) and `twoGbMaxExtentSparse` VMDKs. CDI accepts VMDK or raw input ([Stage 0 CDI model](../stage-0/cdi-storage-model.md#vmdk-vmware)).
 
@@ -234,13 +235,13 @@ Destination (proposed): `C:\VMs\legacy-source-vm\acquisition\<UTC timestamp>\` o
 | 1 | nginx health: `curl.exe` from Windows, `wget` from ESXi | 200, 267 bytes, sha256 `b9826e18...0046` | Stop; investigate the source, no shutdown |
 | 2 | Record the baseline: guest identifiers (stdin-fed read-only script as in section 3), plus on ESXi the sha256 of `.vmx`, descriptor, `.nvram` and `.vmxf`, descriptor `CID`, `vmkfstools -D` (`len`, `nb`, `Addr`), `stat` of all files | Matches section 3 | Stop; explain the difference first |
 | 3 | Graceful shutdown: `vim-cmd vmsvc/power.shutdown 2` (VMware Tools guest shutdown) | Accepted | **No hard power-off without explicit approval**; stop and report |
-| 4 | Confirm fully off: poll `vim-cmd vmsvc/power.getstate 2` until "Powered off" (timeout 5 min). Then check that the `.vswp` files and `.vmx.lck` are gone, and that `vmkfstools -D` on the flat file shows lock `mode 0` / owner all zeros. Record descriptor sha256 and `CID` (final after close) and `stat`. Compute **sha256 of the flat extent on ESXi** (about 5.5 min). | Powered off, lock released, pre-copy hash recorded | Power the VM back on (step 7); nothing was copied |
+| 4 | Confirm fully off: poll `vim-cmd vmsvc/power.getstate 2` until "Powered off" (timeout 5 min). Then check that the `.vswp` files and `.vmx.lck` are gone, and that `vmkfstools -D` on the flat file shows lock `mode 0` / owner all zeros. Record descriptor sha256 and `CID`, and `stat`. Compute **sha256 of the flat extent on ESXi** (about 5.5 min). | Powered off, lock released, pre-copy hash recorded | Power the VM back on (step 7); nothing was copied |
 | 5 | Acquire: `scp` the descriptor and flat extent (plus `.vmx`, `.nvram`, `.vmxf` as reference copies) to the destination | Both copies complete; sizes 541 and 42,949,672,960 bytes | Delete the partial copy; go to step 7 |
-| 6 | Verify: `Get-FileHash` of the local flat file equals the ESXi pre-copy hash; local descriptor equals the source descriptor. **Source unchanged:** re-hash the flat file on ESXi (about 5.5 min) or at least check descriptor `CID`/sha256, `stat` mtime/size and `vmkfstools -D` `nb`/`Addr`. | Hashes equal; source metadata identical to step 4 | Keep the source untouched; discard the copy; report |
+| 6 | Verify: `Get-FileHash` of the local flat file equals the ESXi pre-copy hash; local descriptor equals the source descriptor. **Source unchanged:** re-hash the flat file on ESXi (about 5.5 min) or at least check descriptor sha256, flat `stat` mtime/size and `vmkfstools -D` `nb`/`Addr`. | Hashes equal; source metadata identical to step 4 | Keep the source untouched; discard the copy; report |
 | 7 | Power on: `vim-cmd vmsvc/power.on 2` | Powered on, tools running | Read `vmware.log`; do not edit the source; report |
 | 8 | Networking: ping and ARP MAC `00:0c:29:0f:3d:15` from Windows, `vmkping` from ESXi, tools IP 192.168.50.31 | Reachable | Console check; report |
 | 9 | nginx: HTTP from Windows and ESXi | 200, 267 bytes, sha256 `b9826e18...0046` | Report; the verified copy remains the fallback |
-| 10 | Compare with the Stage 1C baseline: rerun the guest script and diff UUIDs, machine-id, host keys, netplan sha256, nginx checksums, package count | Identical, except expected runtime changes (boot time, logs, `CID` after the first write) | Report the difference before any further stage |
+| 10 | Compare with the Stage 1C baseline: rerun the guest script and diff UUIDs, machine-id, host keys, netplan sha256, nginx checksums, package count | Identical, except expected runtime changes (boot time, logs, flat mtime and allocation) | Report the difference before any further stage |
 
 ## 10. Integrity strategy
 
@@ -250,7 +251,7 @@ What each piece of evidence proves, and what it costs:
 |---|---|---|---|
 | sha256 of the flat extent on ESXi (VM off), before and after the copy | Source disk bytes unchanged by the acquisition | About 5.5 min per pass (40 GiB at about 128 MiB/s) | Only valid for the powered-off window |
 | sha256 of the local copy equals the ESXi hash | The copy is byte-identical to the source disk | About 5 min transfer plus a local hash | Proves copy fidelity, **not** that the guest filesystem is consistent. That comes from the clean shutdown; an `e2fsck -n` on the copy is possible later on a conversion host. |
-| Descriptor sha256 and `CID` / `longContentID` | No disk-library write happened (CID changes on the first write after open) | Seconds | A write outside the VMware disk library would not change `CID`, so this is a strong hint, not proof |
+| Descriptor sha256 and `CID` / `longContentID` | The descriptor file itself is unchanged | Seconds | **Corrected after Stage 1E:** not a write indicator. The `CID` stayed `7475b330` across a run that wrote to the disk and a clean shutdown. Use the flat mtime, size and `nb` as cheap indicators instead. |
 | `stat` size/mtime and `vmkfstools -D` (`len`, `nb`, `Addr <4, 26, 1>`) | Same file object, same size and allocation, not rewritten or replaced | Seconds | mtime has 1 s resolution; it cannot detect an in-place rewrite of identical allocation |
 | `.vmx`, `.nvram`, `.vmxf` sha256 before and after | VM configuration and firmware state untouched | Seconds | `.nvram` may legitimately change on the next boot (firmware writes variables) |
 | `vim-cmd` power state and `bootTime`; `vmware.log` timestamps | Power history: exactly one shutdown and one power-on, with times | Seconds | - |
@@ -262,7 +263,7 @@ Cannot be proven, and must not be claimed:
 
 - That the disk after the source is powered back on equals the disk before shutdown. Booting writes the journal, logs, timestamps and possibly NVRAM variables. "Source unchanged" is only provable for the powered-off window, between the two ESXi hashes.
 - End-to-end byte integrity through conversion. Conversion to raw/qcow2 and guest adaptation deliberately change bytes. Later stages must verify at the guest and application level (FS UUIDs, machine-id, host keys, nginx page hash), not by comparing disk hashes.
-- The cheap checks (CID, mtime, `nb`) are strong indicators but not proof. Only the full hash proves byte identity.
+- The cheap checks (flat mtime, size, `nb`, metadata hashes) are strong indicators but not proof. Only the full hash proves byte identity.
 
 In Stage 1D, the cheap checks were applied to the investigation itself (section 3). The full hash of the source extent was not computed, because the running disk is locked and a shutdown was out of scope.
 
