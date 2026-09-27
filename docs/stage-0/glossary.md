@@ -18,7 +18,33 @@ Request section 23. Terms are grouped by area; each includes the closest VMware 
 | **Nested virtualization** | Running a hypervisor inside a VM. L0 = hardware hypervisor, L1 = guest hypervisor, L2 = its guests. | VHV ("Virtualize Intel VT-x/EPT") |
 | **VHV** | VMware's setting to expose VT-x/EPT to a VM (`vhv.enable`). | - |
 | **VMkernel** | The ESXi kernel. Also the name for ESXi host IP interfaces (`vmk0`). | - |
-| **VMX** | The `.vmx` config file of a VMware VM, and its per-VM process. | - |
+| **VMX** | The `.vmx` config file of a VMware VM, and its per-VM process. Not to be confused with Intel VMX, the CPU extension behind VT-x (see [KVM lab terms](#kvm-lab-terms-stage-1b)). | - |
+
+## KVM lab terms (Stage 1B)
+
+Terms as observed in the Stage 1B learning VM `kvm-learning-01` (see [Stage 1B record](../stage-1/stage-1b-kvm-qemu-fundamentals.md) and [nested KVM feasibility](../stage-1/nested-kvm-feasibility.md)). Level numbers refer to that lab: L0 Workstation, L1 ESXi, L2 `kvm-learning-01`, L3 its test VM.
+
+| Term | Definition | Seen in the lab | VMware analogy |
+|---|---|---|---|
+| **KVM** | The Linux kernel's hypervisor: modules `kvm` + `kvm_intel`/`kvm_amd`. It creates VMs and vCPUs, maps guest memory, enters the guest with VT-x and handles VM exits. It emulates no devices. | `kvm_intel` autoloaded in L2 with `nested=Y`, `ept=Y` | VMM inside VMkernel |
+| **QEMU** | User-space VMM and device model: one `qemu-system-x86_64` process per VM, providing chipset, firmware and devices. Uses KVM (`-accel kvm`) or its own software CPU emulator (`-accel tcg`). A separate component from KVM. | QEMU 8.2.2 running the L3 guest | VMX process |
+| **libvirt** | Management API and daemon (`libvirtd`, or modular `virtqemud`) that turns a domain XML definition into a QEMU process and manages its lifecycle, security labels, cgroups and logs. | libvirt 10.0.0, monolithic `libvirtd` on Ubuntu 24.04 | hostd |
+| **virsh** | Command-line client of the libvirt API (`define`, `start`, `list`, `dumpxml`, `destroy`). It does not run VMs itself; the daemon does. | `virsh -c qemu:///system list --all` | vim-cmd |
+| **virtio-blk** | VirtIO paravirtual block device: one disk per PCI function, seen as `/dev/vdX`. Driver `virtio_blk`. | L3 `vda`, PCI `1af4:1001`/`1af4:1042` | PVSCSI disk (role only) |
+| **virtio-scsi** | VirtIO paravirtual SCSI host adapter; disks behind it appear as `/dev/sdX`. Drivers `virtio_scsi` + `sd`. | L3 `sda`, PCI `1af4:1004`/`1af4:1048` | PVSCSI controller (role only) |
+| **virtio-net** | VirtIO paravirtual Ethernet NIC. Driver `virtio_net`. | L3 `eth0`, PCI `1af4:1000`/`1af4:1041` | VMXNET3 (role only) |
+| **/dev/kvm** | Character device (major 10, minor 232) through which user space talks to KVM with `ioctl()`. Present only when a KVM module is loaded and the CPU offers VT-x/AMD-V. Access is controlled by the `kvm` group. | `crw-rw---- root kvm 10, 232` in L2 | - |
+| **VMX (Intel)** | Virtual Machine Extensions, Intel's CPU instruction set for VT-x (VMXON, VMLAUNCH, VMRESUME, VMCS). The `vmx` flag in `/proc/cpuinfo` means the CPU (real or virtual) offers it. | `vmx` flag in L2 and in L3 | The `.vmx` file is unrelated |
+| **L0** | The hypervisor that runs on the physical CPU and owns the real VT-x. | VMware Workstation VMM | - |
+| **L1** | A guest hypervisor running inside an L0 VM. | ESXi 8.0.3 | Nested ESXi |
+| **L2** | A VM run by the L1 hypervisor. In this lab L2 is itself a KVM host, which creates an L3. | `kvm-learning-01` | VM on nested ESXi |
+| **Nested virtualization** | Running a hypervisor inside a VM, with the outer hypervisor exposing (emulating) VT-x/EPT to the inner one. Every VM exit of the innermost guest is taken by L0 first and reflected inward. | Three hypervisors deep: Workstation, ESXi, KVM | VHV |
+| **Hardware-assisted virtualization** | Guest code runs directly on the CPU in VT-x non-root mode, with EPT translating guest-physical to host-physical memory; the hypervisor steps in only on VM exits. | L3 with `-accel kvm`: thread `CPU 0/KVM` | ESXi's hv-vt + gphys-ept VMM mode |
+| **Software emulation** | The hypervisor itself interprets or translates every guest instruction (QEMU TCG). Works without VT-x but is much slower for CPU-bound work. | L3 with `-accel tcg`: 9x to 15x slower | Old binary translation mode |
+| **TCG** | Tiny Code Generator, QEMU's software CPU emulator. | `CPU 0/TCG` thread, used only as a control | - |
+| **vCPU** | A virtual CPU. In QEMU/KVM each vCPU is one host thread looping on `ioctl(KVM_RUN)`; the host scheduler places it on real CPUs. | Thread `CPU 0/KVM` in the L3 QEMU process | vCPU world |
+| **Guest physical memory** | The address space the guest believes is its RAM. QEMU allocates it as ordinary process memory and registers it with KVM; EPT maps it to host memory, which is backed only when touched. | L3 `-m 256`: MemTotal 211,564 kB, QEMU RSS ~176 MB | VM memory vs. consumed host memory |
+| **L3** | A VM run by an L2 hypervisor. Specific to this lab. | busybox test VM under KVM | - |
 
 ## Disks and conversion
 

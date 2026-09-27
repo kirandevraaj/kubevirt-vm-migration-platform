@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="900" viewBox="0 0 1160 900" role="img" aria-labelledby="title desc">
+  <title id="title">Stage 1B lab: actual nesting layers from physical CPU to the L3 test VM</title>
+  <desc id="desc">Physical CPU, Windows host OS, VMware Workstation (L0), nested ESXi (L1), kvm-learning-01 Ubuntu guest (L2) with Linux KVM and QEMU, and the nested test VM (L3). Right panel shows the VM-exit path and measured timings.</desc>
+  <style>
+    .h { font: 700 20px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+    .t { font: 600 13px 'Segoe UI', Arial, sans-serif; fill: #111827; }
+    .s { font: 11.5px 'Segoe UI', Arial, sans-serif; fill: #374151; }
+    .l { font: 700 15px 'Segoe UI', Arial, sans-serif; fill: #ffffff; }
+    .x { font: 700 11px 'Segoe UI', Arial, sans-serif; fill: #ffffff; }
+    .n { font: 12px 'Segoe UI', Arial, sans-serif; fill: #334155; }
+    .box { stroke: #334155; stroke-width: 1.3; }
+    .arr { stroke: #475569; stroke-width: 1.6; fill: none; marker-end: url(#a); }
+  </style>
+  <defs>
+    <marker id="a" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker>
+  </defs>
+  <rect width="1160" height="900" fill="#ffffff"/>
+  <text x="580" y="32" text-anchor="middle" class="h">kvm-learning-01: the real nesting chain in this lab (OBSERVED 2026-09-27)</text>
+
+  <!-- L3 -->
+  <rect x="30" y="56" width="60" height="96" rx="6" fill="#7c3aed"/><text x="60" y="110" text-anchor="middle" class="l">L3</text>
+  <rect x="100" y="56" width="560" height="96" rx="8" class="box" fill="#ede9fe"/>
+  <text x="116" y="78" class="t">Nested test VM (disposable, direct kernel boot)</text>
+  <text x="116" y="97" class="s">Ubuntu kernel 6.8.0-142 + busybox initramfs; 1 vCPU, 256 MiB</text>
+  <text x="116" y="114" class="s">virtio-blk -> vda, virtio-scsi -> sda, virtio-net -> eth0</text>
+  <text x="116" y="131" class="s">dmesg: "Hypervisor detected: KVM", clocksource kvm-clock</text>
+  <text x="116" y="146" class="s">also defined once through libvirt as domain l3-libvirt-demo</text>
+
+  <!-- L2 -->
+  <rect x="30" y="170" width="60" height="266" rx="6" fill="#16a34a"/><text x="60" y="308" text-anchor="middle" class="l">L2</text>
+  <rect x="100" y="170" width="560" height="266" rx="8" class="box" fill="#dcfce7"/>
+  <text x="116" y="192" class="t">kvm-learning-01: Ubuntu 24.04.4 LTS guest of ESXi, 192.168.50.30</text>
+  <text x="116" y="210" class="s">2 vCPU, 4 GiB, 40 GB thin disk on PVSCSI, one VMXNET3 NIC on "VM Network", UEFI</text>
+  <text x="116" y="227" class="s">sees CPU flags vmx + ept + unrestricted_guest because ESXi VM has vhv.enable = TRUE</text>
+  <rect x="120" y="240" width="520" height="80" rx="6" class="box" fill="#f0fdf4"/>
+  <text x="134" y="261" class="t">User space: QEMU 8.2.2 process (qemu-system-x86_64)</text>
+  <text x="134" y="279" class="s">vCPU thread "CPU 0/KVM"; device models (virtio, q35, SeaBIOS)</text>
+  <text x="134" y="296" class="s">started directly, or by libvirtd 10.0.0 driven by virsh (domain XML)</text>
+  <text x="134" y="312" class="s">holds fds: /dev/kvm, anon_inode:kvm-vm, anon_inode:kvm-vcpu</text>
+  <path d="M380,320 L380,340" class="arr"/>
+  <text x="392" y="336" class="s">ioctl(KVM_RUN)</text>
+  <rect x="120" y="344" width="520" height="80" rx="6" class="box" fill="#f0fdf4"/>
+  <text x="134" y="365" class="t">Kernel: Linux KVM (kvm + kvm_intel modules) = the L2 hypervisor</text>
+  <text x="134" y="383" class="s">/dev/kvm crw-rw---- root:kvm; kvm_intel nested=Y, ept=Y</text>
+  <text x="134" y="400" class="s">executes VMLAUNCH/VMRESUME on the VT-x that ESXi presents (virtual VMX)</text>
+  <text x="134" y="416" class="s">kvm-ok: "KVM acceleration can be used"</text>
+
+  <!-- L1 -->
+  <rect x="30" y="454" width="60" height="96" rx="6" fill="#2563eb"/><text x="60" y="508" text-anchor="middle" class="l">L1</text>
+  <rect x="100" y="454" width="560" height="96" rx="8" class="box" fill="#dbeafe"/>
+  <text x="116" y="476" class="t">ESXi 8.0.3 VMkernel (esxi-8-lab), guest of Workstation</text>
+  <text x="116" y="494" class="s">HV Support = 3; runs kvm-learning-01 in a VMX world, Monitor Mode CPL0</text>
+  <text x="116" y="511" class="s">vmware.log: "VMware nested VM support detected", modules hv-vt + gphys-ept</text>
+  <text x="116" y="528" class="s">emulates VMX for its guest (VHV) on top of the VMX that Workstation emulates</text>
+  <text x="116" y="544" class="s">8 vCPU, 16 GiB; migration-datastore VMFS-6</text>
+
+  <!-- L0 -->
+  <rect x="30" y="568" width="60" height="80" rx="6" fill="#b45309"/><text x="60" y="614" text-anchor="middle" class="l">L0</text>
+  <rect x="100" y="568" width="560" height="80" rx="8" class="box" fill="#fef3c7"/>
+  <text x="116" y="590" class="t">VMware Workstation Pro 17.6.4 VMM (vmware-vmx), Monitor Mode CPL0</text>
+  <text x="116" y="608" class="s">the only hypervisor using the real VT-x/EPT; esxi-8-lab has vhv.enable = TRUE</text>
+  <text x="116" y="625" class="s">VMnet8 NAT 192.168.50.0/24</text>
+  <text x="116" y="641" class="s">(if the Windows hypervisor were on, Hyper-V would be L0 and this chain would not work)</text>
+
+  <!-- Host OS and HW -->
+  <rect x="30" y="662" width="60" height="44" rx="6" fill="#64748b"/><text x="60" y="688" text-anchor="middle" class="x">host OS</text>
+  <rect x="100" y="662" width="560" height="44" rx="8" class="box" fill="#f1f5f9"/>
+  <text x="116" y="682" class="t">Windows 11 (hypervisorlaunchtype Off)</text>
+  <text x="116" y="699" class="s">hosts Workstation; not virtualized itself, so it has no L number</text>
+
+  <rect x="30" y="716" width="60" height="44" rx="6" fill="#334155"/><text x="60" y="742" text-anchor="middle" class="x">hardware</text>
+  <rect x="100" y="716" width="560" height="44" rx="8" class="box" fill="#e5e7eb"/>
+  <text x="116" y="736" class="t">Intel Core i7-14650HX: physical VT-x + EPT</text>
+  <text x="116" y="753" class="s">16 cores / 24 threads, 32 GB RAM</text>
+
+  <!-- Right panel -->
+  <rect x="690" y="56" width="440" height="330" rx="8" fill="#f8fafc" stroke="#94a3b8"/>
+  <text x="706" y="80" class="t">What happens on an L3 VM exit (INFERRED from nested VMX design)</text>
+  <text x="706" y="104" class="n">1. L3 traps (I/O, APIC, timer, CPUID, EPT fault ...).</text>
+  <text x="706" y="124" class="n">2. The real CPU exits to L0 (Workstation VMM).</text>
+  <text x="706" y="144" class="n">3. L0 reflects the exit to L1 (ESXi), which is</text>
+  <text x="706" y="162" class="n">    emulating VMX for kvm-learning-01.</text>
+  <text x="706" y="182" class="n">4. L1 reflects it to L2 (Linux KVM), which handles it,</text>
+  <text x="706" y="200" class="n">    or returns to QEMU for device emulation.</text>
+  <text x="706" y="220" class="n">5. KVM's VMRESUME is itself trapped and emulated by</text>
+  <text x="706" y="238" class="n">    L1, whose own VMRESUME is emulated by L0.</text>
+  <text x="706" y="264" class="t">Consequence (OBSERVED)</text>
+  <text x="706" y="286" class="n">Instructions that do not exit run on the real CPU at</text>
+  <text x="706" y="304" class="n">near-L2 speed. Every exit costs several hypervisor</text>
+  <text x="706" y="322" class="n">round trips, so exit-heavy work (firmware, boot,</text>
+  <text x="706" y="340" class="n">device probing) is slow: the full L3 run under KVM</text>
+  <text x="706" y="358" class="n">took twice as long as under TCG software emulation.</text>
+
+  <rect x="690" y="404" width="440" height="244" rx="8" fill="#f8fafc" stroke="#94a3b8"/>
+  <text x="706" y="428" class="t">Measured in Stage 1B (same kernel + initramfs)</text>
+  <text x="706" y="452" class="t">Workload</text><text x="850" y="452" class="t">L2 direct</text><text x="940" y="452" class="t">L3 + KVM</text><text x="1030" y="452" class="t">L3 + TCG</text>
+  <text x="706" y="474" class="n">md5sum 128 MiB</text><text x="850" y="474" class="n">0.26 s</text><text x="940" y="474" class="n">0.22 s</text><text x="1030" y="474" class="n">2.05 s</text>
+  <text x="706" y="494" class="n">shell loop 300k</text><text x="850" y="494" class="n">0.29 s</text><text x="940" y="494" class="n">0.33 s</text><text x="1030" y="494" class="n">5.09 s</text>
+  <text x="706" y="514" class="n">QEMU start to exit</text><text x="850" y="514" class="n">-</text><text x="940" y="514" class="n">29.7 s</text><text x="1030" y="514" class="n">14.8 s</text>
+  <text x="706" y="542" class="t">Classification</text>
+  <text x="706" y="564" class="n">KVM accelerated: YES (CPU 0/KVM thread, /dev/kvm fds,</text>
+  <text x="706" y="582" class="n">"Hypervisor detected: KVM" in L3). TCG was run only as a</text>
+  <text x="706" y="600" class="n">labeled control. Nested KVM is functional here, but its</text>
+  <text x="706" y="618" class="n">exit cost makes this lab unfit for performance numbers.</text>
+  <text x="706" y="636" class="n">Wall time includes the workloads; 1 timed run each; indicative only.</text>
+
+  <rect x="30" y="780" width="1100" height="104" rx="8" fill="#f8fafc" stroke="#94a3b8"/>
+  <text x="46" y="804" class="t">Terminology used here (Linux KVM nested-guest convention, extended by one level)</text>
+  <text x="46" y="826" class="n">L0 = the hypervisor that runs on the physical CPU. L1 = a guest hypervisor inside an L0 VM. L2 = a VM run by L1; here L2 is itself a hypervisor host (KVM).</text>
+  <text x="46" y="846" class="n">L3 = a VM run by the L2 hypervisor. KVM (kernel) and QEMU (user space) together form the L2 hypervisor; they are separate components, not one program.</text>
+  <text x="46" y="866" class="n">Windows is the host OS of a type-2 hypervisor and is not itself virtualized, so it is not a level. The CPU hardware is not a level either.</text>
+</svg>

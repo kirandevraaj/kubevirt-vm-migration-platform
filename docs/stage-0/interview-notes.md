@@ -113,3 +113,93 @@ Request section 24. Answers are written to be said out loud in a Kubernetes / pl
 **Short answer:** Migration (rehost) moves the whole VM, guest OS included, to a new platform without changing the app. Modernization changes how the app is packaged and run, for example as a container image in a Deployment, which removes the VM and guest OS.
 
 **Detail:** KubeVirt migration is fast and low-risk and puts VMs on the same platform as containers, but you still patch and operate a guest OS. Modernization needs assessment and app changes but gives horizontal scaling, rolling updates and image-based delivery. A good program migrates first and modernizes selectively. Project 1.5 shows both on the same nginx workload. See [modernization-model.md](modernization-model.md).
+
+---
+
+## Stage 1B additions: KVM, QEMU, libvirt and VirtIO, from the lab
+
+Answers below are backed by what was actually run in Stage 1B on `kvm-learning-01` (see [Stage 1B record](../stage-1/stage-1b-kvm-qemu-fundamentals.md), [nested KVM feasibility](../stage-1/nested-kvm-feasibility.md)). Question 6 above gives the short definition of KVM; question 14 adds the lab view.
+
+### 14. "What is KVM?" (lab view)
+
+**Short answer:** The hypervisor built into the Linux kernel: the modules `kvm` and `kvm_intel` (or `kvm_amd`). It uses VT-x/AMD-V and EPT/NPT to run guest code directly on the CPU, and exposes `/dev/kvm` so a user-space program can create VMs and vCPUs.
+
+**Detail:** KVM handles CPU and memory virtualization and a few latency-critical devices (local APIC, timers), and it handles VM exits. It emulates no disks, NICs or firmware. In the lab, Ubuntu autoloaded `kvm_intel` inside an ESXi guest as soon as the (virtual) CPU showed the `vmx` flag, with `nested=Y` and `ept=Y`; no tuning was needed.
+
+### 15. "What is QEMU?"
+
+**Short answer:** A user-space machine emulator and virtual machine monitor. One `qemu-system-x86_64` process per VM provides the chipset, firmware, PCI bus and every virtual device, and runs guest code either through KVM or with its own software emulator (TCG).
+
+**Detail:** Each vCPU is a thread of the QEMU process (`CPU 0/KVM`, or `CPU 0/TCG` without KVM). Guest RAM is ordinary memory in the QEMU process. Disks and NICs are split into a backend (qcow2 file, user-mode network) and a frontend device model (virtio-blk, virtio-net). The machine model (`q35`, `pc`) picks the chipset. In KubeVirt, the same QEMU runs inside the virt-launcher Pod.
+
+### 16. "Why do we need both KVM and QEMU?"
+
+**Short answer:** They do different jobs. KVM makes the CPU run guest code safely at native speed but cannot build a whole machine; QEMU builds the whole machine but, alone, has to emulate the CPU in software. Together you get a full VM at near-native CPU speed.
+
+**Detail:** In the lab, the same tiny guest ran a 128 MiB `md5sum` in 0.22 s with QEMU + KVM, versus 2.05 s with QEMU alone (TCG), and a shell loop in 0.33 s versus 5.09 s. Device emulation was QEMU's job in both runs. KVM cannot do anything useful without a user-space VMM; QEMU without KVM works, only slowly. They are separate components from separate projects.
+
+### 17. "What is /dev/kvm?"
+
+**Short answer:** The character device (major 10, minor 232) through which user space talks to KVM. QEMU opens it and uses `ioctl()` calls to create a VM, create vCPUs, register memory and run vCPUs (`KVM_RUN`).
+
+**Detail:** It exists only when a KVM module is loaded, which requires VT-x/AMD-V visible to the kernel. Permissions come from the `kvm` group (`crw-rw---- root kvm`). In the lab it appeared inside the ESXi guest before any package was installed. The running QEMU process held `/dev/kvm` plus `anon_inode:kvm-vm` and `anon_inode:kvm-vcpu:0` file descriptors. In KubeVirt, virt-handler advertises it to the scheduler as the `devices.kubevirt.io/kvm` resource.
+
+### 18. "What happens when QEMU uses KVM?"
+
+**Short answer:** QEMU sets up the VM through `/dev/kvm`, then each vCPU thread calls `ioctl(KVM_RUN)`. KVM enters the guest with VMLAUNCH/VMRESUME and the guest runs natively until a VM exit. KVM handles the exit in the kernel if it can; otherwise it returns to QEMU, which emulates the device access and calls `KVM_RUN` again.
+
+**Detail:** Typical exits are port or MMIO I/O, some MSR accesses, `HLT`, interrupts and EPT faults. The cost of a VM exit is what separates good from bad virtual performance. In the lab, three hypervisors deep, one exit travels through Workstation, ESXi and KVM. CPU-bound work in the L3 guest was as fast as in L2, but the exit-heavy firmware and boot phase took about 17 s under KVM, compared with about 6 s under TCG.
+
+### 19. "What is nested virtualization?"
+
+**Short answer:** Running a hypervisor inside a virtual machine. The outer hypervisor must expose (emulate) the CPU's virtualization extensions, VT-x and EPT, to the inner one, so that the inner hypervisor can run its own hardware-accelerated guests.
+
+**Detail:** VMware calls the setting VHV (`vhv.enable = "TRUE"`). KVM calls it the `nested` parameter of `kvm_intel`. AWS enables it per instance on supported instance types. It works, but every exit of the innermost guest is handled by the outermost hypervisor first and reflected inward, so it costs performance. The lab stacks three hypervisors: Workstation, ESXi, KVM.
+
+### 20. "Explain L0, L1 and L2."
+
+**Short answer:** L0 is the hypervisor on the physical hardware. L1 is a guest hypervisor running as a VM on L0. L2 is a VM run by L1. That is the Linux kernel's naming for nested guests.
+
+**Detail:** In our lab: L0 is the VMware Workstation VMM on the laptop, L1 is ESXi, L2 is `kvm-learning-01`, and because L2 runs KVM there is also an L3 test VM. Windows is the host OS of a type-2 hypervisor and has no level number. On AWS with nested virtualization, Nitro is L0, the EC2 worker node running KVM is L1, and the KubeVirt VM is L2. On a `.metal` instance, the node's own KVM becomes L0.
+
+### 21. "What is libvirt?"
+
+**Short answer:** A management layer for hypervisors: an API, a daemon (`libvirtd`, or modular daemons such as `virtqemud`) and a declarative VM format (domain XML). For QEMU/KVM it generates the QEMU command line, starts and monitors the QEMU process, and applies security labels, cgroups and logging.
+
+**Detail:** In the lab, a hand-written 30-line domain XML became a QEMU command line with `-accel kvm -cpu host,migratable=on`, a QMP monitor socket, `-sandbox`, `-blockdev` nodes, five PCIe root ports and a USB controller the XML never mentioned. QEMU ran as user `libvirt-qemu` under an enforcing AppArmor profile. KubeVirt runs one libvirtd per VM inside the virt-launcher Pod and generates the domain XML from the VMI.
+
+### 22. "What is virsh?"
+
+**Short answer:** The command-line client for the libvirt API. It sends requests to the libvirt daemon (`define`, `start`, `shutdown`, `destroy`, `list`, `dumpxml`); it does not run VMs itself.
+
+**Detail:** The connection URI matters. `qemu:///system` talks to the system daemon (root-owned VMs); `qemu:///session` is a per-user instance. In the lab, `virsh uri` returned `qemu:///session` for the normal user and `qemu:///system` for root. The VMware counterpart is roughly `vim-cmd` talking to hostd.
+
+### 23. "What is VirtIO?"
+
+**Short answer:** An OASIS-standard family of paravirtual devices for VMs. The guest knows it is virtual and exchanges requests with the hypervisor through shared-memory queues (virtqueues) rather than through emulated hardware registers. Main types: virtio-net, virtio-blk, virtio-scsi.
+
+**Detail:** VirtIO devices appear as PCI devices with vendor `1af4`: transitional IDs (`1000` net, `1001` blk, `1004` scsi) or modern IDs (`1041`, `1042`, `1048`). The lab saw both, depending on where QEMU or libvirt placed the device. Linux ships the drivers in the kernel (`virtio_blk`, `virtio_scsi`, `virtio_net`). Windows needs the virtio-win drivers. KubeVirt presents VirtIO devices by default.
+
+### 24. "VirtIO versus VMXNET3?"
+
+**Short answer:** Both are paravirtual NICs with the same job, but they are different devices. VMXNET3 is VMware's (PCI `15ad:07b0`, driver `vmxnet3`); virtio-net is the KVM/QEMU standard (PCI `1af4:1000` or `1041`, driver `virtio_net`). A guest must have the right driver, and its network configuration must not be tied to the old device.
+
+**Detail:** After conversion the NIC changes driver, MAC vendor prefix (`00:0c:29` to `52:54:00`) and usually its interface name (`ens192` to `enp1s0`). In the lab VM, netplan matches the NIC by `driver: "vmxnet3"`, so after a naive disk move the VM would boot with no configured network. virt-v2v or a pre-migration step must fix that.
+
+### 25. "VirtIO versus PVSCSI?"
+
+**Short answer:** PVSCSI is VMware's paravirtual SCSI controller (PCI `15ad:07c0`, driver `vmw_pvscsi`). The VirtIO equivalents are virtio-scsi (also a SCSI controller, disks stay `/dev/sdX`) and virtio-blk (a simpler per-disk device, disks become `/dev/vdX`). Same role, different devices and drivers.
+
+**Detail:** KubeVirt uses virtio-blk by default for disks, so a migrated Linux guest usually goes from `/dev/sda` to `/dev/vda`. The lab VM mounts `/` and `/boot/efi` by UUID and boots with `root=UUID=...`, so it survives the rename. A guest with `/dev/sda1` in `/etc/fstab` would not. The Ubuntu kernel has the VirtIO storage drivers built in, so no initramfs rebuild is needed; older or custom kernels may need one.
+
+### 26. "What happens if /dev/kvm does not exist?"
+
+**Short answer:** QEMU cannot use hardware acceleration. `-accel kvm` fails, and QEMU can only run with TCG software emulation, which is roughly 10x slower for CPU-bound work (9x to 15x in the lab). KubeVirt will not schedule VMs on that node unless software emulation is explicitly enabled, which is only for testing.
+
+**Detail:** Diagnose from the bottom up:
+
+- Does the CPU expose `vmx`/`svm` in `/proc/cpuinfo`? If not, virtualization is disabled in firmware, or on a VM the outer hypervisor is not exposing it (VHV off, or a cloud instance without nested virtualization).
+- Is the module loaded (`lsmod | grep kvm`)? Does `dmesg` show an error such as "disabled by bios"?
+- Is the user in the `kvm` group?
+
+`kvm-ok` summarizes these checks. Never treat a TCG run as proof that KVM works: check for the `CPU n/KVM` thread, the `/dev/kvm` file descriptor, or `Hypervisor detected: KVM` in the guest.
