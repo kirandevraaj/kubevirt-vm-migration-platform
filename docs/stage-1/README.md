@@ -14,10 +14,11 @@ Background: [Stage 0 README](../stage-0/README.md), [Stage 0 feasibility](../sta
 | 1B | One Linux learning VM on ESXi: KVM / QEMU / libvirt / VirtIO fundamentals and nested KVM feasibility | **Complete (PASS)**, 2026-09-27 | [stage-1b-kvm-qemu-fundamentals.md](stage-1b-kvm-qemu-fundamentals.md), [kvm-learning-lab.md](kvm-learning-lab.md), [nested-kvm-feasibility.md](nested-kvm-feasibility.md) |
 | 1C | Create and baseline the VMware migration source VM `legacy-source-vm` (Ubuntu 24.04.5, nginx, PVSCSI, VMXNET3, static IP) | **Complete (PASS)**, 2026-09-27 | [stage-1c-migration-source.md](stage-1c-migration-source.md) |
 | 1D | Characterize the source VM's datastore artifacts and VMDK; investigate free-ESXi acquisition; design the cold copy (not executed) | **Complete (PASS)**, 2026-09-27 | [stage-1d-vmware-source-artifacts.md](stage-1d-vmware-source-artifacts.md) |
-| 1E | Approved cold acquisition of the source disk (graceful shutdown, `scp` of descriptor + flat extent, sha256 verification, power-on and validation) | **Done**: disk acquired byte-identical, source healthy, awaiting user review | [stage-1e-cold-acquisition.md](stage-1e-cold-acquisition.md) |
-| 1F | Not yet defined | Not started; awaiting user approval | - |
+| 1E | Approved cold acquisition of the source disk (graceful shutdown, `scp` of descriptor + flat extent, sha256 verification, power-on and validation) | **Complete (PASS)**, 2026-09-27 | [stage-1e-cold-acquisition.md](stage-1e-cold-acquisition.md) |
+| 1F | Dedicated conversion host `conversion-host-01` with qemu-img, libguestfs and virt-v2v; hash-verified working copy of the acquired disk; read-only inspection (no conversion) | **Done**: F1 to F10 PASS, awaiting user review | [stage-1f-conversion-host.md](stage-1f-conversion-host.md) |
+| 1G | Not yet defined | Not started; awaiting user approval | - |
 
-Diagrams: [lab-nested-kvm-layers.svg](../diagrams/lab-nested-kvm-layers.svg) (lab layers, Stage 1B), [stage-1c-source-lab.svg](../diagrams/stage-1c-source-lab.svg) (VM roles after Stage 1C) and [stage-1d-source-artifacts.svg](../diagrams/stage-1d-source-artifacts.svg) (source VM artifacts and the future conversion boundary).
+Diagrams: [lab-nested-kvm-layers.svg](../diagrams/lab-nested-kvm-layers.svg) (lab layers, Stage 1B), [stage-1c-source-lab.svg](../diagrams/stage-1c-source-lab.svg) (VM roles after Stage 1C), [stage-1d-source-artifacts.svg](../diagrams/stage-1d-source-artifacts.svg) (source VM artifacts and the future conversion boundary) and [stage-1f-conversion-toolchain.svg](../diagrams/stage-1f-conversion-toolchain.svg) (golden artifact, working copy and the inspection toolchain).
 
 Labels used in all Stage 1 documents: **OBSERVED** = seen in this lab by a command we ran. **INFERRED** = reasoned from observations or documentation, not directly tested. **NOT TESTED** = deliberately not done.
 
@@ -41,21 +42,25 @@ A read-only investigation of `legacy-source-vm` on the datastore. The disk is an
 
 With explicit approval, `legacy-source-vm` was shut down gracefully through VMware Tools: an OS halt taking about 3 s, `cleanShutdown = TRUE`. It was confirmed off with its disk lock released. Its VMDK descriptor and 40 GiB flat extent were then copied with `scp` to `C:\VMs\legacy-source-vm\stage-1e\`, outside Git, in 276 s. The flat extent hashed to the same sha256 (`72ca45c7...c9e7`) on the source before the copy, on the copy, and on the source after the copy, so the copy is byte-identical and the source was not altered. The VM was powered back on, and networking, nginx and every baseline identifier matched. Service downtime was about 10.5 minutes. One Stage 1D assumption was disproved: the descriptor `CID` does not track writes on this disk type, and the Stage 1D record was corrected. Details: [Stage 1E record](stage-1e-cold-acquisition.md).
 
-## Current source host state (after Stage 1E)
+## Stage 1F in one paragraph
+
+With explicit approval, a dedicated Ubuntu 24.04.5 VM, `conversion-host-01` (Vmid 3: 4 vCPU, 8 GB, 60 GB thin, UEFI, PVSCSI, VMXNET3, 192.168.50.32 after proving the address free), was installed unattended from the re-verified Stage 1C ISO. A minimal, investigated package set (`--no-install-recommends`) provides qemu-img 8.2.2, libguestfs/guestfish 1.52.0 and virt-v2v 2.4.0. KVM works inside it (`vhv.enable`), and the libguestfs appliance really runs under KVM, but three hypervisors deep TCG boots the appliance faster. The golden Stage 1E artifact was only read: `scp` made a working copy in `/srv/migration-lab/working/`, whose sha256 matched the golden before and after re-sparsifying, and which was then locked read-only and immutable. qemu-img, partition probing, libguestfs and `guestfish --ro` read it at the container, partition and guest-filesystem levels, and the results match the Stage 1C baseline. Migration-sensitive state was listed, not fixed: netplan keyed on `ens192`, cloud-init disabled, open-vm-tools enabled, virtio built into the kernel, UEFI fallback loader present. virt-v2v was studied from its own documentation only. Nothing was converted, and the golden artifact and source VM are unchanged. Details: [Stage 1F record](stage-1f-conversion-host.md).
+
+## Current source host state (after Stage 1F)
 
 | Item | Value |
 |---|---|
 | Host | `esxi-8-lab.localdomain`, ESXi 8.0.3 build 24677879 |
 | Management | `vmk0` 192.168.50.11/24 static, gateway and DNS 192.168.50.2 (unchanged) |
-| Datastore | `migration-datastore`, VMFS-6, 199.8 GB, 179.3 GB free (192,501,776,384 bytes; GB = 2^30 bytes here, as in Stage 1A); holds `legacy-source-vm/`, `kvm-learning-01/` and `iso/` (Ubuntu 24.04.4 and 24.04.5 ISOs) |
-| Nested virtualization | HV Support 3; 64-bit L2 guest validated; KVM inside L2 validated |
+| Datastore | `migration-datastore`, VMFS-6, 199.8 GB, 163.7 GB free (175,781,183,488 bytes; GB = 2^30 bytes here, as in Stage 1A); holds `legacy-source-vm/`, `kvm-learning-01/`, `conversion-host-01/` and `iso/` (Ubuntu 24.04.4 and 24.04.5 ISOs) |
+| Nested virtualization | HV Support 3; 64-bit L2 guest validated; KVM inside L2 validated (Stage 1B and again in `conversion-host-01`) |
 | Time | NTP enabled and synchronized |
 | Access | SSH key login via the `esxi-8-lab` alias; HTTPS 443 reachable |
-| Guest VMs | 2: `legacy-source-vm` (Vmid 2), **powered on**, 192.168.50.31, nginx on :80; `kvm-learning-01` (Vmid 1), **powered off**, 192.168.50.30 when running. No snapshots on either. |
-| Conversion host | Not created; decision deferred |
-| Acquired source disk | Cold copy on the Windows host at `C:\VMs\legacy-source-vm\stage-1e\` (outside Git): descriptor + 40 GiB flat extent, sha256 `72ca45c7...c9e7` |
+| Guest VMs | 3: `legacy-source-vm` (Vmid 2), **powered on**, 192.168.50.31, nginx on :80; `conversion-host-01` (Vmid 3), **powered on**, 192.168.50.32; `kvm-learning-01` (Vmid 1), **powered off**, 192.168.50.30 when running. No snapshots on any. |
+| Conversion host | `conversion-host-01` for inspection (Stage 1F). Where actual conversion runs is still to be recorded in an ADR before Stage 1G. |
+| Acquired source disk | Golden cold copy on the Windows host at `C:\VMs\legacy-source-vm\stage-1e\` (outside Git): descriptor + 40 GiB flat extent, sha256 `72ca45c7...c9e7`. Verified working copy on `conversion-host-01` in `/srv/migration-lab/working/` (read-only, immutable). |
 | Maintenance mode | Disabled |
 
-## Stage 1F entry criteria
+## Stage 1G entry criteria
 
-See [section 13 of the Stage 1E record](stage-1e-cold-acquisition.md#13-stage-1f-entry-criteria). Earlier entry criteria: Stage 1E in [section 14 of the Stage 1D record](stage-1d-vmware-source-artifacts.md#14-stage-1e-entry-criteria), Stage 1D in [section 16 of the Stage 1C record](stage-1c-migration-source.md#16-stage-1d-entry-criteria), Stage 1C in [section 11 of the Stage 1B record](stage-1b-kvm-qemu-fundamentals.md#11-stage-1c-entry-criteria), Stage 1B in [section 11 of the Stage 1A document](stage-1a-esxi-reboot-validation.md#11-stage-1b-entry-criteria).
+See [section 21 of the Stage 1F record](stage-1f-conversion-host.md#21-stage-1g-entry-criteria). Earlier entry criteria: Stage 1F in [section 13 of the Stage 1E record](stage-1e-cold-acquisition.md#13-stage-1f-entry-criteria), Stage 1E in [section 14 of the Stage 1D record](stage-1d-vmware-source-artifacts.md#14-stage-1e-entry-criteria), Stage 1D in [section 16 of the Stage 1C record](stage-1c-migration-source.md#16-stage-1d-entry-criteria), Stage 1C in [section 11 of the Stage 1B record](stage-1b-kvm-qemu-fundamentals.md#11-stage-1c-entry-criteria), Stage 1B in [section 11 of the Stage 1A document](stage-1a-esxi-reboot-validation.md#11-stage-1b-entry-criteria).

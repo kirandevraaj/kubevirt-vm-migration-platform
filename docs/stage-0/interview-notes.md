@@ -292,3 +292,45 @@ Answers below are backed by the read-only Stage 1D investigation of `legacy-sour
 **Short answer:** With the VM powered off, hash the flat extent on the host before and after the copy, and compare the copy's hash with it. Cheap supporting checks: flat file size and mtime, VMFS allocation (`nb`) and file address, descriptor/`.vmx`/`.nvram` checksums, power-state history and snapshot count.
 
 **Detail:** In the Stage 1E acquisition, a full 40 GiB hash took about 2.5 minutes per pass on ESXi. All three hashes matched: source before the copy, the copy, and source after the copy. The descriptor `CID` turned out **not** to be a write indicator on this ESXi disk: it stayed the same across a run that wrote to the disk. The cheap checks are strong indicators but not proof. The hash proves copy fidelity, not filesystem consistency; that comes from the clean shutdown. Once the source is powered on again, its disk changes legitimately (journal, logs), so "unchanged" can only be claimed for the powered-off window. After conversion, disk hashes no longer apply: verify the migrated VM at guest and application level (FS UUIDs, machine-id, SSH host keys, the nginx page hash).
+
+---
+
+## Stage 1F additions: conversion host and disk inspection
+
+Answers below are backed by the Stage 1F conversion lab (see [Stage 1F record](../stage-1/stage-1f-conversion-host.md)).
+
+### 38. "What is the difference between qemu-img and virt-v2v?"
+
+**Short answer:** qemu-img changes the **container**: VMDK to raw or qcow2, sizes, backing chains. It never looks inside the guest. virt-v2v converts the **guest**: it opens the OS and makes it bootable on KVM (virtio drivers, boot configuration, VMware-specific pieces), then writes the disks and target metadata. So qemu-img alone is not a migration tool.
+
+**Detail:** In the lab, `qemu-img info` sees the source disk as `vmdk`, `create type: vmfs`, one raw extent, 40 GiB, no backing file. It knows nothing about the netplan file keyed on `ens192`, which would leave a converted VM without network. virt-v2v 2.4.0 reads a VMware `.vmx` + `.vmdk` (`-i vmx`) or a bare image (`-i disk`). It can write `-o local`, `-o qemu`, `-o libvirt` or an experimental `-o kubevirt` (disks plus a YAML file). MTV/Forklift runs virt-v2v in a conversion pod and imports the result with CDI.
+
+### 39. "How do you inspect a VM disk without booting it?"
+
+**Short answer:** With libguestfs. It boots its own tiny appliance VM with the disk attached read-only, uses real Linux drivers to mount the guest filesystems, and reads files. The guest OS never runs, so nothing inside it changes.
+
+**Detail:** On the working copy, `virt-inspector` identified Ubuntu 24.04.5, hostname `legacy-source-vm` and 500 packages. `virt-cat` read fstab, netplan and the nginx site. `guestfish --ro -i` mounted the root filesystem with `ST_RDONLY` set. Partition probing (`fdisk -l`, `sfdisk --json`, `blkid -p` with byte offsets) gives the host-level view (GPT, partition GUIDs, filesystem UUIDs), but it cannot read files. The image hash was identical before and after every step.
+
+### 40. "How do you protect the original disk while you experiment?"
+
+**Short answer:** Keep a golden copy that is only ever read, and work on a hash-verified working copy. Lock the working copy, re-hash it after each step, and never attach an image to a running VM while tools inspect it.
+
+**Detail:** In the lab, the golden copy on Windows was only hashed and copied: its sha256, size, timestamps and attributes were identical before and after. The working copy on the conversion host matched the golden hash on arrival and after re-sparsifying. It was then set to mode 0444 plus `chattr +i`, so even root's append failed. qemu-img ran without `-U` (force-share) and `check` without `-r` (repair). Any future conversion writes to a new path.
+
+### 41. "VMDK, raw or qcow2: why does each appear in a migration?"
+
+**Short answer:** VMDK is the source format, because the VM comes from VMware. Raw is the plain sector image: KubeVirt/CDI store VM disks as raw on a PVC, and an ESXi flat extent is already raw inside. qcow2 is QEMU's thin, feature-rich format, common for transport, container disks and virt-v2v output (`-of qcow2`). Which one to use at each step is a design decision, not a default.
+
+**Detail:** qemu-img probes the lab's `-flat.vmdk` on its own as `raw`: the VMDK wrapper is just the 541-byte descriptor. The target format for KubeVirt was deliberately not chosen in Stage 1F. It depends on CDI's import path, sparseness during transfer and the conversion method.
+
+### 42. "libguestfs works, so KVM acceleration works, right?"
+
+**Short answer:** No. libguestfs falls back to software emulation (TCG) when KVM is unavailable, so a successful run proves nothing about acceleration. Check which accelerator actually ran.
+
+**Detail:** In the lab, libguestfs requested `accel=kvm:tcg`. The appliance kernel logged "Hypervisor detected: KVM" and used `kvm-clock`, and the qemu process held `/dev/kvm` open: KVM was used. Yet with `force_tcg` the same self-test finished in 19 s instead of 34 s. The appliance is an L3 guest, so every VM exit crosses two outer hypervisors. "KVM works", "libguestfs works" and "KVM is faster" are three separate claims.
+
+### 43. "Which layer owns what in a VMware disk?"
+
+**Short answer:** The guest OS owns the filesystems (ext4, vfat, fstab, netplan). The disk container owns the packaging of the bytes (VMDK descriptor + extent, or raw, or qcow2). The hypervisor's VM metadata owns the virtual hardware and firmware state (`.vmx`, `.nvram`). Each tool works at one layer.
+
+**Detail:** libguestfs works at the guest layer, qemu-img at the container layer, and virt-v2v spans all three: `-i vmx` reads the `.vmx`, it converts the container, and it modifies the guest. CDI works at the container layer on the Kubernetes side. The `.nvram` is never migrated: the target boots with a fresh variable store through the ESP fallback loader (`EFI/BOOT/BOOTX64.EFI`), which the lab disk has.

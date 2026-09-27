@@ -86,6 +86,27 @@ Terms as observed in the datastore folder of `legacy-source-vm` (see [Stage 1D r
 | **Cold copy** | Copying a VM's disk after a clean guest shutdown, when the disk is closed and consistent. The only snapshot-free way to acquire a VMware disk. | Designed in Stage 1D; executed in [Stage 1E](../stage-1/stage-1e-cold-acquisition.md): 40 GiB in 276 s, sha256 identical on both ends |
 | **Datastore file service (`/folder`)** | hostd HTTPS endpoint for datastore file download and upload: `/folder/<path>?dcPath=ha-datacenter&dsName=<datastore>`. Needs an authenticated session. | 401 without a session; 200 for the descriptor with one; 500 for the locked extent |
 
+## Conversion lab terms (Stage 1F)
+
+Terms as used on `conversion-host-01` (see [Stage 1F record](../stage-1/stage-1f-conversion-host.md)). The tools themselves (qemu-img, libguestfs, virt-v2v) are defined in [Disks and conversion](#disks-and-conversion).
+
+| Term | Definition | Seen in the lab |
+|---|---|---|
+| **Conversion host** | A Linux machine that holds disk copies and runs offline disk tooling (qemu-img, libguestfs, virt-v2v). It has a single role, separate from the source VM and from learning or experiment VMs. | `conversion-host-01`, Vmid 3, 192.168.50.32 |
+| **Golden artifact** | The verified original acquisition, kept unmodified as the reference. It is only ever read (hashed or copied), never inspected or converted in place. | `C:\VMs\legacy-source-vm\stage-1e\`, sha256 `72ca45c7...c9e7` |
+| **Working copy** | A hash-verified copy of the golden artifact that tools are allowed to open. It can be locked, re-made or discarded without risk to the original. | `/srv/migration-lab/working/`, mode 0444 + `chattr +i` |
+| **libguestfs appliance** | The small Linux VM (host kernel + minimal userspace, built by `supermin`) that libguestfs boots with the disk image attached. It reads partitions and filesystems with real kernel drivers, without booting the guest's own OS. | 403 MB cached in `/var/tmp/.guestfs-0`; ran as an L3 guest |
+| **libguestfs backend** | How libguestfs launches the appliance. `direct` starts qemu itself; `libvirt` goes through libvirtd. | `direct` (default here; no libvirt daemon installed) |
+| **TCG / `force_tcg`** | QEMU's Tiny Code Generator: software CPU emulation used when KVM is not available. `LIBGUESTFS_BACKEND_SETTINGS=force_tcg` makes libguestfs use it even when KVM is. | Appliance under TCG: 19.3 s, versus 34.3 s under KVM three hypervisors deep |
+| **`guestfish --ro` / `-i`** | `--ro` opens every disk read-only. `-i` runs OS inspection and mounts the guest's filesystems as its own fstab describes. Without `-i`, only block devices and partitions are visible. | Guest root mounted with `ST_RDONLY` inside the appliance |
+| **OS inspection (`virt-inspector`)** | libguestfs heuristics that find the root filesystem and read the OS type, distro, version, hostname and installed packages from files, without booting. | ubuntu 24.04, hostname `legacy-source-vm`, 500 packages |
+| **`qemu-img map`** | Lists which ranges of a virtual disk hold data and which read as zeros (or are unallocated). It reflects the image as it is stored, so a copy's holes can differ from the original storage's. | 2,112 non-zero extents, 3,219 MiB |
+| **Re-sparsify (`fallocate --dig-holes`)** | Deallocate all-zero blocks of a file in place, making it sparse again without changing its content. Used after a transfer method that writes every byte. | 40 GiB allocated -> 3.14 GiB; sha256 unchanged |
+| **`fstrim` / UNMAP (thin VMDK)** | `fstrim` tells the storage which filesystem blocks are free. On a thin VMDK on VMFS-6 this lets ESXi reclaim the space. | 46.7 GiB trimmed; the conversion host's disk shrank to 7.5 GiB allocated |
+| **Immutable flag (`chattr +i`)** | ext4 file attribute that blocks writes, renames and deletion, even by root, until it is removed. | Append as root: "Operation not permitted" |
+| **virt-v2v input / output mode** | `-i` selects where the source guest comes from (`disk`, `vmx`, `ova`, `libvirt`, `libvirtxml`), and `-o` selects where the converted guest goes (`local`, `qemu`, `libvirt`, `kubevirt`, `openstack`, ...). | virt-v2v 2.4.0; `-o kubevirt` is marked experimental |
+| **nbdkit / NBD** | A pluggable Network Block Device server. virt-v2v uses it internally to expose source disks (local files, SSH, VDDK) to qemu and libguestfs. | nbdkit 1.36.3, installed as a virt-v2v dependency |
+
 ## Disks and conversion
 
 | Term | Definition |
