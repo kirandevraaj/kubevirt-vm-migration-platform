@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="860" viewBox="0 0 1160 860" role="img" aria-labelledby="title desc">
+  <title id="title">Stage 1C lab: legacy-source-vm is the migration source, kvm-learning-01 is the powered-off learning VM, conversion host deferred</title>
+  <desc id="desc">Nested ESXi hosts two VMs on migration-datastore and VM Network. legacy-source-vm runs Ubuntu 24.04.5 with nginx on a PVSCSI disk and a VMXNET3 NIC with static IP 192.168.50.31 and is powered on. kvm-learning-01 is the KVM/QEMU learning VM, powered off after Stage 1C. The conversion host is a deferred decision and was not created. Windows reaches nginx over VMnet8.</desc>
+  <style>
+    .h { font: 700 20px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+    .c { font: 700 16px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+    .t { font: 600 13px 'Segoe UI', Arial, sans-serif; fill: #111827; }
+    .s { font: 11.5px 'Segoe UI', Arial, sans-serif; fill: #374151; }
+    .l { font: 700 13px 'Segoe UI', Arial, sans-serif; fill: #ffffff; }
+    .n { font: 12px 'Segoe UI', Arial, sans-serif; fill: #334155; }
+    .box { stroke: #334155; stroke-width: 1.3; }
+    .dash { stroke: #64748b; stroke-width: 1.5; stroke-dasharray: 7 5; fill: #f8fafc; }
+    .arr { stroke: #475569; stroke-width: 1.6; fill: none; marker-end: url(#a); }
+  </style>
+  <defs>
+    <marker id="a" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker>
+  </defs>
+  <rect width="1160" height="860" fill="#ffffff"/>
+  <text x="580" y="32" text-anchor="middle" class="h">Stage 1C: the VMware migration source and its neighbours (OBSERVED 2026-09-27)</text>
+
+  <!-- ESXi container -->
+  <rect x="30" y="54" width="800" height="560" rx="10" class="box" fill="#dbeafe"/>
+  <text x="48" y="80" class="c">ESXi 8.0.3 (esxi-8-lab), vmk0 192.168.50.11, HV Support 3</text>
+  <text x="48" y="99" class="s">vSwitch0 / port group "VM Network" (unchanged)  |  migration-datastore VMFS-6 (unchanged configuration)</text>
+
+  <!-- legacy-source-vm -->
+  <rect x="50" y="114" width="470" height="484" rx="8" class="box" fill="#dcfce7"/>
+  <rect x="50" y="114" width="470" height="30" rx="8" fill="#16a34a"/>
+  <text x="64" y="134" class="l">MIGRATION SOURCE: legacy-source-vm (Vmid 2)  -  POWERED ON</text>
+  <text x="64" y="164" class="s">2 vCPU, 4096 MB, UEFI (Secure Boot off), vmx-21, no snapshots, no VHV</text>
+  <text x="64" y="181" class="s">[migration-datastore] legacy-source-vm/legacy-source-vm.vmx</text>
+
+  <rect x="66" y="194" width="438" height="72" rx="6" class="box" fill="#f0fdf4"/>
+  <text x="80" y="214" class="t">Guest OS: Ubuntu Server 24.04.5 LTS (minimized)</text>
+  <text x="80" y="232" class="s">kernel 6.8.0-142-generic, x86_64; hostname legacy-source-vm</text>
+  <text x="80" y="249" class="s">open-vm-tools 13.0.10 running; cloud-init disabled (marker file)</text>
+  <text x="80" y="262" class="s">no desktop, no Docker, no Kubernetes, no libvirt/QEMU</text>
+
+  <rect x="66" y="276" width="438" height="72" rx="6" class="box" fill="#f0fdf4"/>
+  <text x="80" y="296" class="t">Workload: nginx 1.24.0 on :80 (enabled, active)</text>
+  <text x="80" y="314" class="s">/var/www/html/index.html: "legacy-source-vm / Stage 1C migration</text>
+  <text x="80" y="330" class="s">source / nginx", 267 bytes, sha256 b9826e18...0046</text>
+  <text x="80" y="344" class="s">marker: p15-stage1c-source-v1</text>
+
+  <rect x="66" y="358" width="212" height="112" rx="6" class="box" fill="#fef9c3"/>
+  <text x="80" y="378" class="t">Disk: PVSCSI</text>
+  <text x="80" y="396" class="s">15ad:07c0, vmw_pvscsi (module)</text>
+  <text x="80" y="412" class="s">40 GB thin VMDK, ~3.5 GB used</text>
+  <text x="80" y="428" class="s">/dev/sda: GPT, sda1 ESP 1G</text>
+  <text x="80" y="444" class="s">sda2 ext4 38.9G (/)</text>
+  <text x="80" y="460" class="s">fstab + root= by FS UUID</text>
+
+  <rect x="292" y="358" width="212" height="112" rx="6" class="box" fill="#fef9c3"/>
+  <text x="306" y="378" class="t">NIC: VMXNET3</text>
+  <text x="306" y="396" class="s">15ad:07b0, vmxnet3 (module)</text>
+  <text x="306" y="412" class="s">MAC 00:0c:29:0f:3d:15 (generated)</text>
+  <text x="306" y="428" class="s">name ens192 (altname enp11s0)</text>
+  <text x="306" y="444" class="s">netplan key: ens192 (by NAME)</text>
+  <text x="306" y="460" class="s">on "VM Network"</text>
+
+  <rect x="66" y="480" width="438" height="104" rx="6" class="box" fill="#fee2e2"/>
+  <text x="80" y="500" class="t">Static IP: 192.168.50.31/24 (netplan, no DHCP)</text>
+  <text x="80" y="518" class="s">gateway 192.168.50.2, DNS 192.168.50.2 (VMnet8 NAT)</text>
+  <text x="80" y="538" class="t">Migration-sensitive (recorded, NOT changed):</text>
+  <text x="80" y="556" class="s">NIC name/driver/MAC change on virtio-net; disk becomes /dev/vda on</text>
+  <text x="80" y="572" class="s">virtio-blk; UEFI NVRAM entries stay behind; SMBIOS UUID changes</text>
+
+  <!-- kvm-learning-01 -->
+  <rect x="540" y="114" width="274" height="220" rx="8" class="box" fill="#e5e7eb"/>
+  <rect x="540" y="114" width="274" height="30" rx="8" fill="#64748b"/>
+  <text x="554" y="134" class="l">LEARNING: kvm-learning-01 (Vmid 1)</text>
+  <text x="554" y="166" class="t">KVM/QEMU/libvirt learning VM</text>
+  <text x="554" y="186" class="s">Ubuntu 24.04.4, 192.168.50.30</text>
+  <text x="554" y="202" class="s">2 vCPU, 4096 MB, vhv.enable = TRUE</text>
+  <text x="554" y="218" class="s">Stage 1B nested KVM tests</text>
+  <text x="554" y="244" class="t">POWERED OFF after Stage 1C</text>
+  <text x="554" y="262" class="s">graceful shutdown via VMware Tools</text>
+  <text x="554" y="278" class="s">not deleted, not restarted</text>
+  <text x="554" y="298" class="t">NOT a conversion host</text>
+  <text x="554" y="316" class="s">never touched the source workload</text>
+
+  <!-- conversion host deferred -->
+  <rect x="540" y="352" width="274" height="120" rx="8" class="dash"/>
+  <text x="554" y="376" class="t">Conversion host: DEFERRED</text>
+  <text x="554" y="396" class="s">decision still open (Stage 0 feasibility</text>
+  <text x="554" y="412" class="s">section 6): local helper, AWS helper,</text>
+  <text x="554" y="428" class="s">or another Linux runtime</text>
+  <text x="554" y="452" class="t">not created in Stage 1C</text>
+
+  <!-- datastore -->
+  <rect x="540" y="488" width="274" height="110" rx="8" class="box" fill="#f1f5f9"/>
+  <text x="554" y="510" class="t">migration-datastore contents</text>
+  <text x="554" y="530" class="s">legacy-source-vm/  7.5G (incl. 4 GB .vswp)</text>
+  <text x="554" y="546" class="s">kvm-learning-01/   4.6G</text>
+  <text x="554" y="562" class="s">iso/  7.0G (24.04.4 + 24.04.5 ISOs)</text>
+  <text x="554" y="582" class="s">free: 192,509,116,416 bytes</text>
+
+  <!-- Windows client -->
+  <rect x="860" y="114" width="270" height="140" rx="8" class="box" fill="#fef3c7"/>
+  <text x="874" y="138" class="t">Windows host, VMnet8 192.168.50.1</text>
+  <text x="874" y="158" class="s">independent client on the lab network</text>
+  <text x="874" y="180" class="s">ping .31: 0 ms, ARP = 00:0c:29:0f:3d:15</text>
+  <text x="874" y="198" class="s">curl http://192.168.50.31/ -> 200, 267 B</text>
+  <text x="874" y="216" class="s">500/500 requests OK</text>
+  <text x="874" y="238" class="s">ESXi wget: same body sha256</text>
+  <path d="M870,254 C 850,300 845,343 815,343 L510,343" class="arr"/>
+
+  <!-- Later stages -->
+  <rect x="860" y="280" width="270" height="130" rx="8" class="dash"/>
+  <text x="874" y="304" class="t">Later stages (NOT STARTED)</text>
+  <text x="874" y="324" class="s">disk export, conversion to virtio,</text>
+  <text x="874" y="340" class="s">CDI import, KubeVirt VM on AWS</text>
+  <text x="874" y="360" class="s">compare against this baseline:</text>
+  <text x="874" y="376" class="s">same FS UUIDs, machine-id, SSH host keys,</text>
+  <text x="874" y="392" class="s">same page sha256 over HTTP</text>
+  <path d="M520,480 L840,480 C 930,480 995,460 995,414" class="arr" stroke-dasharray="6 4"/>
+
+  <!-- Workstation / hardware -->
+  <rect x="30" y="630" width="800" height="34" rx="6" class="box" fill="#fef3c7"/>
+  <text x="46" y="652" class="t">VMware Workstation 17.6.4 (L0), esxi-8-lab: 8 vCPU, 16 GiB, VMnet8 NAT 192.168.50.0/24</text>
+  <rect x="30" y="672" width="800" height="34" rx="6" class="box" fill="#e5e7eb"/>
+  <text x="46" y="694" class="t">Windows 11 host (hypervisor off) on Intel i7-14650HX, 32 GB RAM</text>
+
+  <!-- Legend -->
+  <rect x="30" y="724" width="1100" height="120" rx="8" fill="#f8fafc" stroke="#94a3b8"/>
+  <text x="46" y="748" class="t">Roles</text>
+  <text x="46" y="770" class="n">legacy-source-vm = the migration source. It stays in its genuine VMware state: PVSCSI, VMXNET3, VMware Tools, netplan keyed to ens192. Nothing was adapted for KubeVirt.</text>
+  <text x="46" y="790" class="n">kvm-learning-01 = learning environment only. Powered off at the end of Stage 1C and kept isolated from the source workload.</text>
+  <text x="46" y="810" class="n">Conversion host = deferred decision; nothing was created. Kubernetes, KubeVirt, CDI, AWS and the migration controller are all out of scope and untouched.</text>
+  <text x="46" y="830" class="n">Solid boxes exist (OBSERVED). Dashed boxes do not exist yet.</text>
+</svg>

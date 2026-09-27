@@ -203,3 +203,56 @@ Answers below are backed by what was actually run in Stage 1B on `kvm-learning-0
 - Is the user in the `kvm` group?
 
 `kvm-ok` summarizes these checks. Never treat a TCG run as proof that KVM works: check for the `CPU n/KVM` thread, the `/dev/kvm` file descriptor, or `Hypervisor detected: KVM` in the guest.
+
+---
+
+## Stage 1C additions: the migration source VM
+
+Answers below are backed by the Stage 1C source VM `legacy-source-vm` (see [Stage 1C record](../stage-1/stage-1c-migration-source.md)). Statements about the KubeVirt side are INFERRED; nothing has been migrated yet.
+
+### 27. "How do you baseline a VM before migrating it?"
+
+**Short answer:** Record three things before touching it: the platform view (hypervisor config), the guest view (OS, devices, identifiers, network, services), and a deterministic application check. Then the migrated copy can be compared fact by fact instead of "it seems to work".
+
+**Detail:** For `legacy-source-vm` the baseline covers:
+
+- **ESXi side:** Vmid, `.vmx` path, CPU/RAM, thin 40 GB disk, PVSCSI, VMXNET3, MAC, firmware, snapshots.
+- **Guest side:** OS and kernel, `lsblk`/`blkid` UUIDs, fstab, kernel command line, interface name and driver, netplan, routes, DNS, loaded drivers, EFI boot entries, cloud-init state.
+- **Application:** nginx version, unit state, listening sockets, config file checksums, and the sha256 of a static validation page fetched from another machine.
+
+Collect it with commands whose output can be diffed. Label what was observed versus inferred.
+
+### 28. "Which identifiers survive a VMware to KubeVirt migration, and which change?"
+
+**Short answer:** Everything stored on the disk survives: filesystem UUIDs, PARTUUIDs, the GPT disk GUID, machine-id, SSH host keys, hostname, config files. Everything the platform presents changes: controller and NIC drivers, device names, PCI paths, interface name, MAC, SMBIOS UUID and serial, and UEFI NVRAM entries.
+
+**Detail:** In the lab, `/dev/sda` behind PVSCSI becomes `/dev/vda` on virtio-blk, `ens192`/`vmxnet3` becomes something like `enp1s0`/`virtio_net`, and the VMware MAC `00:0c:29:0f:3d:15` is replaced unless the KubeVirt spec sets `macAddress`. Some platform identifiers can be pinned in KubeVirt if the guest depends on them: MAC, `firmware.uuid`, `firmware.serial`. Device names cannot and should never be treated as identity.
+
+### 29. "Why does a migrated Linux VM often boot but have no network?"
+
+**Short answer:** Its network config is tied to the old NIC. Here, netplan configures the interface named `ens192`. On KubeVirt the virtio-net NIC gets a different name, nothing matches it, and the interface stays unconfigured.
+
+**Detail:** The rendered networkd file contains `[Match] Name=ens192`, and the name comes from VMware's PCI slot 192. The Stage 1B VM had the same problem with `match: driver: vmxnet3`. Fixes belong to the migration design, not the source: match by MAC and preserve the MAC, rewrite the config during conversion (virt-v2v does some of this), or supply target-side config. Even with a matching interface, a static 192.168.50.x address does not fit KubeVirt's default masquerade pod network. Keeping the address needs a bridged secondary network.
+
+### 30. "Why use UUIDs in fstab?"
+
+**Short answer:** Because device names depend on the controller and discovery order, while filesystem UUIDs are stored inside the filesystem and travel with the disk.
+
+**Detail:** `legacy-source-vm` mounts `/` and `/boot/efi` by `/dev/disk/by-uuid/...`, boots with `root=UUID=db8b3bb3-...`, and GRUB finds its files with `search --fs-uuid`. The switch from PVSCSI (`sda`) to virtio-blk (`vda`) therefore needs no edit. `/dev/disk/by-path` changes with the PCI topology, and `/dev/disk/by-id` is empty on this VMware disk, so neither is a good anchor. A guest with `/dev/sda1` in fstab would drop to an emergency shell after migration.
+
+### 31. "What is special about migrating a UEFI VM?"
+
+**Short answer:** The boot entries are not on the disk. VMware keeps them in the VM's `.nvram` file, so the target starts with an empty or different variable store and must find the loader through the removable-media fallback path `\EFI\BOOT\BOOTX64.EFI`.
+
+**Detail:** On `legacy-source-vm` that file exists and is identical to `shimx64.efi`. On a fallback boot, shim runs `fbx64.efi`, which recreates the "Ubuntu" entry from `BOOTX64.CSV`. Two more things to settle in the target spec:
+
+- KubeVirt's EFI firmware defaults to Secure Boot on, and the source had it off. Signed Ubuntu components should boot either way, but the choice should be explicit, and Secure Boot needs SMM.
+- NVRAM persistence is off by default in KubeVirt.
+
+A BIOS-to-UEFI or UEFI-to-BIOS mismatch is a different, harder failure.
+
+### 32. "Why keep the learning VM, the source VM and the conversion host separate?"
+
+**Short answer:** Each has a different job and a different blast radius. The source VM must stay a clean, unmodified reference. The learning VM is where experiments and package installs happen. A conversion host needs disk access and conversion tooling. Mixing them contaminates the baseline or quietly makes an architecture decision.
+
+**Detail:** In the lab, `kvm-learning-01` (KVM/QEMU/libvirt installed, nested virtualization on) was powered off after the source baseline and never touched `legacy-source-vm`. The conversion-host decision stays explicitly deferred (local helper, AWS helper or another runtime) instead of being made implicitly by reusing the learning VM.

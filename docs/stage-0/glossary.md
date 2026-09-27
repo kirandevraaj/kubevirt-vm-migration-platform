@@ -46,6 +46,27 @@ Terms as observed in the Stage 1B learning VM `kvm-learning-01` (see [Stage 1B r
 | **Guest physical memory** | The address space the guest believes is its RAM. QEMU allocates it as ordinary process memory and registers it with KVM; EPT maps it to host memory, which is backed only when touched. | L3 `-m 256`: MemTotal 211,564 kB, QEMU RSS ~176 MB | VM memory vs. consumed host memory |
 | **L3** | A VM run by an L2 hypervisor. Specific to this lab. | busybox test VM under KVM | - |
 
+## Migration source terms (Stage 1C)
+
+Terms as observed on the migration source VM `legacy-source-vm` (see [Stage 1C record](../stage-1/stage-1c-migration-source.md)). The last column is INFERRED: nothing has been migrated yet.
+
+| Term | Definition | Seen in the lab | After a VMware -> KubeVirt migration |
+|---|---|---|---|
+| **Migration source VM** | The VM whose workload is to be moved, kept in its genuine source-platform configuration so the migration has something real to solve. | `legacy-source-vm`, Vmid 2, 192.168.50.31 | Stays on ESXi; the target is a new KubeVirt VM |
+| **Pre-migration baseline** | A recorded set of platform and guest facts (identifiers, config checksums, service state, HTTP response) that the migrated copy is later compared against. | [Stage 1C sections 6 to 10](../stage-1/stage-1c-migration-source.md#10-baseline-evidence) | Used as the acceptance reference |
+| **Validation page** | A static page with fixed content and a known checksum, so "the app works" becomes a byte-exact test instead of "some page loads". | `index.html`, 267 bytes, marker `p15-stage1c-source-v1` | Same sha256 expected over HTTP |
+| **Predictable interface name** | systemd/udev naming of NICs from firmware or bus position (`ens<slot>`, `enp<bus>s<slot>`, `enx<MAC>`) instead of `eth0`. | `ens192` (slot 192), altname `enp11s0` | Name changes with the new PCI position (typically `enp1s0`) |
+| **netplan match** | How a netplan entry selects its NIC. A bare key (for example `ens192:`) matches by interface name; a `match:` block can match by `macaddress` or `driver`. Unmatched NICs get no configuration. | Bare key `ens192`, rendered as networkd `[Match] Name=ens192` | New NIC does not match: no IP until adapted |
+| **Filesystem UUID** | Identifier stored inside the filesystem (ext4 superblock, vfat volume ID). Used by `fstab`, `root=UUID=` and GRUB `search --fs-uuid`. | root `db8b3bb3-...`, ESP `C340-CD01` | Survives (disk contents are copied) |
+| **PARTUUID** | GPT partition entry GUID, independent of the filesystem inside it. | `408d91cb-...` (ESP), `b701fe8c-...` (root) | Survives |
+| **PTUUID (disk GUID)** | GUID of the whole GPT partition table. | `ebeb0ebf-f2f7-4507-b842-6db77a2d14a1` | Survives |
+| **SMBIOS system UUID** | Machine UUID reported by virtual firmware (`/sys/class/dmi/id/product_uuid`). VMware derives it from `uuid.bios`. | `ac4d4d56-...-17bc250f3d15` | Changes unless pinned (`firmware.uuid`) |
+| **machine-id** | Per-installation ID in `/etc/machine-id`, used by systemd and journald. Lives on disk, not in firmware. | `d90f169b...8324` | Survives unless reset on purpose |
+| **UEFI NVRAM boot entry** | `Boot####` variable in the firmware's variable store naming the loader to start. On VMware it lives in the `.nvram` file next to the `.vmx`. | Boot0005 "Ubuntu" -> `\EFI\ubuntu\shimx64.efi` | Lost; not part of the disk |
+| **UEFI fallback boot path** | `\EFI\BOOT\BOOTX64.EFI` on the ESP, which firmware tries when no NVRAM entry works. On Ubuntu it is shim, which runs `fbx64.efi` to recreate entries. | Present; identical to `shimx64.efi` | What makes the migrated disk bootable |
+| **open-vm-tools** | Open-source VMware Tools for Linux: guest info, graceful shutdown, time and quiescing. VMware-only. | 13.0.10, running, `guestToolsUnmanaged` | Useless on KVM; replaced by qemu-guest-agent |
+| **cloud-init disabled marker** | The file `/etc/cloud/cloud-init.disabled`, which stops cloud-init from running at boot. The Ubuntu installer writes it after an install without a real datasource. | `status: disabled`, DataSourceNone | Keeps network config and SSH keys from being regenerated |
+
 ## Disks and conversion
 
 | Term | Definition |
