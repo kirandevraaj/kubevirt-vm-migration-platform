@@ -1,0 +1,41 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Secrets and credentials
+.env
+*.pem
+*.key
+*_secret*
+credentials*
+
+# Terraform
+.terraform/
+terraform.tfstate
+terraform.tfstate.*
+crash.log
+*.tfplan
+
+# VM disks and VMware runtime files
+*.vmdk
+*.vmx
+*.vmxf
+*.vmsd
+*.vmsn
+*.vmss
+*.vmem
+*.nvram
+*.iso
+*.ova
+*.ovf
+*.qcow2
