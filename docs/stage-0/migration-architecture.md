@@ -29,7 +29,7 @@ ESXi VM
 | 1 | **Discovery** | Connect to ESXi (SSH + `vim-cmd`, read `.vmx`) and find the VM by name or UUID. | Raw facts | Wrong VM selected; free-edition API limits |
 | 2 | **Assessment** | Check whether the VM is migratable: supported guest OS, firmware (BIOS/UEFI), no snapshots, no RDM or shared disks, no passthrough devices, disk sizes fit the target, network mapping exists. | Pass / warnings / blockers | Silent incompatibility discovered only at boot |
 | 3 | **Inventory** | Normalize facts into a stable record (identity, CPU, memory, disks, controllers, NICs, networks, guest, power). | `status.sourceInventory` | Inventory drifts if the VM changes during migration |
-| 4 | **Source disk acquisition** | Power off the VM (cold), confirm it is off, then copy the VMDK(s) off the datastore, preserving sparseness and recording checksums. | Disk files + checksums | Copying a running disk gives an inconsistent image |
+| 4 | **Source disk acquisition** | Power off the VM (cold), confirm it is off, then copy every file that makes up each VMDK (the layout varies: descriptor + extent(s), or one sparse file) off the datastore, preserving sparseness and recording checksums. | Disk files + checksums | Copying a running disk gives an inconsistent image |
 | 5 | **Disk conversion** | Convert VMDK to qcow2 or raw (qemu-img), and optionally convert the guest for KVM (virt-v2v: virtio drivers, remove VMware Tools, fix fstab/bootloader). | Converted image | Guest does not boot on virtio |
 | 5b | **Staging** | Put the converted image where CDI can reach it: an S3 bucket (presigned URL) or a direct upload through `cdi-uploadproxy`. | Image URL or upload | Transfer size and time over the laptop uplink |
 | 6 | **CDI import** | Create a DataVolume that imports or receives the image into a new PVC. | DataVolume | Scratch space, StorageClass, quota |
@@ -40,6 +40,10 @@ ESXi VM
 | 11 | **Validation** | Check VMI `Running`, guest agent connected (if installed), IP present, and application-level checks (for example `curl` nginx returns HTTP 200 and the expected content). | Pass / fail | "Running" but app is broken |
 
 After validation, a real migration has **cutover** (point DNS/traffic to the new VM) and **decommission** (remove or archive the source). In our lab the source is left powered off, not deleted, so we can roll back.
+
+### Stages are reconciliation checkpoints, not a script
+
+The table reads like a sequence, but the controller does **not** execute it as a procedural script. **The migration state machine represents declarative reconciliation checkpoints.** For each stage the controller holds a *desired state* ("a valid converted artifact exists"), re-reads the *observed state* on every reconcile (absent / partial / complete / failed), takes whatever idempotent action closes the gap (start, resume, clean up and retry, or nothing), records phase, conditions, progress and errors, and reconciles again. `status.phase` is the controller's current reconciliation state, not a log of what already ran. This is what gives the platform **idempotency**, **resumability** and **retry safety**. Details and per-phase examples: [migration-state-machine.md](migration-state-machine.md#1-reconciliation-checkpoints-not-a-procedural-script).
 
 ---
 
@@ -104,7 +108,7 @@ MTV services: an **Inventory** service, a **Validation** service (rules in the `
 | Scope | Many VMs, many source platforms | One VM at a time, VMware only |
 | Migration types | Cold, warm, live (some sources) | Cold only |
 | Objects | Provider, NetworkMap, StorageMap, Plan, Migration, Hook | One CR: `VirtualMachineMigration` with inline source, storage and network mapping |
-| Conversion | virt-v2v in a conversion Pod | qemu-img first, virt-v2v as a candidate; location deferred |
+| Conversion | virt-v2v in a conversion Pod | qemu-img and virt-v2v both candidates; where conversion runs is a deferred decision (see [feasibility.md](feasibility.md#6-conversion-host-deferred-decision)) |
 | Inventory | Continuous inventory service | One-shot discovery per migration, frozen into status |
 | Support | Red Hat supported | None; a portfolio and learning project |
 
@@ -232,7 +236,7 @@ status:
 | `spec.storage.staging` | The converted image needs a place CDI can reach. |
 | `spec.network.mappings` | Port group -> pod network or NAD, and which binding (see [networking-model.md](networking-model.md)). |
 | `spec.validation` | "Migrated" means the application works, not just "VMI Running". |
-| `status.phase` | One word for where we are in the state machine. Drives reconcile. |
+| `status.phase` | The current reconciliation checkpoint: which desired state the controller is working to make true right now. Not a history log (history is in `errors`, `timestamps`, conditions and Events). |
 | `status.observedGeneration` | Shows whether status reflects the latest spec. |
 | `status.conditions` | Independent, machine-readable facts with reasons. |
 | `status.progress` | Long steps (copy, import) need visible progress. |

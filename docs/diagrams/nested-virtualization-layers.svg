@@ -55,7 +55,7 @@
   <text x="656" y="252" class="s">KubeVirt: virt-handler, virt-launcher Pods</text>
   <text x="656" y="270" class="s">CDI importer Pods, EBS CSI volumes</text>
   <text x="656" y="292" class="t">Needs a nested-virtualization instance type</text>
-  <text x="656" y="312" class="s">(e.g. M8i/C8i/R8i/M7i families, NestedVirtualization=enabled)</text>
+  <text x="656" y="312" class="s">(supported family, NestedVirtualization=enabled; type TBD)</text>
   <text x="656" y="328" class="s">or a *.metal instance, where this becomes L0</text>
 
   <rect x="570" y="350" width="60" height="90" rx="6" fill="#b45309"/><text x="600" y="401" text-anchor="middle" class="l">L0</text>

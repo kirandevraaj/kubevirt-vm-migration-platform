@@ -53,7 +53,7 @@ Request section 24. Answers are written to be said out loud in a Kubernetes / pl
 
 **Detail:**
 
-- Make sure the VMDK is consistent (VM off, no snapshot chain, or flattened) and that you have the flat extent, not just the descriptor.
+- Make sure the VMDK is consistent (VM off, no snapshot chain, or consolidated) and that you copied every file its layout needs. Layouts differ: a VMFS disk is usually a descriptor plus a flat extent, while a Workstation `monolithicSparse` disk is one file. Copying only the descriptor gives you nothing.
 - CDI accepts VMDK directly, but converting to qcow2 first reduces size and lets you check it with `qemu-img check`.
 - A format conversion does not fix guest drivers. Use virt-v2v if the guest lacks virtio drivers (always for Windows).
 - For direct import from vCenter/ESXi, CDI has a `vddk` source (needs the VDDK image and API access; not viable on free ESXi).

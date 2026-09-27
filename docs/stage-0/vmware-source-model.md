@@ -21,8 +21,8 @@ esxi-8-lab.localdomain  (ESXi 8.0.3, build 24677879, free "vSphere 8 Hypervisor"
 |   migration-datastore (VMFS-6, 199.8 GB, 198.3 GB free, empty)
 |     -> future: /vmfs/volumes/migration-datastore/legacy-source-vm/
 |           legacy-source-vm.vmx          (VM configuration)
-|           legacy-source-vm.vmdk         (disk descriptor)
-|           legacy-source-vm-flat.vmdk    (disk data)
+|           legacy-source-vm.vmdk         (disk descriptor)          } typical ESXi/VMFS layout;
+|           legacy-source-vm-flat.vmdk    (flat data extent)         } to be observed, not assumed
 |           legacy-source-vm.nvram, vmware.log, ...
 |   OSDATA (system only, not for VMs)
 |
@@ -33,7 +33,7 @@ esxi-8-lab.localdomain  (ESXi 8.0.3, build 24677879, free "vSphere 8 Hypervisor"
 |---|---|---|
 | **VM** | A set of files (config + disks) plus, when powered on, a running VMX process | None yet. `legacy-source-vm` is planned. |
 | **VMX** | The `.vmx` text file: virtual hardware version, guest OS type, CPU, memory, firmware, devices, disk and NIC wiring. Also the name of the per-VM process. | Will live next to the disks on `migration-datastore`. |
-| **VMDK** | The virtual disk: descriptor + flat extent (+ delta files if snapshots exist) | Future. Likely thin. |
+| **VMDK** | The virtual disk. Its file layout depends on format and provisioning: on VMFS usually a descriptor + flat extent; on Workstation often one monolithic sparse file; plus delta disks if snapshots exist (see [cdi-storage-model.md](cdi-storage-model.md#vmdk-vmware)) | Future. Likely thin on VMFS. The Workstation disks that hold ESXi itself are `monolithicSparse`. |
 | **Virtual NIC** | A device in the VM (VMXNET3 or E1000e) with a MAC address, connected to a port group | Future guest NIC on "VM Network". |
 | **vSwitch** | A software L2 switch in VMkernel with physical uplinks | `vSwitch0`, uplink `vmnic0`. |
 | **Port group** | A named set of ports on a vSwitch with a policy (VLAN, security, teaming). VMs connect to port groups, not to vSwitches directly. | "Management Network", "VM Network" (both VLAN 0). |
@@ -47,7 +47,7 @@ The platform must answer three questions: **what is it** (so we can recreate it)
 How we can read this on a free standalone host (INFERRED, to validate):
 
 - **SSH + `vim-cmd`** (works today): `vim-cmd vmsvc/getallvms`, `vim-cmd vmsvc/get.summary <vmid>`, `vim-cmd vmsvc/get.config <vmid>`, `vim-cmd vmsvc/power.getstate <vmid>`, `vim-cmd vmsvc/get.guest <vmid>`, `vim-cmd vmsvc/snapshot.get <vmid>`.
-- **Read the `.vmx` file** over SSH (`cat`), and the VMDK descriptor.
+- **Read the `.vmx` file** over SSH (`cat`), and each VMDK descriptor, to learn the disk's actual layout, extents, provisioning and snapshot chain.
 - **`esxcli`** for host-level network and storage facts.
 - **vSphere API (pyVmomi / govc)**: Broadcom states that for the free edition, "usage of APIs to manage hosts is not supported, and may only provide read-only information" ([Broadcom KB 399823](https://knowledge.broadcom.com/external/article/399823)). Read-only discovery through the API may work, but it is unsupported, and write operations (snapshots, power, CBT) are expected to fail.
 

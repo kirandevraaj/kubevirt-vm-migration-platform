@@ -24,6 +24,7 @@ Use **nested ESXi 8.0 U3e (free "vSphere 8 Hypervisor")** running as the Worksta
 - Free edition limits apply: no vCenter, 8 vCPU per VM, no VADP, and API use is unsupported and may be read-only. MTV/VDDK/CBT-based paths are not reliable here. Discovery and disk access go through SSH.
 - The Windows hypervisor must stay off, so WSL2 and Docker Desktop are unavailable while the lab runs.
 - Nested virtualization means performance results are not representative.
+- Clarification (Stage 0 refinement): the host itself is proven (ESXi 8.0.3, VMFS-6 datastore, static vmk0, SSH key auth, NTP). A nested 64-bit L2 guest and VMDK acquisition from this free host are **not yet proven** ([feasibility](../stage-0/feasibility.md#not-yet-proven)).
 
 ## Evidence
 

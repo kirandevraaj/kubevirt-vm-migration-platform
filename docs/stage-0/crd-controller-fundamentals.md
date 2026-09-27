@@ -21,6 +21,9 @@ References: [Custom resources](https://kubernetes.io/docs/concepts/extend-kubern
 | **Conditions** | A list in `status` of typed booleans with reasons, for example `type: Ready, status: "False", reason: ImportInProgress`. Machines and humans read them. |
 | **Finalizer** | A string in `metadata.finalizers`. While it is present, a delete request only sets `metadata.deletionTimestamp`. The object stays until the controller finishes cleanup and removes the finalizer. |
 | **Owner reference** | A pointer from a child object to its parent. When the parent is deleted, garbage collection deletes the children. |
+| **Idempotency** | Doing a step twice has the same effect as doing it once. |
+| **Resumability** | After any interruption, the next reconcile continues from what it observes, not from the start. |
+| **Retry safety** | A failed step can be retried without corrupting data or creating duplicates. |
 
 ## 2. A very small example first
 
@@ -139,6 +142,7 @@ Conditions summarize state for humans and tools independently of the phase, for 
 | `DiskConverted` | Converted image exists and checksum recorded |
 | `DiskImported` | DataVolume `Succeeded` |
 | `VMCreated` | `VirtualMachine` exists |
+| `VMStarted` | VMI observed `Running` |
 | `GuestReady` | Guest booted and validation passed |
 | `Ready` | Whole migration done |
 
@@ -150,6 +154,18 @@ Our CR would carry a finalizer such as `migration.platform.example/cleanup`. If 
 
 ## 6. Mapping the state machine onto reconciliation
 
+**The migration state machine represents declarative reconciliation checkpoints, not a procedural script.** Each phase names the desired state the controller is currently trying to make true. `status.phase` is the controller's **current reconciliation state**, not a log of what happened. On every reconcile the controller re-observes the real system and decides again; it never assumes that an action it issued earlier succeeded.
+
+Five properties make this work:
+
+| Property | What it means here |
+|---|---|
+| **Desired state** | What must be true to leave the current checkpoint, derived from `spec` + `status.phase`. |
+| **Observed state** | What the controller sees now (objects, Jobs, files, ESXi power state), read fresh on every reconcile. |
+| **Idempotency** | Repeating a step has the same effect as doing it once (deterministic names, create-if-absent). |
+| **Resumability** | After a crash or restart, the next reconcile continues from the observed state, not from the beginning. |
+| **Retry safety** | Partial results are detected and resumed or cleaned before a retry, so retries never corrupt data or duplicate objects. |
+
 ```
 VirtualMachineMigration CR
         |
@@ -157,30 +173,32 @@ VirtualMachineMigration CR
    controller (Reconcile)
         |
         v
-   read status.phase  ---------------------------+
-        |                                        |
-        v                                        |
-   external action for that phase               |
-   (idempotent, one step)                        |
-        |                                        |
-        v                                        |
-   observe result                                |
-   (DataVolume phase, Job status, ESXi state)    |
-        |                                        |
-        v                                        |
-   update status (phase, conditions, progress)   |
-        |                                        |
-        v                                        |
-   reconcile again (requeue / watch event) ------+
+   read status.phase = current checkpoint ------------+
+   (derive desired state for this checkpoint)         |
+        |                                             |
+        v                                             |
+   observe actual state NOW                           |
+   (DataVolume phase, Job status, ESXi power state)   |
+        |                                             |
+        v                                             |
+   compare desired vs observed                        |
+        |- already satisfied -> no action              |
+        |- absent            -> start (idempotent)     |
+        |- partial           -> resume / wait          |
+        |- failed            -> classify, clean, retry |
+        v                                             |
+   update status (phase, conditions, progress, errors)|
+        |                                             |
+        v                                             |
+   reconcile again (requeue / watch event) -----------+
 ```
 
-Example for the `Importing` phase:
+Example for the `Importing` checkpoint:
 
-1. Phase is `Importing`.
-2. Ensure DataVolume `<name>-disk-0` exists (create if absent, with an owner reference).
-3. Read its `status.phase` and `status.progress`.
-4. If `ImportInProgress`: copy progress into our status and requeue in 30 seconds.
-5. If `Succeeded`: set condition `DiskImported=True` and phase `CreatingVM`.
-6. If `Failed`: classify the error. Either set `Retryable` (delete and recreate the DataVolume within budget) or `Failed`.
+- **Desired state:** DataVolume `<name>-disk-0` exists, is owned by this migration, and has `status.phase: Succeeded`.
+- **Observed state** (read every time): absent / `Pending` or `WaitForFirstConsumer` / `ImportInProgress` / `Succeeded` / `Failed`.
+- **Controller action:** absent -> create it (deterministic name, owner reference); in progress -> nothing, copy progress and requeue in 30 seconds; `Succeeded` -> nothing; `Failed` -> classify: transient -> delete and recreate within the retry budget (`Retryable`), permanent -> `Failed`.
+- **Status:** `DiskImported` condition, `status.progress`, DataVolume name, error details.
+- **Next reconcile:** re-observe; if `Succeeded`, set `DiskImported=True` and move the checkpoint to `CreatingVM`.
 
-The full state machine is in [migration-state-machine.md](migration-state-machine.md).
+If the controller restarts in the middle, nothing is lost: the phase says `Importing`, the DataVolume either exists or not, and the same logic picks up where reality is. The same pattern for `Preparing`, `Converting`, `CreatingVM`, `Starting` and `Validating` is in [migration-state-machine.md](migration-state-machine.md#1-reconciliation-checkpoints-not-a-procedural-script).

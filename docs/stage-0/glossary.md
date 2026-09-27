@@ -24,7 +24,9 @@ Request section 23. Terms are grouped by area; each includes the closest VMware 
 
 | Term | Definition |
 |---|---|
-| **VMDK** | VMware virtual disk format: a descriptor plus data extents (`-flat.vmdk`), plus delta files for snapshots. |
+| **VMDK** | VMware virtual-disk representation. Its on-disk layout depends on format and provisioning: some layouts use a text descriptor plus extent files (for example ESXi's descriptor + `-flat.vmdk`), others a single monolithic sparse file (for example Workstation `monolithicSparse`). Snapshots add delta disks to a chain. See [cdi-storage-model.md](cdi-storage-model.md#vmdk-vmware). |
+| **Descriptor (VMDK)** | Text metadata of a VMDK (geometry, CID/parentCID, extent list); a separate file or embedded in a sparse extent. |
+| **Extent (VMDK)** | A file holding a VMDK's data bytes; flat (preallocated layout) or sparse (grain-allocated). |
 | **QCOW2** | QEMU copy-on-write v2. Thin by nature; supports snapshots, compression and backing files. |
 | **RAW** | Plain byte-for-byte disk image. No metadata; can be sparse on the filesystem. CDI stores imported disks as raw. |
 | **Thin provisioning** | Allocating storage only as it is written. |
@@ -55,6 +57,10 @@ Request section 23. Terms are grouped by area; each includes the closest VMware 
 | **Owner reference** | Link from a child object to its parent; enables garbage collection. |
 | **Informer / work queue** | Client-side watch + cache, and the deduplicating, rate-limited queue of object keys to reconcile. |
 | **Idempotency** | Property that repeating an operation has the same effect as doing it once. |
+| **Resumability** | After any interruption, the next reconcile continues from the observed state instead of starting over. |
+| **Retry safety** | A failed step can be retried without corrupting data or duplicating objects, because partial results are detected first. |
+| **Reconciliation checkpoint** | A phase understood as "the desired state the controller is currently making true", re-evaluated on every reconcile; not a step in a script. See [migration-state-machine.md](migration-state-machine.md). |
+| **Compatibility tuple** | The (KubeVirt, Kubernetes, CDI) versions chosen together at deployment time and accepted only after runtime validation. See [feasibility.md](feasibility.md). |
 
 ## KubeVirt
 

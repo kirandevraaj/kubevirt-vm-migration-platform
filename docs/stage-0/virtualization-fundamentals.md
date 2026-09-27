@@ -195,7 +195,7 @@ Why the Windows hypervisor had to be off (OBSERVED in the handoff): with it runn
 ```
 AWS Nitro hypervisor on physical host                                    <- L0
   |
-EC2 instance with NestedVirtualization=enabled (e.g. m8i / c8i / r8i)    <- L1: Linux + KVM
+EC2 instance of a supported family, NestedVirtualization=enabled         <- L1: Linux + KVM
   |
 Kubernetes node (kubelet, containerd) + KubeVirt virt-handler
   |
@@ -206,9 +206,12 @@ target VM (the migrated legacy-source-vm)                                <- L2
 
 DOCUMENTED ([AWS: Use nested virtualization](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/amazon-ec2-nested-virtualization.html), [AWS What's New 2026-02-16](https://aws.amazon.com/about-aws/whats-new/2026/02/amazon-ec2-nested-virtualization-on-virtual/)):
 
-- Since 2026-02-16, virtual (non-metal) EC2 instances can run KVM or Hyper-V. The Nitro System passes Intel VT-x to the instance.
+- AWS announced nested virtualization on virtual EC2 instances on **2026-02-16**. Virtual (non-bare-metal) instances of supported types can run a hypervisor. The Nitro System passes Intel VT-x to the instance.
 - AWS names the layers exactly as above: Nitro (L0), your instance (L1), nested VMs (L2).
-- Supported families (per the user guide at time of writing) include C8i, M8i, R8i and their `d` / `flex` variants, X8i, C7i, M7i, R7i (and flex variants) and I7i. Always re-check with `aws ec2 describe-instance-types` (look for `nested-virtualization` in `ProcessorInfo.SupportedFeatures`).
+- Supported L1 hypervisors: **KVM** and **Hyper-V**.
+- AWS states: "There is no additional cost for using nested virtualization."
+- Supported instance families listed in the AWS user guide (checked 2026-09-27); the full list and the deferred choice are in [feasibility.md](feasibility.md#4-aws-nested-virtualization-capability). Always re-check per Region with `aws ec2 describe-instance-types` (look for `nested-virtualization` in `ProcessorInfo.SupportedFeatures`).
+- No instance family, size, Region or AMI is chosen in Stage 0.
 - It is enabled per instance with CPU options (`--cpu-options NestedVirtualization=enabled`), or on a stopped instance with `modify-instance-cpu-options`. The launch template API also has a `NestedVirtualization` CPU option ([LaunchTemplateCpuOptionsRequest](https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_LaunchTemplateCpuOptionsRequest.html)).
 - The alternative is a bare-metal (`*.metal`) instance, where KVM runs at L0 on real hardware. AWS recommends bare metal for performance-sensitive workloads.
 

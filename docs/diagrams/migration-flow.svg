@@ -34,7 +34,7 @@
   <text x="690" y="92" class="s">the thing we want to move</text>
   <path d="M230,116 L230,126" class="arr" marker-end="url(#a)"/>
 
-  <rect x="80" y="128" width="300" height="44" rx="7" class="box" fill="#fef3c7"/><text x="96" y="148" class="t">1  Discovery</text><text x="96" y="164" class="s">find VM, read .vmx + disk descriptors</text>
+  <rect x="80" y="128" width="300" height="44" rx="7" class="box" fill="#fef3c7"/><text x="96" y="148" class="t">1  Discovery</text><text x="96" y="164" class="s">find VM, read .vmx + disk metadata</text>
   <text x="410" y="148" class="s">controller &#8594; ESXi over SSH (vim-cmd)</text><text x="410" y="164" class="s">or read-only vSphere API if it works</text>
   <text x="690" y="148" class="s">raw facts: vmid, paths, power state</text>
   <path d="M230,172 L230,182" class="arr" marker-end="url(#a)"/>

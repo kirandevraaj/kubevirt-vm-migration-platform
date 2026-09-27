@@ -16,6 +16,7 @@ The first real migration is **cold**: power off the source, copy and convert the
 - Downtime = copy + convert + import + boot. It will be measured and recorded in the migration status.
 - The CRD keeps `spec.strategy.type` with `Cold` only, reserving `Warm`.
 - Revisit only with a licensed vSphere (or vCenter) source and a demonstrated need.
+- Clarification (Stage 0 refinement): warm migration (precopy, CBT, cutover) remains **reference and study work** only, documented from MTV as an industry reference. No warm-migration code, CRD phases or controller logic will be designed until this ADR is superseded.
 
 ## Evidence
 

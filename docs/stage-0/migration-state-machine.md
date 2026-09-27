@@ -4,7 +4,70 @@ Stage 0 design document for request section 13. It defines the `status.phase` va
 
 ![Migration state machine](../diagrams/migration-state-machine.svg)
 
-## 1. Phases
+## 1. Reconciliation checkpoints, not a procedural script
+
+**The migration state machine represents declarative reconciliation checkpoints, not a procedural script.**
+
+A script says "do step 5, then step 6". A controller says "this is what should be true; let me look at what *is* true; let me do whatever closes the gap; let me record what I saw; let me look again". Each phase is therefore a **checkpoint** that names the desired state the controller is currently working to make true.
+
+**`status.phase` is not merely a log of what happened.** It is the controller's **current reconciliation state**: the checkpoint it is working on right now. On every reconcile, including after a controller crash or restart, the controller reads the phase, **re-observes the real system**, and decides again. History belongs in `status.errors`, `status.timestamps`, conditions and Kubernetes Events, not in the phase.
+
+### Terms
+
+| Term | Meaning in this design |
+|---|---|
+| **Desired state** | What must be true to leave the current checkpoint (for example "a valid converted artifact exists"). Derived from `spec` + the current phase. |
+| **Observed state** | What the controller sees *now* when it looks at the real system (files, objects, DataVolume/VMI status, ESXi power state). Never assumed from memory. |
+| **Idempotency** | Running the same reconcile step twice has the same effect as running it once. |
+| **Resumability** | After any interruption (crash, restart, network loss), the next reconcile continues from the observed state instead of starting over. |
+| **Retry safety** | A failed step can be retried without corrupting data or duplicating objects, because partial results are detected and either resumed or cleaned up first. |
+
+### Example: the `Converting` checkpoint
+
+Not this (procedural):
+
+```
+Converting
+   |
+   v
+run virt-v2v once
+```
+
+But this (declarative checkpoint):
+
+```
+Desired state:     a converted artifact for every disk exists, is valid (checksum/qemu-img check),
+                   and is staged where CDI can reach it
+
+Observed state:    one of
+                     absent    - no conversion Job/output for this disk
+                     partial   - Job running, or output present but incomplete / checksum missing
+                     complete  - output present, validated, staged, checksum recorded
+                     failed    - Job failed, or output invalid
+
+Controller action: absent   -> start conversion (Job with a deterministic name)
+                   partial  -> resume: wait for the running Job, or remove the invalid partial output and restart
+                   complete -> nothing to do
+                   failed   -> classify: transient -> Retryable; permanent -> Failed / ManualInterventionRequired
+
+Status:            update phase, conditions (DiskConverted), progress (bytes/percent), error information
+
+Next reconcile:    re-observe the system; decide whether conversion is complete;
+                   continue (advance to Importing), retry, or fail
+```
+
+### The same model for every active checkpoint
+
+| Checkpoint | Desired state | Observed states | Controller action | Status written | Next reconcile |
+|---|---|---|---|---|---|
+| **Preparing** | Source VM is powered off (per `powerOffPolicy`) and every disk has been acquired intact | Power: on / shutting down / off. Disk copy: absent / partial / complete (size + checksum match) / failed | Request graceful shutdown only if on and allowed; wait if shutting down; copy only when observed off; resume or restart a partial copy | `SourcePoweredOff`, `DiskAcquired`, `timestamps.sourcePoweredOff` (set once), copy progress, errors | Re-check power state and copy result; advance to Converting, retry, or ManualInterventionRequired (for example guest will not shut down) |
+| **Converting** | Valid converted artifact staged per disk | absent / partial / complete / failed (see above) | Start / resume / clean up + restart / classify failure | `DiskConverted`, progress, artifact URL + checksum, errors | Advance to Importing, retry, or fail |
+| **Importing** | One DataVolume per disk has `Succeeded` | DataVolume absent / `Pending` or `WaitForFirstConsumer` / `ImportInProgress` / `Succeeded` / `Failed` | Create if absent (deterministic name, owner reference); wait if in progress; on transient failure delete and recreate within budget | `DiskImported`, `status.progress` copied from DataVolume, DataVolume names, errors | Advance to CreatingVM, keep waiting, retry, or fail |
+| **CreatingVM** | A `VirtualMachine` owned by this migration exists and matches the rendered spec | absent / present and ours but drifted / present and matching / present but **not ours** | Create if absent; update if ours and drifted; nothing if matching; stop if not ours | `VMCreated`, `destinationVM` (name, UID), errors | Advance to Starting, or ManualInterventionRequired (name conflict) |
+| **Starting** | The VMI is `Running` | runStrategy not yet set / VMI absent / `Pending` or `Scheduling` / `Running` / `Failed` / timeout exceeded | Set `runStrategy` (declarative, safe to re-apply); wait; on scheduling failure classify (capacity -> Retryable; missing `/dev/kvm` -> ManualInterventionRequired) | `VMStarted`, `timestamps.vmStarted`, VMI phase, errors | Advance to Validating, keep waiting, retry, or intervene |
+| **Validating** | Every `spec.validation.checks` entry passes | not yet run / some failing / all passing / timed out | Run read-only checks (HTTP via Service, guest agent, IP); repeat until pass or timeout | `GuestReady`, per-check results, errors | Advance to Completed, keep checking, or ManualInterventionRequired (app broken) |
+
+## 2. Phases
 
 ```
 Pending
@@ -21,7 +84,7 @@ Pending
 Failure states: Retryable, ManualInterventionRequired, Failed
 ```
 
-| Phase | Goal of the phase (what must be true to leave it) | External action (idempotent) | Observed result that advances it |
+| Phase (checkpoint) | Desired state (what must be true to leave it) | Controller action (idempotent, re-entrant) | Observed state that advances it |
 |---|---|---|---|
 | **Pending** | The CR is accepted and has a finalizer. | Add finalizer; set `timestamps.created`. | Finalizer present. |
 | **Discovering** | Source VM found and inventory recorded. | SSH to ESXi, `vim-cmd` + read `.vmx`. Read-only. | `status.sourceInventory` written; `SourceDiscovered=True`. |
@@ -37,7 +100,7 @@ Failure states: Retryable, ManualInterventionRequired, Failed
 | **ManualInterventionRequired** | A human decision or fix is needed. | Nothing automatic. Record reason; emit Event. | A human changes spec or adds an annotation (for example `migration.platform.example/retry: "true"`). |
 | **Failed** | Terminal failure. | Clean up destination artifacts per policy; never touch the source disk. | - |
 
-## 2. Transition types
+## 3. Transition types
 
 ### Automatic (controller advances on observed success)
 
@@ -76,7 +139,7 @@ Rules: bounded by `spec.strategy.retryLimit`, exponential backoff, the attempt i
 
 Terminal states are never left automatically. Re-running means creating a new CR (or an explicit, documented reset annotation).
 
-## 3. Where idempotency is required
+## 4. Where idempotency is required
 
 **Everywhere a phase can be re-entered.** Because reconcile can run many times for the same phase (requeues, watch events, controller restarts), every external action must be safe to repeat.
 
@@ -97,7 +160,7 @@ Two more rules:
 1. **Record before you advance.** Write evidence (checksum, URL, object name) and the new phase in the same status update. If the update fails, the next reconcile repeats the step, which is safe because the step is idempotent.
 2. **Irreversible actions need a guard.** Powering off the source is the only action that affects the running service. It happens only after `Validated=True`, only per `powerOffPolicy`, and it is recorded with a timestamp so it is never "re-decided".
 
-## 4. Failure halfway: what the state machine guarantees
+## 5. Failure halfway: what the state machine guarantees
 
 - The source disk is **never modified**. Cold migration only reads it after power-off.
 - Rollback for our lab is simple: power the source VM back on. The controller can offer this as a cleanup policy, but never does it silently after the target VM has started (to avoid two copies of the same server with the same identity on the network).

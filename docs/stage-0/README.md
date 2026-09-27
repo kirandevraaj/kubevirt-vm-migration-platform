@@ -2,7 +2,7 @@
 
 **Project 1.5: VM-to-Kubernetes Migration Platform (ESXi -> KubeVirt Migration & VM Modernization)**
 
-Stage 0 status: **complete, pending user review** (2026-09-27). Nothing was installed or created. ESXi, VMware networking, Windows virtualization and AWS are unchanged.
+Stage 0 status: **complete, with a technical refinement pass** (2026-09-27), pending user review. Nothing was installed or created. ESXi, VMware networking, Windows virtualization and AWS are unchanged.
 
 ## Why Stage 0 exists
 
@@ -53,32 +53,44 @@ ADRs: [../adr/README.md](../adr/README.md).
 4. **Format conversion is not guest conversion.** qemu-img changes the container format; virt-v2v also fixes drivers and boot config for virtio.
 5. **Metadata is translated, disk data is copied, runtime state is only observed.**
 6. **Cold first.** Warm migration depends on snapshots and CBT via the vSphere API, which the free ESXi edition does not support.
-7. **A controller, not scripts,** is the right owner of a long, failure-prone, multi-step workflow; idempotency is the core design rule.
-8. **Migration preserves the VM model; modernization removes it.**
+7. **A controller, not scripts,** is the right owner of a long, failure-prone, multi-step workflow. The state machine is a set of **declarative reconciliation checkpoints**, not a procedural script; idempotency, resumability and retry safety are the core design rules.
+8. **A VMDK's file layout depends on its format and provisioning mode** (descriptor + extents, or monolithic sparse); discovery must read it, not assume it.
+9. **Versions are a tuple, validated at deployment time.** "Latest at documentation time" is an observation, not a decision.
+10. **Migration preserves the VM model; modernization removes it.**
 
-## What was validated
+## What was validated (in our lab)
+
+Only facts we observed ourselves. Full list: [feasibility.md, "Proven in our lab"](feasibility.md#proven-in-our-lab).
 
 | Item | How |
 |---|---|
-| ESXi 8.0.3 build 24677879 at 192.168.50.11, `migration-datastore` 199.8 GB / 198.3 GB free, no VMs | Read-only SSH (see [evidence-index.md](evidence-index.md)) |
+| Nested ESXi 8.0.3 build 24677879 runs on VMware Workstation | Read-only SSH (see [evidence-index.md](evidence-index.md)) |
 | ESXi sees hardware virtualization (`HV Support: 3`) | Read-only SSH |
-| KubeVirt v1.9 supports Kubernetes 1.34-1.36 | Official support matrix / release notes |
+| VMFS-6 `migration-datastore` 199.8 GB / 198.3 GB free, no VMs | Read-only SSH |
+| Static vmk0 192.168.50.11, SSH key auth, NTP in sync | Read-only SSH |
+
+## What was confirmed from documentation (documented, NOT validated)
+
+| Item | Source |
+|---|---|
+| KubeVirt v1.9 is built for Kubernetes 1.36 and supported on the previous two minors | KubeVirt release notes / support matrix |
 | Kubernetes 1.34 EOL 2026-10-27; EKS standard support 1.34-1.36 | kubernetes.io, AWS docs |
-| AWS nested virtualization on virtual instances exists (since 2026-02-16) | AWS docs |
+| CDI v1.66.1 is the newest release; no official KubeVirt-to-CDI pairing statement found | CDI releases / API reference |
+| AWS nested virtualization on supported non-bare-metal instances since 2026-02-16; KVM and Hyper-V; no additional cost | AWS EC2 user guide |
 | Free ESXi: API unsupported / possibly read-only, no vCenter, 8 vCPU per VM | Broadcom KB + release notes |
+| `virt-v2v -i vmx -it ssh` requirements (guest shut down, no snapshots, key auth) | virt-v2v-input-vmware(1) |
 | MTV 2.11 architecture and warm-migration limits | Red Hat docs |
 
 ## What remains unvalidated
 
-See [feasibility.md](feasibility.md) for the full list. Most important:
+See [feasibility.md, "Not yet proven"](feasibility.md#not-yet-proven). Most important:
 
-- `/dev/kvm` on an actual nested-virt EC2 node, and EKS managed node group support for it.
-- Host kernel compatibility (AL2023 / Bottlerocket vs the EL-based virt-launcher).
-- CDI v1.66.x + KubeVirt v1.9 pairing.
-- A nested 64-bit L2 guest on our ESXi.
-- ESXi configuration persistence across a controlled reboot.
-- Disk acquisition via SSH / virt-v2v `-i vmx -it ssh` on free ESXi.
-- Whether a qemu-img-only conversion boots on virtio.
+- A nested 64-bit L2 guest on our ESXi, and ESXi config persistence across a controlled reboot.
+- KVM and `/dev/kvm` on an actual AWS target node.
+- Whether EKS worker nodes (or a self-managed node) meet every KubeVirt host requirement.
+- The runtime combination of CDI, KubeVirt and Kubernetes (the compatibility tuple).
+- VMDK acquisition from this free ESXi host and virt-v2v conversion of the source.
+- Target VM boot and end-to-end migration.
 
 ## Architecture
 
@@ -91,26 +103,52 @@ See [architecture.md](architecture.md). In one line: **local nested ESXi source 
 | Local nested ESXi is the source | [ADR 001](../adr/001-local-esxi-migration-source.md) |
 | AWS is the disposable target, Terraform only | [ADR 002](../adr/002-aws-disposable-target.md) |
 | Cold before warm; no custom warm engine | [ADR 003](../adr/003-cold-before-warm.md) |
-| Upstream KubeVirt + CDI is the destination; Kubernetes 1.35 or 1.36 | [ADR 004](../adr/004-kubevirt-vm-destination.md) |
-| Custom controller + `VirtualMachineMigration` CR owns the workflow | [ADR 005](../adr/005-custom-controller-vs-scripts.md) |
+| Upstream KubeVirt + CDI is the destination; versions chosen as a validated compatibility tuple at deployment time | [ADR 004](../adr/004-kubevirt-vm-destination.md) |
+| Custom controller + `VirtualMachineMigration` CR owns the declarative migration workflow (reconciliation checkpoints) | [ADR 005](../adr/005-custom-controller-vs-scripts.md) |
 
 Deferred decisions:
 
-- Where conversion runs (Linux helper VM on ESXi vs in AWS).
+- Where conversion runs: local helper Linux environment, AWS conversion helper, or another controlled Linux runtime ([feasibility section 6](feasibility.md#6-conversion-host-deferred-decision)).
 - qemu-img-only vs virt-v2v conversion (test both).
-- EKS vs self-managed Kubernetes; nested-virt instance vs `*.metal`; exact instance type and region.
+- Kubernetes topology: EKS vs self-managed (both unvalidated, neither rejected).
+- EC2 instance family, exact size, Region and AMI; nested-virtualization instance vs `*.metal`.
+- The exact compatibility tuple (KubeVirt, Kubernetes, CDI).
 - Source guest OS, version and sizing.
 - Controller language / framework.
 - Multus secondary networks (not needed for the first demo).
 - Stage 1 scope and order.
 
-## Prerequisites for Stage 1
+## Stage 1 entry criteria
 
-1. **User review and approval** of Stage 0, and confirmation of Stage 1 scope.
-2. AWS credentials recovered or re-issued (before any cloud work).
-3. Version pins chosen: Kubernetes 1.35 or 1.36, KubeVirt v1.9.x, CDI v1.66.x (compatibility confirmed).
-4. Conversion location decided.
-5. For source-side work: controlled ESXi reboot test, guest OS/ISO chosen, then create `legacy-source-vm` and prove nested boot.
+Stage 1 may begin only when **all** general criteria are met, plus the criteria for whichever track Stage 1 covers.
+
+General (always required):
+
+1. The user has reviewed Stage 0 (including this refinement) and explicitly approved starting Stage 1.
+2. Stage 1 scope is written down: which track (source side, destination side, or both), what will be created, and what is out of scope.
+3. The approved change boundary is explicit: which systems Stage 1 may modify (ESXi, AWS, Kubernetes). Anything not listed stays unchanged.
+4. Deferred decisions needed by that scope are either made (recorded as an ADR) or explicitly kept out of scope.
+5. Success criteria and evidence to capture are defined for each Stage 1 task, using the categories in [feasibility.md](feasibility.md).
+
+Source-side track (creating `legacy-source-vm` on ESXi):
+
+1. A controlled ESXi reboot has been approved, performed, and vmk0/route/DNS/hostname/NTP/datastore/SSH re-verified (N2).
+2. Guest OS, version, ISO (with checksum) and sizing (at most 8 vCPU) are chosen.
+3. The ISO upload location on `migration-datastore` and the VM's port group ("VM Network") are agreed.
+4. The first Stage 1 check is a nested 64-bit guest boot (N1). If it fails, stop and report.
+
+Destination-side track (any AWS or Kubernetes work):
+
+1. AWS credentials are recovered from the Docker volume or re-issued, stored outside Git, and verified with a read-only call (F20).
+2. Terraform is the only creation path; a `terraform destroy` plan and cost guardrails (tags, budget alert, session teardown) are defined.
+3. A candidate compatibility tuple (KubeVirt, Kubernetes, CDI) is written down with its evidence, and the runtime validation gate G1-G7 is the acceptance test ([feasibility section 3](feasibility.md#3-compatibility-tuple-and-runtime-validation-gate)).
+4. The first test node is scoped to the host-requirement checklist H1-H11 ([feasibility section 5](feasibility.md#5-eks-host-requirement-compatibility)), for whichever topology is tried first; EKS vs self-managed is decided from that evidence.
+5. Instance family, size, Region and AMI for the test node are chosen and recorded (currently deferred).
+
+Migration track (only after both sides exist):
+
+1. The conversion host location is decided and recorded as an ADR.
+2. The source VM exists, runs nginx, has no snapshots, and has a recorded baseline (page content, checksums).
 
 ## Official sources consulted
 
@@ -118,6 +156,7 @@ All checked on 2026-09-27.
 
 KubeVirt:
 
+- [KubeVirt user guide](https://kubevirt.io/user-guide/)
 - [KubeVirt user guide: Architecture](https://kubevirt.io/user-guide/architecture/)
 - [KubeVirt user guide: Installation](https://kubevirt.io/user-guide/cluster_admin/installation/)
 - [KubeVirt user guide: Run Strategies](https://kubevirt.io/user-guide/compute/run_strategies/)
@@ -129,6 +168,7 @@ KubeVirt:
 
 CDI:
 
+- [CDI API reference](https://kubevirt.io/cdi-api-reference/)
 - [CDI repository](https://github.com/kubevirt/containerized-data-importer), [releases](https://github.com/kubevirt/containerized-data-importer/releases)
 - [DataVolumes](https://github.com/kubevirt/containerized-data-importer/blob/main/doc/datavolumes.md), [Supported operations](https://github.com/kubevirt/containerized-data-importer/blob/main/doc/supported_operations.md), [Upload](https://github.com/kubevirt/containerized-data-importer/blob/main/doc/upload.md), [Scratch space](https://github.com/kubevirt/containerized-data-importer/blob/main/doc/scratch-space.md)
 

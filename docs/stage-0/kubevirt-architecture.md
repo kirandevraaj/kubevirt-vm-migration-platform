@@ -11,7 +11,7 @@ Stage 0 learning document for request section 4. Version-sensitive facts come fr
 | Kubernetes releases | 1.37 is the newest upstream minor; 1.34 reaches end of life 2026-10-27 | [kubernetes.io/releases](https://kubernetes.io/releases/) |
 | EKS | Standard support for 1.36, 1.35, 1.34 | [EKS Kubernetes versions](https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html) |
 
-INFERRED: for Stage 1, target Kubernetes **1.35 or 1.36** with KubeVirt **v1.9**. Avoid 1.34 (EOL next month) and 1.37 (not yet in the KubeVirt v1.9 support window).
+INFERRED: if KubeVirt v1.9 is used, Kubernetes **1.35 or 1.36** fits its support window; 1.34 is EOL next month and 1.37 is outside the v1.9 window. These are observations, not pins. The actual versions are chosen at deployment time as one compatibility tuple (KubeVirt, Kubernetes, CDI) and must pass the runtime validation gate in [feasibility.md](feasibility.md#3-compatibility-tuple-and-runtime-validation-gate).
 
 ## The big picture
 
@@ -110,6 +110,7 @@ DOCUMENTED in [KubeVirt installation](https://kubevirt.io/user-guide/cluster_adm
 - A supported container runtime: containerd or CRI-O.
 - Hardware virtualization on the nodes. `virt-host-validate qemu` checks for `/dev/kvm`, `/dev/vhost-net` and `/dev/net/tun`.
 - If there is no hardware virtualization, software emulation can be enabled (`useEmulation`). This is slow and only suitable for testing.
-- Host kernel note: virt-launcher images are built on an Enterprise Linux (CentOS Stream) userland. The documentation recommends host kernels compatible with that userland. INFERRED risk: Amazon Linux 2023 or Bottlerocket nodes are not EL, so this must be validated in Stage 1 (see [feasibility.md](feasibility.md)).
+- Host kernel and userland: virt-launcher ships an Enterprise Linux (CentOS Stream / RHEL) based libvirt and QEMU userland. The documentation says running it on a host kernel that diverges significantly (in particular a newer, non-Enterprise-Linux kernel) is not recommended, because KVM/vhost feature negotiation can mismatch. INFERRED risk: EKS-optimized node images are not Enterprise Linux. This is a risk to test, not a reason to reject EKS (see the host-requirement checklist in [feasibility.md](feasibility.md#5-eks-host-requirement-compatibility)).
+- Container runtime and device ownership: the [KubeVirt CDI page](https://kubevirt.io/user-guide/storage/containerized_data_importer/) notes the container runtime may need to handle device ownership through the security context.
 
 Nothing here was installed in Stage 0.

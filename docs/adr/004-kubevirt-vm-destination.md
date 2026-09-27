@@ -8,7 +8,13 @@ Migrated VMs need a destination on Kubernetes, the platform built in Project 1, 
 
 ## Decision
 
-Use upstream **KubeVirt** (currently v1.9) with **CDI** (currently v1.66.x) as the VM destination, on Kubernetes **1.35 or 1.36** (inside the KubeVirt v1.9 support window). Not OpenShift Virtualization, because that requires OpenShift.
+Use upstream **KubeVirt** with **CDI** as the VM destination. Not OpenShift Virtualization, because that requires OpenShift.
+
+## Version clarification (Stage 0 refinement)
+
+- Observed at documentation time (2026-09-27): KubeVirt v1.9 is the newest release (built for Kubernetes 1.36, supported on 1.35 and 1.34); CDI v1.66.1 is the newest CDI release. These are observations, **not pins**.
+- No official KubeVirt-to-CDI pairing statement was found, so this ADR does not claim any specific pairing is supported.
+- The versions are chosen **at deployment time** as one **compatibility tuple** (KubeVirt, Kubernetes, CDI) and accepted only after the runtime validation gate passes ([feasibility section 3](../stage-0/feasibility.md#3-compatibility-tuple-and-runtime-validation-gate)).
 
 ## Alternatives considered
 
@@ -21,10 +27,10 @@ Use upstream **KubeVirt** (currently v1.9) with **CDI** (currently v1.66.x) as t
 ## Consequences
 
 - VMs become Kubernetes objects (`VirtualMachine`, VMI, DataVolume) manageable by GitOps.
-- Worker nodes need `/dev/kvm`, privileged virt-handler, containerd/CRI-O (see [feasibility](../stage-0/feasibility.md)).
+- Worker nodes must meet KubeVirt host requirements: `/dev/kvm`, `/dev/vhost-net`, `/dev/net/tun`, privileged virt-handler, containerd/CRI-O, aligned host kernel/userland (see [feasibility section 5](../stage-0/feasibility.md#5-eks-host-requirement-compatibility)).
 - Guest drivers must work on virtio.
-- KubeVirt and CDI versions must be pinned together and checked against the Kubernetes version.
+- KubeVirt, Kubernetes and CDI versions are recorded together as one tuple and validated at runtime before use.
 
 ## Evidence
 
-[KubeVirt architecture](https://kubevirt.io/user-guide/architecture/), [KubeVirt installation](https://kubevirt.io/user-guide/cluster_admin/installation/), [support matrix](https://github.com/kubevirt/sig-release/blob/main/releases/k8s-support-matrix.md), [CDI releases](https://github.com/kubevirt/containerized-data-importer/releases).
+[KubeVirt architecture](https://kubevirt.io/user-guide/architecture/), [KubeVirt installation](https://kubevirt.io/user-guide/cluster_admin/installation/), [support matrix](https://github.com/kubevirt/sig-release/blob/main/releases/k8s-support-matrix.md), [CDI releases](https://github.com/kubevirt/containerized-data-importer/releases), [CDI API reference](https://kubevirt.io/cdi-api-reference/), [KubeVirt: CDI](https://kubevirt.io/user-guide/storage/containerized_data_importer/), [KubeVirt release notes](https://kubevirt.io/user-guide/release_notes/).

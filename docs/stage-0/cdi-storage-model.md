@@ -2,7 +2,12 @@
 
 Stage 0 learning document for request sections 6 (CDI), 7 (VM disk formats) and 16 (storage mapping).
 
-Current CDI release: **v1.66.1** (2026-09-06), per [CDI releases](https://github.com/kubevirt/containerized-data-importer/releases). CDI and KubeVirt are versioned separately. Compatibility between CDI v1.66.x and KubeVirt v1.9 must be confirmed in Stage 1 (see [feasibility.md](feasibility.md)).
+### Versions: observed, not chosen
+
+- Observed on 2026-09-27: the newest CDI release is **v1.66.1** ([CDI releases](https://github.com/kubevirt/containerized-data-importer/releases); also the newest tagged version in the [CDI API reference](https://kubevirt.io/cdi-api-reference/)). The newest KubeVirt release is **v1.9** ([KubeVirt release notes](https://kubevirt.io/user-guide/release_notes/)).
+- CDI and KubeVirt are separate projects with separate release trains. The KubeVirt user guide's CDI page installs "the latest CDI release" ([KubeVirt: Containerized Data Importer](https://kubevirt.io/user-guide/storage/containerized_data_importer/)) but, in the sources reviewed, does not publish a KubeVirt-to-CDI compatibility matrix. **We therefore make no claim that any specific CDI/KubeVirt pairing is officially supported.**
+- Project principle: **do not hard-code CDI just because it is the latest release at documentation time.** At deployment time, select the CDI release explicitly validated for the chosen KubeVirt/Kubernetes combination, and record the three versions as one **compatibility tuple** (KubeVirt, Kubernetes, CDI). The tuple and the runtime validation gate are defined in [feasibility.md](feasibility.md#3-compatibility-tuple-and-runtime-validation-gate).
+- The same page notes that the container runtime may need to be configured to handle device ownership through the security context. That is part of the host-requirements check in [feasibility.md](feasibility.md).
 
 ---
 
@@ -93,10 +98,28 @@ KubeVirt VM disk (VM spec: volumes[].dataVolume or persistentVolumeClaim -> disk
 
 ### VMDK (VMware)
 
-- A VMDK is a **descriptor** (text) plus one or more **extents** (data). On ESXi the usual layout is `vm.vmdk` (descriptor) + `vm-flat.vmdk` (data).
-- Disk types on VMFS: thin, lazy-zeroed thick, eager-zeroed thick. Workstation uses other variants (for example `monolithicSparse`, which is what our ESXi lab's own disks use on the laptop).
-- **Snapshots** create delta disks (`vm-000001.vmdk`, `-delta` or `-sesparse`) that point to a parent. The running VM writes to the newest delta.
-- Tools: `vmkfstools` on ESXi can clone and convert between VMDK types. qemu-img can read VMDK.
+A VMDK is a VMware virtual-disk representation whose **on-disk layout depends on the disk format and the provisioning mode**. Some VMDK layouts use a small text descriptor plus separate extent (data) files; others use a single monolithic sparse file with the descriptor embedded. Do not assume every VMDK has the same file layout.
+
+Several different aspects of a VMware virtual disk are easy to blur together. They are separate things:
+
+| Aspect | What it describes | Examples |
+|---|---|---|
+| **Descriptor** | Text metadata: disk geometry, adapter type, CID/parentCID, and the list of extents. It can be a separate small `.vmdk` file or embedded inside a sparse extent. | `vm.vmdk` next to `vm-flat.vmdk`; embedded in a `monolithicSparse` file |
+| **Extent** | Where the data bytes live. A disk can have one or many extents. | `-flat.vmdk` (flat extent), `-s001.vmdk` ... (split sparse extents) |
+| **Layout / subformat** | How descriptor and extents are packaged. | `monolithicSparse` (one growable file), `monolithicFlat` (descriptor + one preallocated flat extent), `twoGbMaxExtentSparse` / `twoGbMaxExtentFlat` (split into 2 GB pieces), `streamOptimized` (compressed, used inside OVA/OVF exports), `vmfs` (ESXi datastore disks: descriptor + `-flat.vmdk`) |
+| **Provisioning mode** | How space is allocated on the underlying storage. | Thin, lazy-zeroed thick, eager-zeroed thick on VMFS; growable vs preallocated on Workstation. On VMFS, "thin" is a property of how VMFS allocates blocks for the flat extent, not a different file layout. |
+| **Snapshot chain** | Delta disks that record writes after a snapshot and point to a parent via `parentCID` / `parentFileNameHint`. | `vm-000001.vmdk` descriptor + `vm-000001-sesparse.vmdk` (SEsparse, the VMFS-6 default) or `-delta.vmdk` |
+
+Our own lab shows that layouts differ:
+
+- The **Workstation-hosted ESXi VM's boot disk** (`esxi-8-lab.vmdk`, 100 GiB) and its data disk are **thin/growable `monolithicSparse` VMware Workstation VMDKs**: one file each, descriptor embedded, only ~0.65 GB and ~0.04 GB allocated (OBSERVED, [handoff section 6](../project-context/project1-5-context-handoff.md)).
+- A VM created **on ESXi's VMFS-6 datastore** (the future `legacy-source-vm`) will most likely get the ESXi layout: a descriptor `.vmdk` plus a `-flat.vmdk` extent, thin-provisioned by VMFS (INFERRED; to be observed when the VM exists).
+
+Migration impact:
+
+- Discovery must record the **actual** layout, provisioning mode and snapshot chain from the descriptor, not assume one.
+- Copying only a descriptor, or only a delta, produces an unusable disk. Copy the whole chain or consolidate first.
+- Tools: `vmkfstools` on ESXi clones between VMDK types. qemu-img reads the common VMDK subformats ([QEMU disk images](https://www.qemu.org/docs/master/system/images.html)) and `qemu-img info --backing-chain` shows what it sees.
 
 ### QCOW2 (QEMU copy-on-write v2)
 
@@ -150,7 +173,7 @@ virt-v2v VMware input modes relevant to us ([virt-v2v-input-vmware](https://libg
 VMware datastore (VMFS-6 "migration-datastore")
    |
    v
-extracted disk (the VM's .vmdk + -flat.vmdk, VM powered off)
+extracted disk (all files of the VM's VMDK, e.g. descriptor + extent(s), VM powered off, no snapshot chain)
    |
    v
 image conversion (qemu-img or virt-v2v -> qcow2 or raw; guest drivers fixed if virt-v2v)

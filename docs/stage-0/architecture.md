@@ -10,14 +10,14 @@ SOURCE (local, exists)                     TRANSFER                   DESTINATIO
 Windows 11 + VMware Workstation 17.6.4                                Terraform-built VPC + Kubernetes cluster
   esxi-8-lab (ESXi 8.0.3, 192.168.50.11)                              (Kubernetes 1.35 or 1.36)
     migration-datastore (VMFS-6)                                        KVM-capable workers (nested-virt EC2 or .metal)
-      legacy-source-vm (planned)                                        KubeVirt v1.9 + CDI v1.66.x
-        .vmx + .vmdk                                                    EBS CSI (gp3) for VM disks
+      legacy-source-vm (planned)                                        KubeVirt + CDI (versions = validated tuple)
+        .vmx + VMDK files                                               EBS CSI (gp3) for VM disks
             |                                                           S3 bucket for image staging
             | discover (SSH + vim-cmd), power off, copy VMDK                  |
             v                                                                |
    conversion (qemu-img / virt-v2v)  --- upload converted image --->  S3 --> CDI DataVolume --> PVC
-   location deferred: helper VM on ESXi,                                        |
-   or a conversion step in AWS                                                  v
+   location deferred: local helper Linux,                                       |
+   AWS helper, or another Linux runtime                                         v
                                                                       KubeVirt VirtualMachine -> VMI -> virt-launcher
                                                                         -> QEMU/KVM -> guest (nginx)
                                                                                 |
@@ -65,7 +65,7 @@ Detailed views:
 | Datastore | `migration-datastore`, VMFS-6, 199.8 GB (198.3 GB free) |
 | Source VM | **Not created** (planned `legacy-source-vm`, e.g. 2 vCPU / 2 GB / 20 GB thin) |
 
-Resource budget inside ESXi: 8 vCPU and ~14 GB usable for nested guests. A small source VM plus an optional Linux helper VM for conversion (for example 2 vCPU / 4 GB) fit comfortably (INFERRED).
+Resource budget inside ESXi: 8 vCPU and ~14 GB usable for nested guests. A small source VM fits comfortably, with room for a Linux conversion helper **if** the local option is chosen (INFERRED; the conversion location is a deferred decision).
 
 ### Cloud (planned, **not created**, disposable, Terraform only)
 
@@ -73,9 +73,9 @@ Resource budget inside ESXi: 8 vCPU and ~14 GB usable for nested guests. A small
 |---|---|
 | Region | One region, one AZ for the VM worker (EBS is AZ-scoped) |
 | Network | Small VPC, public + private subnets, NAT or VPC endpoints for S3/ECR |
-| Cluster | EKS (familiar from Project 1) **or** self-managed kubeadm on EC2. EKS custom launch template support for nested virtualization and the node OS kernel are open questions. |
-| Kubernetes version | 1.35 or 1.36 (inside KubeVirt v1.9 support; 1.34 EOL 2026-10-27) |
-| VM worker nodes | 1 node with nested virtualization enabled (for example `m8i.xlarge` or `c8i.2xlarge` class) - or `*.metal` if nested virt is not workable |
+| Cluster topology | **Deferred.** EKS and self-managed Kubernetes (for example kubeadm on EC2) are parallel, unvalidated options. The deciding question is whether the worker architecture meets KubeVirt's host requirements ([feasibility section 5](feasibility.md#5-eks-host-requirement-compatibility)). |
+| Kubernetes version | Part of the compatibility tuple chosen at deployment time; 1.35 or 1.36 are inside the KubeVirt v1.9 window (1.34 EOL 2026-10-27) |
+| VM worker nodes | KVM-capable node(s): a nested-virtualization-capable EC2 instance or `*.metal`. **Instance family, size, Region and AMI are deferred** ([supported families](feasibility.md#4-aws-nested-virtualization-capability)). |
 | System nodes | Small general-purpose node(s) for KubeVirt/CDI control components |
 | Storage | EBS CSI driver, `gp3` StorageClass (RWO, `WaitForFirstConsumer`) |
 | Staging | S3 bucket, block public access, SSE, lifecycle expiry |
@@ -92,7 +92,7 @@ Resource budget inside ESXi: 8 vCPU and ~14 GB usable for nested guests. A small
 ### Current blockers for the cloud side
 
 1. **AWS credentials** are only in the Docker volume `platform-aws-tools-aws`, which cannot be read while Docker Desktop is down (hypervisor off). They must be recovered or re-issued before any Terraform work.
-2. **Conversion host**: conversion tools need Linux. WSL/Docker are unavailable locally while VHV is required. Options: a Linux helper VM on ESXi, or run conversion in AWS. Deferred decision.
+2. **Conversion host**: conversion tools need Linux. Windows intentionally runs without the Windows hypervisor so nested ESXi can use VMware's native virtualization mode, so WSL2 and Docker are not available in this mode. This is a lab architecture constraint, not a production limitation. Options (local helper Linux environment, AWS conversion helper, or another controlled Linux runtime) stay open: [feasibility section 6](feasibility.md#6-conversion-host-deferred-decision).
 
 ## 4. Decisions
 
