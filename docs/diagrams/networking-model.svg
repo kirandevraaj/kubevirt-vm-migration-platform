@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="660" viewBox="0 0 1120 660" role="img" aria-labelledby="title desc">
+  <title id="title">VMware networking vs KubeVirt networking</title>
+  <desc id="desc">Left: VM vNIC to port group to standard vSwitch to physical uplink on ESXi. Right: guest virtio NIC to interface binding inside the virt-launcher Pod, to the pod network via the primary CNI, and to secondary networks via Multus and NetworkAttachmentDefinitions. A mapping between port groups and destination networks.</desc>
+  <style>
+    .h { font: 700 20px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+    .c { font: 700 15px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+    .t { font: 600 13px 'Segoe UI', Arial, sans-serif; fill: #111827; }
+    .s { font: 11.5px 'Segoe UI', Arial, sans-serif; fill: #374151; }
+    .m { font: 700 12px 'Segoe UI', Arial, sans-serif; fill: #b91c1c; }
+    .box { stroke: #334155; stroke-width: 1.3; }
+    .arr { stroke: #475569; stroke-width: 1.8; fill: none; }
+    .map { stroke: #b91c1c; stroke-width: 2; fill: none; stroke-dasharray: 7 4; }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker>
+    <marker id="m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b91c1c"/></marker>
+  </defs>
+  <rect width="1120" height="660" fill="#ffffff"/>
+  <text x="560" y="32" text-anchor="middle" class="h">Networking: ESXi source vs KubeVirt destination</text>
+
+  <text x="230" y="66" text-anchor="middle" class="c">ESXi (our source host)</text>
+  <rect x="40" y="80" width="380" height="60" rx="8" class="box" fill="#dcfce7"/>
+  <text x="56" y="104" class="t">Guest NIC: ens192 (vmxnet3 driver)</text>
+  <text x="56" y="124" class="s">IP configured inside the guest (static or DHCP)</text>
+  <path d="M230,140 L230,158" class="arr" marker-end="url(#a)"/>
+  <rect x="40" y="160" width="380" height="54" rx="8" class="box" fill="#e0f2fe"/>
+  <text x="56" y="184" class="t">vNIC ethernet0 (virtualDev = vmxnet3, MAC)</text>
+  <text x="56" y="202" class="s">defined in .vmx, networkName = "VM Network"</text>
+  <path d="M230,214 L230,232" class="arr" marker-end="url(#a)"/>
+  <rect x="40" y="234" width="380" height="54" rx="8" class="box" fill="#fef3c7"/>
+  <text x="56" y="258" class="t">Port group "VM Network" (VLAN 0)</text>
+  <text x="56" y="276" class="s">policy + VLAN tag for a set of vNICs</text>
+  <path d="M230,288 L230,306" class="arr" marker-end="url(#a)"/>
+  <rect x="40" y="308" width="380" height="54" rx="8" class="box" fill="#fef3c7"/>
+  <text x="56" y="332" class="t">vSwitch0 (standard switch, MTU 1500)</text>
+  <text x="56" y="350" class="s">L2 switch in VMkernel; also carries Management Network / vmk0</text>
+  <path d="M230,362 L230,380" class="arr" marker-end="url(#a)"/>
+  <rect x="40" y="382" width="380" height="54" rx="8" class="box" fill="#e5e7eb"/>
+  <text x="56" y="406" class="t">vmnic0 uplink &#8594; VMnet8 NAT (192.168.50.0/24)</text>
+  <text x="56" y="424" class="s">in our lab the "physical" uplink is itself virtual</text>
+
+  <text x="850" y="66" text-anchor="middle" class="c">KubeVirt (destination)</text>
+  <rect x="600" y="80" width="490" height="60" rx="8" class="box" fill="#dcfce7"/>
+  <text x="616" y="104" class="t">Guest NIC: eth0 / enp1s0 (virtio-net driver)</text>
+  <text x="616" y="124" class="s">name + MAC may change &#8594; static IP configs can break (see MTV preserveStaticIPs)</text>
+  <path d="M845,140 L845,158" class="arr" marker-end="url(#a)"/>
+  <rect x="600" y="160" width="490" height="110" rx="8" class="box" fill="#ede9fe"/>
+  <text x="616" y="184" class="t">virt-launcher Pod network namespace</text>
+  <text x="616" y="206" class="s">spec.domain.devices.interfaces[] = binding method:</text>
+  <text x="630" y="226" class="s">masquerade: VM gets an internal IP, NAT to the Pod IP (recommended for pod network)</text>
+  <text x="630" y="244" class="s">bridge: Pod IP handed to the VM via DHCP (no live migration on pod network)</text>
+  <text x="630" y="262" class="s">passt, sriov, binding plugins: other options</text>
+  <path d="M740,270 L700,300" class="arr" marker-end="url(#a)"/>
+  <path d="M960,270 L990,300" class="arr" marker-end="url(#a)"/>
+  <rect x="600" y="302" width="230" height="134" rx="8" class="box" fill="#dbeafe"/>
+  <text x="616" y="326" class="t">Primary: pod network</text>
+  <text x="616" y="346" class="s">networks: - name: default</text>
+  <text x="616" y="362" class="s">             pod: {}</text>
+  <text x="616" y="382" class="s">cluster CNI (e.g. VPC CNI on EKS)</text>
+  <text x="616" y="400" class="s">works with Services, Ingress,</text>
+  <text x="616" y="418" class="s">NetworkPolicy</text>
+  <rect x="850" y="302" width="240" height="134" rx="8" class="box" fill="#fce7f3"/>
+  <text x="866" y="326" class="t">Secondary: Multus</text>
+  <text x="866" y="346" class="s">networks: - name: vlan20</text>
+  <text x="866" y="362" class="s">  multus: {networkName: vlan20}</text>
+  <text x="866" y="382" class="s">NetworkAttachmentDefinition</text>
+  <text x="866" y="400" class="s">(bridge / OVS / SR-IOV CNI config)</text>
+  <text x="866" y="418" class="s">extra NICs, L2 segments, VLANs</text>
+
+  <path d="M420,261 C520,261 520,370 598,370" class="map" marker-end="url(#m)"/>
+  <text x="440" y="400" class="m">NetworkMap:</text>
+  <text x="440" y="416" class="m">"VM Network" &#8594; pod</text>
+  <text x="440" y="432" class="m">(or &#8594; NAD)</text>
+
+  <rect x="40" y="470" width="1050" height="170" rx="8" fill="#f8fafc" stroke="#94a3b8"/>
+  <text x="56" y="494" class="t">Rough analogy (not equivalence)</text>
+  <text x="56" y="516" class="s">vNIC (vmxnet3) &#8776; interface in spec.domain.devices.interfaces (virtio model).   Port group &#8776; a named network in spec.networks (pod, or a Multus NAD).</text>
+  <text x="56" y="536" class="s">vSwitch &#8776; Linux bridge / OVS on the node, created by CNI plugins.   VLAN ID on a port group &#8776; VLAN in a NetworkAttachmentDefinition config.</text>
+  <text x="56" y="556" class="s">Differences: the pod network is routed and NAT-friendly, not a flat L2 segment; IPs come from the CNI; Services give stable names instead of static IPs.</text>
+  <text x="56" y="584" class="t">Project decision for the first demo</text>
+  <text x="56" y="606" class="s">Map "VM Network" &#8594; pod network with masquerade binding. Expose nginx with a Kubernetes Service. The guest must use DHCP (a static IP in the source guest is an assessment warning).</text>
+  <text x="56" y="626" class="s">Multus and secondary networks are documented here but not built in the first stages.</text>
+</svg>

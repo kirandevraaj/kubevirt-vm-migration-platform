@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="560" viewBox="0 0 1160 560" role="img" aria-labelledby="title desc">
+  <title id="title">CDI import flow: source image to KubeVirt VM disk</title>
+  <desc id="desc">Image sources feed a DataVolume. The CDI controller creates a PVC and an importer Pod that converts the image to raw on the PVC. KubeVirt then attaches the PVC as a VM disk. A boundary shows where CDI ends and KubeVirt begins.</desc>
+  <style>
+    .h { font: 700 20px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+    .c { font: 700 15px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+    .t { font: 600 13px 'Segoe UI', Arial, sans-serif; fill: #111827; }
+    .s { font: 11.5px 'Segoe UI', Arial, sans-serif; fill: #374151; }
+    .b { font: 700 13px 'Segoe UI', Arial, sans-serif; fill: #b91c1c; }
+    .box { stroke: #334155; stroke-width: 1.3; }
+    .arr { stroke: #475569; stroke-width: 2; fill: none; }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#475569"/>
+    </marker>
+  </defs>
+  <rect width="1160" height="560" fill="#ffffff"/>
+  <text x="580" y="32" text-anchor="middle" class="h">CDI: from a disk image to a KubeVirt VM disk</text>
+
+  <text x="120" y="70" text-anchor="middle" class="c">Source</text>
+  <rect x="30" y="84" width="180" height="300" rx="8" class="box" fill="#fef3c7"/>
+  <text x="46" y="108" class="t">Image sources</text>
+  <text x="46" y="132" class="s">&#8226; http / https URL</text>
+  <text x="46" y="152" class="s">&#8226; S3 or GCS bucket</text>
+  <text x="46" y="172" class="s">&#8226; container registry</text>
+  <text x="46" y="192" class="s">&#8226; upload (virtctl)</text>
+  <text x="46" y="212" class="s">&#8226; existing PVC (clone)</text>
+  <text x="46" y="232" class="s">&#8226; VolumeSnapshot</text>
+  <text x="46" y="252" class="s">&#8226; VDDK (vCenter/ESXi)</text>
+  <text x="46" y="272" class="s">&#8226; oVirt imageio</text>
+  <text x="46" y="292" class="s">&#8226; blank disk</text>
+  <text x="46" y="320" class="t">Formats accepted</text>
+  <text x="46" y="340" class="s">qcow2, VMDK, VDI, VHD(X),</text>
+  <text x="46" y="356" class="s">raw; optional gz / xz</text>
+  <text x="46" y="372" class="s">&#8594; always stored as raw</text>
+
+  <path d="M210,200 L262,200" class="arr" marker-end="url(#a)"/>
+
+  <text x="380" y="70" text-anchor="middle" class="c">CDI (cdi.kubevirt.io)</text>
+  <rect x="266" y="84" width="230" height="96" rx="8" class="box" fill="#dbeafe"/>
+  <text x="282" y="108" class="t">DataVolume (CR)</text>
+  <text x="282" y="128" class="s">spec.source: where the image is</text>
+  <text x="282" y="146" class="s">spec.storage: size, class, mode</text>
+  <text x="282" y="164" class="s">status.phase / progress</text>
+
+  <rect x="266" y="196" width="230" height="80" rx="8" class="box" fill="#e0e7ff"/>
+  <text x="282" y="220" class="t">cdi-deployment (controller)</text>
+  <text x="282" y="240" class="s">reconciles the DataVolume;</text>
+  <text x="282" y="258" class="s">creates PVC + worker Pods</text>
+
+  <rect x="266" y="292" width="230" height="92" rx="8" class="box" fill="#ede9fe"/>
+  <text x="282" y="316" class="t">importer / uploader / cloner Pod</text>
+  <text x="282" y="336" class="s">short-lived; fetches the image,</text>
+  <text x="282" y="354" class="s">converts with qemu-img to raw,</text>
+  <text x="282" y="372" class="s">writes it into the PVC</text>
+  <path d="M381,180 L381,194" class="arr" marker-end="url(#a)"/>
+  <path d="M381,276 L381,290" class="arr" marker-end="url(#a)"/>
+
+  <path d="M496,240 L548,240" class="arr" marker-end="url(#a)"/>
+
+  <text x="660" y="70" text-anchor="middle" class="c">Kubernetes storage</text>
+  <rect x="552" y="84" width="220" height="120" rx="8" class="box" fill="#dcfce7"/>
+  <text x="568" y="108" class="t">PersistentVolumeClaim</text>
+  <text x="568" y="128" class="s">same name as the DataVolume</text>
+  <text x="568" y="146" class="s">ReadWriteOnce, Block or Filesystem</text>
+  <text x="568" y="164" class="s">bound when the importer Pod</text>
+  <text x="568" y="182" class="s">(or the VM, if WaitForFirstConsumer)</text>
+  <rect x="552" y="220" width="220" height="80" rx="8" class="box" fill="#f1f5f9"/>
+  <text x="568" y="244" class="t">StorageClass + CSI driver</text>
+  <text x="568" y="264" class="s">e.g. ebs-gp3 &#8594; EBS CSI</text>
+  <text x="568" y="282" class="s">provisions the PersistentVolume</text>
+  <rect x="552" y="316" width="220" height="68" rx="8" class="box" fill="#f1f5f9"/>
+  <text x="568" y="340" class="t">PersistentVolume</text>
+  <text x="568" y="360" class="s">the actual EBS volume in one AZ</text>
+  <path d="M662,204 L662,218" class="arr" marker-end="url(#a)"/>
+  <path d="M662,300 L662,314" class="arr" marker-end="url(#a)"/>
+
+  <line x1="800" y1="60" x2="800" y2="420" stroke="#b91c1c" stroke-width="2.5" stroke-dasharray="8 5"/>
+  <text x="812" y="404" class="b">CDI ends here: DataVolume = Succeeded,</text>
+  <text x="812" y="422" class="b">PVC holds a raw disk. KubeVirt begins.</text>
+
+  <path d="M772,144 L832,144" class="arr" marker-end="url(#a)"/>
+
+  <text x="990" y="70" text-anchor="middle" class="c">KubeVirt</text>
+  <rect x="836" y="84" width="300" height="130" rx="8" class="box" fill="#dbeafe"/>
+  <text x="852" y="108" class="t">VirtualMachine spec</text>
+  <text x="852" y="128" class="s">volumes:</text>
+  <text x="852" y="146" class="s">  - name: rootdisk</text>
+  <text x="852" y="164" class="s">    dataVolume: {name: legacy-web-disk0}</text>
+  <text x="852" y="182" class="s">(or persistentVolumeClaim, or</text>
+  <text x="852" y="200" class="s"> dataVolumeTemplates inside the VM)</text>
+  <rect x="836" y="230" width="300" height="80" rx="8" class="box" fill="#ede9fe"/>
+  <text x="852" y="254" class="t">virt-launcher Pod mounts the PVC</text>
+  <text x="852" y="274" class="s">Filesystem mode &#8594; disk.img file on the volume</text>
+  <text x="852" y="292" class="s">Block mode &#8594; raw block device</text>
+  <rect x="836" y="326" width="300" height="58" rx="8" class="box" fill="#e0f2fe"/>
+  <text x="852" y="350" class="t">QEMU presents it to the guest</text>
+  <text x="852" y="370" class="s">as a virtio-blk (or SCSI/SATA) disk</text>
+  <path d="M986,214 L986,228" class="arr" marker-end="url(#a)"/>
+  <path d="M986,310 L986,324" class="arr" marker-end="url(#a)"/>
+
+  <rect x="30" y="440" width="1106" height="100" rx="8" fill="#f8fafc" stroke="#94a3b8"/>
+  <text x="46" y="464" class="t">Responsibilities</text>
+  <text x="46" y="486" class="s">CDI: get bytes from somewhere, convert to raw, and fill a PVC of the right size. Reports progress and phase on the DataVolume. Knows nothing about CPUs, NICs or boot.</text>
+  <text x="46" y="506" class="s">KubeVirt: define virtual hardware, attach the PVC as a disk, run QEMU, boot. Knows nothing about where the bytes came from.</text>
+  <text x="46" y="526" class="s">Migration platform (ours): decide the source, the format conversion, the size and StorageClass, then write both the DataVolume and the VirtualMachine.</text>
+</svg>

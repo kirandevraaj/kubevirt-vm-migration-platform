@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="700" viewBox="0 0 1160 700" role="img" aria-labelledby="title desc">
+  <title id="title">Project 1.5 lab resource architecture</title>
+  <desc id="desc">Local source lab on the laptop (Windows, VMware Workstation, nested ESXi, source VM) connected over the internet to a disposable AWS target built with Terraform (VPC, Kubernetes with KVM-capable nodes, KubeVirt, CDI, EBS, S3 staging).</desc>
+  <style>
+    .h { font: 700 20px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+    .c { font: 700 15px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+    .t { font: 600 13px 'Segoe UI', Arial, sans-serif; fill: #111827; }
+    .s { font: 11.5px 'Segoe UI', Arial, sans-serif; fill: #374151; }
+    .p { font: 700 11px 'Segoe UI', Arial, sans-serif; fill: #b91c1c; }
+    .box { stroke: #334155; stroke-width: 1.2; }
+    .arr { stroke: #475569; stroke-width: 2; fill: none; }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker>
+  </defs>
+  <rect width="1160" height="700" fill="#ffffff"/>
+  <text x="580" y="32" text-anchor="middle" class="h">Lab resource architecture (local source + disposable AWS target)</text>
+
+  <rect x="30" y="56" width="500" height="560" rx="12" fill="#fffbeb" stroke="#b45309" stroke-width="1.5"/>
+  <text x="46" y="80" class="c">LOCAL: laptop LAPTOP-HUAOOKQ0 (exists)</text>
+  <text x="46" y="98" class="s">i7-14650HX 24 threads &#183; 31.7 GB RAM (about 17 GB free) &#183; C: about 434 GB free</text>
+  <rect x="50" y="112" width="460" height="56" rx="8" class="box" fill="#e5e7eb"/>
+  <text x="66" y="134" class="t">Windows 11 Home 26200 (Windows hypervisor OFF)</text>
+  <text x="66" y="152" class="s">WSL2 / Docker Desktop unavailable while VHV is in use</text>
+  <rect x="50" y="178" width="460" height="56" rx="8" class="box" fill="#fef3c7"/>
+  <text x="66" y="200" class="t">VMware Workstation Pro 17.6.4</text>
+  <text x="66" y="218" class="s">VMnet8 NAT 192.168.50.0/24 &#183; gateway/DNS 192.168.50.2</text>
+  <rect x="50" y="244" width="460" height="240" rx="8" class="box" fill="#dbeafe"/>
+  <text x="66" y="266" class="t">esxi-8-lab: ESXi 8.0.3 build 24677879 (free license)</text>
+  <text x="66" y="286" class="s">8 vCPU &#183; 16 GB &#183; vmk0 192.168.50.11 static &#183; SSH key auth</text>
+  <text x="66" y="304" class="s">vSwitch0: "Management Network" + "VM Network"</text>
+  <rect x="70" y="316" width="420" height="156" rx="8" fill="#ffffff" stroke="#2563eb"/>
+  <text x="86" y="338" class="t">migration-datastore (VMFS-6, 199.8 GB, empty)</text>
+  <rect x="86" y="350" width="190" height="110" rx="8" class="box" fill="#dcfce7"/>
+  <text x="96" y="372" class="t">legacy-source-vm</text>
+  <text x="96" y="390" class="s">Linux + nginx</text>
+  <text x="96" y="406" class="s">vmxnet3 + pvscsi</text>
+  <text x="96" y="422" class="s">about 2 vCPU / 2 GB / 20 GB</text>
+  <text x="96" y="448" class="p">PLANNED</text>
+  <rect x="290" y="350" width="190" height="110" rx="8" class="box" fill="#ede9fe"/>
+  <text x="300" y="372" class="t">helper / conversion VM</text>
+  <text x="300" y="390" class="s">Linux: qemu-img,</text>
+  <text x="300" y="406" class="s">virt-v2v, aws CLI</text>
+  <text x="300" y="422" class="s">(one option; see feasibility)</text>
+  <text x="300" y="448" class="p">DEFERRED</text>
+  <rect x="50" y="494" width="460" height="110" rx="8" class="box" fill="#f1f5f9"/>
+  <text x="66" y="516" class="t">Operator workstation tools (Windows)</text>
+  <text x="66" y="536" class="s">Git, SSH (ssh esxi-8-lab), Terraform, kubectl, virtctl</text>
+  <text x="66" y="554" class="s">AWS credentials: only in Docker volume platform-aws-tools-aws</text>
+  <text x="66" y="572" class="s">&#8594; must be recovered or re-issued before any Terraform run</text>
+  <text x="66" y="592" class="p">BLOCKER FOR THE AWS STAGE</text>
+
+  <path d="M530,380 L628,380" class="arr" marker-end="url(#a)"/>
+  <text x="536" y="364" class="s">HTTPS over</text>
+  <text x="536" y="398" class="s">laptop Wi-Fi</text>
+  <text x="536" y="414" class="s">(outbound only)</text>
+
+  <rect x="630" y="56" width="500" height="560" rx="12" fill="#eff6ff" stroke="#1d4ed8" stroke-width="1.5" stroke-dasharray="8 5"/>
+  <text x="646" y="80" class="c">AWS: disposable, Terraform-managed (NOT created)</text>
+  <text x="646" y="98" class="s">terraform apply for a session &#8594; demo &#8594; terraform destroy</text>
+  <rect x="650" y="112" width="460" height="56" rx="8" class="box" fill="#f1f5f9"/>
+  <text x="666" y="134" class="t">S3 staging bucket</text>
+  <text x="666" y="152" class="s">converted qcow2/raw images; CDI imports with an S3 source</text>
+  <rect x="650" y="178" width="460" height="420" rx="8" class="box" fill="#e0e7ff"/>
+  <text x="666" y="200" class="t">VPC (public + private subnets, one AZ is enough)</text>
+  <rect x="670" y="212" width="420" height="376" rx="8" fill="#ffffff" stroke="#6366f1"/>
+  <text x="686" y="234" class="t">Kubernetes 1.35 or 1.36 (EKS or kubeadm: deferred)</text>
+  <text x="686" y="252" class="s">KubeVirt v1.9.x supports Kubernetes 1.34 to 1.36</text>
+  <rect x="686" y="264" width="390" height="120" rx="8" class="box" fill="#dbeafe"/>
+  <text x="700" y="286" class="t">KVM-capable worker node(s)</text>
+  <text x="700" y="304" class="s">nested-virt instance type (e.g. m8i / c8i family,</text>
+  <text x="700" y="320" class="s">NestedVirtualization=enabled) or *.metal</text>
+  <text x="700" y="338" class="s">/dev/kvm present &#183; containerd &#183; privileged pods allowed</text>
+  <text x="700" y="356" class="s">virt-handler &#183; virt-launcher Pods &#183; CDI importer Pods</text>
+  <text x="700" y="374" class="p">INSTANCE TYPE + CLUSTER TYPE: DEFERRED</text>
+  <rect x="686" y="394" width="190" height="84" rx="8" class="box" fill="#fde68a"/>
+  <text x="700" y="416" class="t">KubeVirt operator</text>
+  <text x="700" y="434" class="s">virt-api, virt-controller</text>
+  <text x="700" y="452" class="s">KubeVirt CR</text>
+  <rect x="886" y="394" width="190" height="84" rx="8" class="box" fill="#bbf7d0"/>
+  <text x="900" y="416" class="t">CDI operator</text>
+  <text x="900" y="434" class="s">cdi-deployment,</text>
+  <text x="900" y="452" class="s">uploadproxy</text>
+  <rect x="686" y="488" width="190" height="88" rx="8" class="box" fill="#f1f5f9"/>
+  <text x="700" y="510" class="t">EBS CSI + gp3</text>
+  <text x="700" y="528" class="s">StorageClass for VM</text>
+  <text x="700" y="544" class="s">disks (RWO, AZ-scoped)</text>
+  <rect x="886" y="488" width="190" height="88" rx="8" class="box" fill="#ede9fe"/>
+  <text x="900" y="510" class="t">Migration controller</text>
+  <text x="900" y="528" class="s">VirtualMachineMigration</text>
+  <text x="900" y="544" class="s">CRD (later stage)</text>
+
+  <rect x="30" y="632" width="1100" height="52" rx="8" fill="#f8fafc" stroke="#94a3b8"/>
+  <text x="46" y="654" class="s">Connectivity is one-way: the lab pushes to AWS (S3 upload or CDI upload proxy). AWS never needs to reach 192.168.50.0/24, so no VPN is required for cold migration.</text>
+  <text x="46" y="672" class="s">If the controller runs in AWS, SSH discovery of ESXi needs a path back to the lab. That is why discovery/acquisition may run from the local side (see feasibility.md).</text>
+</svg>

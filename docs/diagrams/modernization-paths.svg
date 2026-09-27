@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="560" viewBox="0 0 1100 560" role="img" aria-labelledby="title desc">
+  <title id="title">VM migration vs application modernization</title>
+  <desc id="desc">A legacy VM running nginx can take two paths: rehost as a KubeVirt VM (VM model preserved) or modernize into a container image, Deployment and Service (VM dependency removed).</desc>
+  <style>
+    .h { font: 700 20px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+    .c { font: 700 15px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+    .t { font: 600 13px 'Segoe UI', Arial, sans-serif; fill: #111827; }
+    .s { font: 11.5px 'Segoe UI', Arial, sans-serif; fill: #374151; }
+    .box { stroke: #334155; stroke-width: 1.3; }
+    .arr { stroke: #475569; stroke-width: 2; fill: none; }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker>
+  </defs>
+  <rect width="1100" height="560" fill="#ffffff"/>
+  <text x="550" y="32" text-anchor="middle" class="h">Two destinations for the same legacy workload</text>
+
+  <rect x="40" y="200" width="230" height="130" rx="8" class="box" fill="#fef3c7"/>
+  <text x="155" y="224" text-anchor="middle" class="c">Legacy VM on ESXi</text>
+  <text x="56" y="248" class="s">Linux guest + kernel</text>
+  <text x="56" y="266" class="s">nginx (package), config in /etc</text>
+  <text x="56" y="284" class="s">static content in /var/www</text>
+  <text x="56" y="302" class="s">VMware Tools, vmxnet3, pvscsi</text>
+  <text x="56" y="320" class="s">patched by hand / Ansible</text>
+
+  <path d="M270,240 L340,140" class="arr" marker-end="url(#a)"/>
+  <path d="M270,290 L340,390" class="arr" marker-end="url(#a)"/>
+
+  <text x="700" y="70" text-anchor="middle" class="c">Path 1: VM migration (rehost), Project 1.5 core</text>
+  <rect x="344" y="84" width="170" height="104" rx="8" class="box" fill="#ede9fe"/>
+  <text x="429" y="108" text-anchor="middle" class="t">Convert disk</text>
+  <text x="358" y="130" class="s">VMDK &#8594; qcow2/raw</text>
+  <text x="358" y="148" class="s">VMware drivers &#8594;</text>
+  <text x="358" y="166" class="s">virtio</text>
+  <path d="M514,136 L560,136" class="arr" marker-end="url(#a)"/>
+  <rect x="564" y="84" width="170" height="104" rx="8" class="box" fill="#dbeafe"/>
+  <text x="649" y="108" text-anchor="middle" class="t">CDI import</text>
+  <text x="578" y="130" class="s">DataVolume &#8594; PVC</text>
+  <text x="578" y="148" class="s">(EBS gp3)</text>
+  <path d="M734,136 L780,136" class="arr" marker-end="url(#a)"/>
+  <rect x="784" y="84" width="280" height="104" rx="8" class="box" fill="#dbeafe"/>
+  <text x="924" y="108" text-anchor="middle" class="t">KubeVirt VirtualMachine</text>
+  <text x="798" y="130" class="s">same OS, same kernel, same nginx package,</text>
+  <text x="798" y="148" class="s">same config and data; still patched as a VM;</text>
+  <text x="798" y="166" class="s">now scheduled + managed by Kubernetes</text>
+
+  <text x="700" y="296" text-anchor="middle" class="c">Path 2: application modernization (refactor/replatform)</text>
+  <rect x="344" y="310" width="150" height="120" rx="8" class="box" fill="#f1f5f9"/>
+  <text x="419" y="334" text-anchor="middle" class="t">Assess</text>
+  <text x="356" y="356" class="s">stateless? ports?</text>
+  <text x="356" y="374" class="s">config + content?</text>
+  <text x="356" y="392" class="s">OS dependencies?</text>
+  <text x="356" y="410" class="s">&#8594; candidate: yes</text>
+  <path d="M494,370 L530,370" class="arr" marker-end="url(#a)"/>
+  <rect x="534" y="310" width="160" height="120" rx="8" class="box" fill="#dcfce7"/>
+  <text x="614" y="334" text-anchor="middle" class="t">Container image</text>
+  <text x="546" y="356" class="s">FROM nginx (pinned)</text>
+  <text x="546" y="374" class="s">COPY site content</text>
+  <text x="546" y="392" class="s">COPY nginx.conf</text>
+  <text x="546" y="410" class="s">push by digest</text>
+  <path d="M694,370 L730,370" class="arr" marker-end="url(#a)"/>
+  <rect x="734" y="310" width="150" height="120" rx="8" class="box" fill="#dcfce7"/>
+  <text x="809" y="334" text-anchor="middle" class="t">Deployment</text>
+  <text x="746" y="356" class="s">replicas: 2+</text>
+  <text x="746" y="374" class="s">probes, limits</text>
+  <text x="746" y="392" class="s">rolling updates</text>
+  <text x="746" y="410" class="s">GitOps (Argo CD)</text>
+  <path d="M884,370 L920,370" class="arr" marker-end="url(#a)"/>
+  <rect x="924" y="310" width="140" height="120" rx="8" class="box" fill="#dcfce7"/>
+  <text x="994" y="334" text-anchor="middle" class="t">Service</text>
+  <text x="936" y="356" class="s">(+ Ingress)</text>
+  <text x="936" y="374" class="s">stable name,</text>
+  <text x="936" y="392" class="s">load-balanced</text>
+  <text x="936" y="410" class="s">no guest OS</text>
+
+  <rect x="40" y="460" width="1024" height="80" rx="8" fill="#f8fafc" stroke="#94a3b8"/>
+  <text x="56" y="484" class="t">Migration preserves the VM model (guest kernel, OS patching, VM-shaped scaling). It is fast and low-risk, and needs no application change.</text>
+  <text x="56" y="506" class="t">Modernization removes the VM dependency: the image is the unit of delivery, the node kernel is shared, and scaling is horizontal.</text>
+  <text x="56" y="528" class="t">Project 1.5 demonstrates both on the same nginx workload so the trade-off is visible, not theoretical.</text>
+</svg>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="860" viewBox="0 0 1100 860" role="img" aria-labelledby="title desc">
+  <title id="title">VirtualMachineMigration state machine</title>
+  <desc id="desc">Happy path from Pending through Discovering, Validated, Preparing, Converting, Importing, CreatingVM, Starting, Validating to Completed. Side states Retryable, ManualInterventionRequired and Failed, with their transitions.</desc>
+  <style>
+    .h { font: 700 20px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+    .t { font: 700 14px 'Segoe UI', Arial, sans-serif; fill: #111827; }
+    .s { font: 11.5px 'Segoe UI', Arial, sans-serif; fill: #374151; }
+    .e { font: 11px 'Segoe UI', Arial, sans-serif; fill: #1f2937; }
+    .st { stroke: #334155; stroke-width: 1.4; }
+    .arr { stroke: #475569; stroke-width: 1.8; fill: none; }
+    .ret { stroke: #d97706; stroke-width: 1.8; fill: none; }
+    .man { stroke: #7c3aed; stroke-width: 1.8; fill: none; }
+    .fail { stroke: #dc2626; stroke-width: 1.8; fill: none; }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#d97706"/></marker>
+    <marker id="am" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#7c3aed"/></marker>
+    <marker id="af" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#dc2626"/></marker>
+  </defs>
+  <rect width="1100" height="860" fill="#ffffff"/>
+  <text x="550" y="32" text-anchor="middle" class="h">VirtualMachineMigration phases (status.phase)</text>
+
+  <rect x="80" y="56" width="300" height="48" rx="24" class="st" fill="#f1f5f9"/><text x="230" y="78" text-anchor="middle" class="t">Pending</text><text x="230" y="95" text-anchor="middle" class="s">CR accepted, finalizer added</text>
+  <path d="M230,104 L230,126" class="arr" marker-end="url(#a)"/>
+  <rect x="80" y="128" width="300" height="48" rx="24" class="st" fill="#fef3c7"/><text x="230" y="150" text-anchor="middle" class="t">Discovering</text><text x="230" y="167" text-anchor="middle" class="s">read source VM + build inventory</text>
+  <path d="M230,176 L230,198" class="arr" marker-end="url(#a)"/>
+  <rect x="80" y="200" width="300" height="48" rx="24" class="st" fill="#fef3c7"/><text x="230" y="222" text-anchor="middle" class="t">Validated</text><text x="230" y="239" text-anchor="middle" class="s">assessment passed, mappings resolved</text>
+  <path d="M230,248 L230,270" class="arr" marker-end="url(#a)"/>
+  <rect x="80" y="272" width="300" height="48" rx="24" class="st" fill="#fef3c7"/><text x="230" y="294" text-anchor="middle" class="t">Preparing</text><text x="230" y="311" text-anchor="middle" class="s">power off source, acquire VMDK</text>
+  <path d="M230,320 L230,342" class="arr" marker-end="url(#a)"/>
+  <rect x="80" y="344" width="300" height="48" rx="24" class="st" fill="#ede9fe"/><text x="230" y="366" text-anchor="middle" class="t">Converting</text><text x="230" y="383" text-anchor="middle" class="s">qemu-img / virt-v2v, stage image</text>
+  <path d="M230,392 L230,414" class="arr" marker-end="url(#a)"/>
+  <rect x="80" y="416" width="300" height="48" rx="24" class="st" fill="#dbeafe"/><text x="230" y="438" text-anchor="middle" class="t">Importing</text><text x="230" y="455" text-anchor="middle" class="s">DataVolume until Succeeded</text>
+  <path d="M230,464 L230,486" class="arr" marker-end="url(#a)"/>
+  <rect x="80" y="488" width="300" height="48" rx="24" class="st" fill="#dbeafe"/><text x="230" y="510" text-anchor="middle" class="t">CreatingVM</text><text x="230" y="527" text-anchor="middle" class="s">apply KubeVirt VirtualMachine</text>
+  <path d="M230,536 L230,558" class="arr" marker-end="url(#a)"/>
+  <rect x="80" y="560" width="300" height="48" rx="24" class="st" fill="#dbeafe"/><text x="230" y="582" text-anchor="middle" class="t">Starting</text><text x="230" y="599" text-anchor="middle" class="s">wait for VMI Running + guest ready</text>
+  <path d="M230,608 L230,630" class="arr" marker-end="url(#a)"/>
+  <rect x="80" y="632" width="300" height="48" rx="24" class="st" fill="#dbeafe"/><text x="230" y="654" text-anchor="middle" class="t">Validating</text><text x="230" y="671" text-anchor="middle" class="s">run spec.validation checks</text>
+  <path d="M230,680 L230,702" class="arr" marker-end="url(#a)"/>
+  <rect x="80" y="704" width="300" height="48" rx="24" stroke="#15803d" stroke-width="3" fill="#dcfce7"/><text x="230" y="726" text-anchor="middle" class="t">Completed</text><text x="230" y="743" text-anchor="middle" class="s">terminal: success</text>
+
+  <path d="M392,128 L412,128 L412,680 L392,680" stroke="#64748b" stroke-width="1.5" fill="none"/>
+  <text x="424" y="404" text-anchor="middle" class="s" transform="rotate(-90 424 404)">any active phase (Discovering &#8230; Validating)</text>
+
+  <rect x="560" y="150" width="300" height="70" rx="24" class="st" fill="#ffedd5"/><text x="710" y="176" text-anchor="middle" class="t">Retryable</text><text x="710" y="194" text-anchor="middle" class="s">transient error; back off, then</text><text x="710" y="209" text-anchor="middle" class="s">resume status.failedPhase</text>
+  <rect x="560" y="380" width="300" height="70" rx="24" class="st" fill="#f3e8ff"/><text x="710" y="406" text-anchor="middle" class="t">ManualInterventionRequired</text><text x="710" y="424" text-anchor="middle" class="s">needs a human decision; paused,</text><text x="710" y="439" text-anchor="middle" class="s">no automatic retries</text>
+  <rect x="560" y="610" width="300" height="70" rx="24" stroke="#b91c1c" stroke-width="3" fill="#fee2e2"/><text x="710" y="636" text-anchor="middle" class="t">Failed</text><text x="710" y="654" text-anchor="middle" class="s">terminal: permanent error or</text><text x="710" y="669" text-anchor="middle" class="s">retry budget exhausted</text>
+
+  <path d="M436,200 L558,185" class="ret" marker-end="url(#ar)"/>
+  <text x="446" y="182" class="e">transient error</text>
+  <path d="M558,205 L436,250" class="ret" marker-end="url(#ar)"/>
+  <text x="446" y="262" class="e">backoff elapsed &#8594; same phase</text>
+  <path d="M436,410 L558,415" class="man" marker-end="url(#am)"/>
+  <text x="446" y="400" class="e">needs a human</text>
+  <path d="M436,640 L558,645" class="fail" marker-end="url(#af)"/>
+  <text x="446" y="630" class="e">permanent error</text>
+
+  <path d="M760,220 L760,378" class="man" marker-end="url(#am)"/>
+  <text x="768" y="300" class="e">error class changes</text>
+  <path d="M600,220 C480,330 480,520 620,608" class="fail" marker-end="url(#af)"/>
+  <text x="540" y="530" class="e">attempts &#8805; maxRetries</text>
+  <path d="M760,450 L760,608" class="fail" marker-end="url(#af)"/>
+  <text x="768" y="535" class="e">user aborts</text>
+  <path d="M860,415 C960,415 960,260 862,200" class="man" marker-end="url(#am)"/>
+  <text x="900" y="300" class="e">user approves</text>
+  <text x="900" y="316" class="e">(annotation) &#8594;</text>
+  <text x="900" y="332" class="e">resume phase</text>
+
+  <rect x="40" y="776" width="1020" height="70" rx="8" fill="#f8fafc" stroke="#94a3b8"/>
+  <text x="56" y="800" class="s">Solid grey arrows: automatic, taken by the controller when the phase's exit condition is observed. Orange: automatic retry with exponential backoff (bounded).</text>
+  <text x="56" y="820" class="s">Purple: pause for a human (e.g. source VM is powered on and policy forbids forced shutdown, guest OS not supported by virt-v2v).</text>
+  <text x="56" y="840" class="s">Terminal states: Completed and Failed. A Failed migration is not resumed; a new VirtualMachineMigration is created after cleanup.</text>
+</svg>

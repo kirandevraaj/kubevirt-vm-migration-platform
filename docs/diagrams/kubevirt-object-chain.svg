@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="820" viewBox="0 0 1000 820" role="img" aria-labelledby="title desc">
+  <title id="title">From ESXi VM to guest OS on KubeVirt: layers and owners</title>
+  <desc id="desc">Vertical chain: ESXi VM, KubeVirt VirtualMachine, VirtualMachineInstance, virt-launcher Pod, QEMU, KVM, guest OS, with the component that owns each layer.</desc>
+  <style>
+    .h { font: 700 20px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+    .t { font: 700 14px 'Segoe UI', Arial, sans-serif; fill: #111827; }
+    .s { font: 12px 'Segoe UI', Arial, sans-serif; fill: #374151; }
+    .o { font: 12px 'Segoe UI', Arial, sans-serif; fill: #1e3a8a; }
+    .ol { font: 700 12px 'Segoe UI', Arial, sans-serif; fill: #1e3a8a; }
+    .box { stroke: #334155; stroke-width: 1.3; }
+    .own { fill: #eff6ff; stroke: #93c5fd; stroke-width: 1; }
+    .arr { stroke: #475569; stroke-width: 2; fill: none; }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#475569"/>
+    </marker>
+  </defs>
+  <rect width="1000" height="820" fill="#ffffff"/>
+  <text x="500" y="34" text-anchor="middle" class="h">The chain from an ESXi VM to a running guest on KubeVirt</text>
+
+  <!-- 1 ESXi VM -->
+  <rect x="40" y="60" width="440" height="70" rx="8" class="box" fill="#fef3c7"/>
+  <text x="60" y="86" class="t">ESXi VM (source)</text>
+  <text x="60" y="106" class="s">.vmx config + .vmdk disks on a VMFS datastore</text>
+  <text x="60" y="122" class="s">runs as a VMX process on VMkernel</text>
+  <rect x="520" y="60" width="440" height="70" rx="8" class="own"/>
+  <text x="536" y="84" class="ol">Owner: ESXi (hostd, VMkernel)</text>
+  <text x="536" y="104" class="o">Leaves the picture after migration. The platform reads</text>
+  <text x="536" y="120" class="o">its metadata and copies its disks; it does not run it.</text>
+  <path d="M260,130 L260,168" class="arr" stroke-dasharray="6 4" marker-end="url(#a)"/>
+  <text x="272" y="154" class="s">migration: translate metadata, convert + import disks</text>
+
+  <!-- 2 VirtualMachine -->
+  <rect x="40" y="172" width="440" height="70" rx="8" class="box" fill="#dbeafe"/>
+  <text x="60" y="198" class="t">VirtualMachine (kubevirt.io/v1)</text>
+  <text x="60" y="218" class="s">persistent desired state: CPU, memory, disks, NICs</text>
+  <text x="60" y="234" class="s">spec.runStrategy decides whether it should be running</text>
+  <rect x="520" y="172" width="440" height="70" rx="8" class="own"/>
+  <text x="536" y="196" class="ol">Owner: you (kubectl / GitOps / migration controller)</text>
+  <text x="536" y="216" class="o">Survives stop/start. Like a StatefulSet with replicas=1.</text>
+  <text x="536" y="232" class="o">virt-api validates it; virt-controller acts on it.</text>
+  <path d="M260,242 L260,280" class="arr" marker-end="url(#a)"/>
+  <text x="272" y="266" class="s">virt-controller creates VMI when runStrategy says run</text>
+
+  <!-- 3 VMI -->
+  <rect x="40" y="284" width="440" height="70" rx="8" class="box" fill="#dbeafe"/>
+  <text x="60" y="310" class="t">VirtualMachineInstance (VMI)</text>
+  <text x="60" y="330" class="s">one running instance; deleted when the VM stops</text>
+  <text x="60" y="346" class="s">status: phase, nodeName, interfaces, guest info</text>
+  <rect x="520" y="284" width="440" height="70" rx="8" class="own"/>
+  <text x="536" y="308" class="ol">Owner: virt-controller (ownerReference to the VM)</text>
+  <text x="536" y="328" class="o">Ephemeral, like a Pod. Recreated from the VM template.</text>
+  <text x="536" y="344" class="o">virt-handler takes over once nodeName is set.</text>
+  <path d="M260,354 L260,392" class="arr" marker-end="url(#a)"/>
+  <text x="272" y="378" class="s">virt-controller creates the launcher Pod; scheduler places it</text>
+
+  <!-- 4 virt-launcher Pod -->
+  <rect x="40" y="396" width="440" height="70" rx="8" class="box" fill="#ede9fe"/>
+  <text x="60" y="422" class="t">virt-launcher Pod (virt-launcher-&lt;vm&gt;-xxxxx)</text>
+  <text x="60" y="442" class="s">compute container: virt-launcher + libvirt + QEMU</text>
+  <text x="60" y="458" class="s">gets the pod IP, mounted PVCs, CPU/memory limits</text>
+  <rect x="520" y="396" width="440" height="70" rx="8" class="own"/>
+  <text x="536" y="420" class="ol">Owners: kube-scheduler (placement), kubelet (runs it)</text>
+  <text x="536" y="440" class="o">Kubernetes treats it as a normal Pod: cgroups, namespaces,</text>
+  <text x="536" y="456" class="o">CNI networking, CSI volume mounts.</text>
+  <path d="M260,466 L260,504" class="arr" marker-end="url(#a)"/>
+  <text x="272" y="490" class="s">virt-handler (node) tells virt-launcher to start the domain</text>
+
+  <!-- 5 QEMU -->
+  <rect x="40" y="508" width="440" height="70" rx="8" class="box" fill="#e0f2fe"/>
+  <text x="60" y="534" class="t">QEMU process (the VM's user-space process)</text>
+  <text x="60" y="554" class="s">emulates machine + virtio devices; vCPUs are threads</text>
+  <text x="60" y="570" class="s">disk = PVC (file disk.img or raw block device)</text>
+  <rect x="520" y="508" width="440" height="70" rx="8" class="own"/>
+  <text x="536" y="532" class="ol">Owner: libvirt inside virt-launcher (domain XML)</text>
+  <text x="536" y="552" class="o">Runs inside the Pod's cgroup, so Pod requests/limits</text>
+  <text x="536" y="568" class="o">apply to the VM. Comparable to the VMX process on ESXi.</text>
+  <path d="M260,578 L260,616" class="arr" marker-end="url(#a)"/>
+  <text x="272" y="602" class="s">ioctl() on /dev/kvm: create VM, vCPUs, memory slots</text>
+
+  <!-- 6 KVM -->
+  <rect x="40" y="620" width="440" height="70" rx="8" class="box" fill="#fef3c7"/>
+  <text x="60" y="646" class="t">KVM (kernel module on the node)</text>
+  <text x="60" y="666" class="s">VT-x/AMD-V: guest code runs directly on the CPU</text>
+  <text x="60" y="682" class="s">EPT/NPT: guest-physical to host-physical memory</text>
+  <rect x="520" y="620" width="440" height="70" rx="8" class="own"/>
+  <text x="536" y="644" class="ol">Owner: node Linux kernel</text>
+  <text x="536" y="664" class="o">Exposed to the Pod as the /dev/kvm device (virt-handler</text>
+  <text x="536" y="680" class="o">advertises it). Comparable to the VMM in VMkernel.</text>
+  <path d="M260,690 L260,728" class="arr" marker-end="url(#a)"/>
+
+  <!-- 7 Guest OS -->
+  <rect x="40" y="732" width="440" height="66" rx="8" class="box" fill="#dcfce7"/>
+  <text x="60" y="758" class="t">Guest OS + application (e.g. Linux + nginx)</text>
+  <text x="60" y="778" class="s">the same OS that ran on ESXi, now on virtio devices</text>
+  <rect x="520" y="732" width="440" height="66" rx="8" class="own"/>
+  <text x="536" y="756" class="ol">Owner: application / OS team</text>
+  <text x="536" y="776" class="o">Kubernetes cannot see processes inside the guest; it only</text>
+  <text x="536" y="792" class="o">sees the Pod. Guest health needs probes or the guest agent.</text>
+</svg>

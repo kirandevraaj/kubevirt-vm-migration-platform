@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="760" viewBox="0 0 1160 760" role="img" aria-labelledby="title desc">
+  <title id="title">KubeVirt architecture and VM start-up sequence</title>
+  <desc id="desc">Control plane with Kubernetes API server and KubeVirt cluster components; worker node with kubelet, virt-handler, and a virt-launcher Pod running libvirt and QEMU on KVM. Numbered steps from kubectl apply to guest boot.</desc>
+  <style>
+    .h { font: 700 20px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+    .c { font: 700 15px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+    .t { font: 600 13px 'Segoe UI', Arial, sans-serif; fill: #111827; }
+    .s { font: 11.5px 'Segoe UI', Arial, sans-serif; fill: #374151; }
+    .k { font: 700 12px 'Segoe UI', Arial, sans-serif; fill: #ffffff; }
+    .st { font: 12px 'Segoe UI', Arial, sans-serif; fill: #1f2937; }
+    .box { stroke: #334155; stroke-width: 1.3; }
+    .arr { stroke: #1d4ed8; stroke-width: 1.8; fill: none; }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1d4ed8"/>
+    </marker>
+  </defs>
+  <rect width="1160" height="760" fill="#ffffff"/>
+  <text x="580" y="32" text-anchor="middle" class="h">KubeVirt architecture (KubeVirt v1.9 component model)</text>
+
+  <rect x="30" y="60" width="170" height="60" rx="8" class="box" fill="#f1f5f9"/>
+  <text x="115" y="86" text-anchor="middle" class="t">User / GitOps /</text>
+  <text x="115" y="104" text-anchor="middle" class="t">migration controller</text>
+
+  <rect x="240" y="50" width="890" height="250" rx="10" fill="#f8fafc" stroke="#64748b" stroke-dasharray="6 4"/>
+  <text x="256" y="72" class="c">Cluster-wide (control plane and kubevirt namespace)</text>
+  <rect x="260" y="86" width="250" height="196" rx="8" class="box" fill="#e0e7ff"/>
+  <text x="385" y="108" text-anchor="middle" class="t">kube-apiserver + etcd</text>
+  <text x="276" y="132" class="s">CRDs registered by virt-operator:</text>
+  <text x="276" y="150" class="s">&#8226; KubeVirt (install config)</text>
+  <text x="276" y="168" class="s">&#8226; VirtualMachine (VM)</text>
+  <text x="276" y="186" class="s">&#8226; VirtualMachineInstance (VMI)</text>
+  <text x="276" y="204" class="s">&#8226; VirtualMachineInstanceMigration, &#8230;</text>
+  <text x="276" y="222" class="s">CDI adds: DataVolume, &#8230;</text>
+  <text x="276" y="246" class="s">kube-scheduler places Pods</text>
+  <text x="276" y="264" class="s">(including virt-launcher Pods)</text>
+
+  <rect x="540" y="86" width="175" height="90" rx="8" class="box" fill="#fde68a"/>
+  <text x="628" y="108" text-anchor="middle" class="t">virt-operator</text>
+  <text x="628" y="128" text-anchor="middle" class="s">watches the KubeVirt CR;</text>
+  <text x="628" y="144" text-anchor="middle" class="s">installs + upgrades all</text>
+  <text x="628" y="160" text-anchor="middle" class="s">KubeVirt components</text>
+
+  <rect x="740" y="86" width="175" height="90" rx="8" class="box" fill="#bbf7d0"/>
+  <text x="828" y="108" text-anchor="middle" class="t">virt-api</text>
+  <text x="828" y="128" text-anchor="middle" class="s">admission webhooks:</text>
+  <text x="828" y="144" text-anchor="middle" class="s">defaulting + validation;</text>
+  <text x="828" y="160" text-anchor="middle" class="s">console/VNC subresources</text>
+
+  <rect x="940" y="86" width="175" height="90" rx="8" class="box" fill="#bfdbfe"/>
+  <text x="1028" y="108" text-anchor="middle" class="t">virt-controller</text>
+  <text x="1028" y="128" text-anchor="middle" class="s">cluster-wide logic:</text>
+  <text x="1028" y="144" text-anchor="middle" class="s">VM &#8594; VMI, VMI &#8594; Pod,</text>
+  <text x="1028" y="160" text-anchor="middle" class="s">migrations, status</text>
+
+  <rect x="540" y="196" width="575" height="86" rx="8" fill="#ffffff" stroke="#94a3b8"/>
+  <text x="556" y="218" class="t">Custom resources (examples)</text>
+  <text x="556" y="240" class="s">VirtualMachine "legacy-web" (runStrategy: Always)  &#8594;  VirtualMachineInstance "legacy-web"</text>
+  <text x="556" y="258" class="s">DataVolume "legacy-web-disk0"  &#8594;  PVC "legacy-web-disk0" (populated by CDI)</text>
+  <text x="556" y="274" class="s">Pod "virt-launcher-legacy-web-abcde" (created by virt-controller)</text>
+
+  <rect x="240" y="330" width="890" height="300" rx="10" fill="#f8fafc" stroke="#64748b" stroke-dasharray="6 4"/>
+  <text x="256" y="352" class="c">Worker node (KVM-capable)</text>
+  <rect x="260" y="366" width="200" height="80" rx="8" class="box" fill="#fce7f3"/>
+  <text x="360" y="390" text-anchor="middle" class="t">kubelet + containerd</text>
+  <text x="360" y="410" text-anchor="middle" class="s">starts the launcher Pod,</text>
+  <text x="360" y="426" text-anchor="middle" class="s">mounts PVCs, runs CNI</text>
+
+  <rect x="260" y="462" width="200" height="100" rx="8" class="box" fill="#bfdbfe"/>
+  <text x="360" y="486" text-anchor="middle" class="t">virt-handler (DaemonSet)</text>
+  <text x="360" y="506" text-anchor="middle" class="s">privileged, one per node;</text>
+  <text x="360" y="522" text-anchor="middle" class="s">syncs VMI spec &#8596; libvirt domain;</text>
+  <text x="360" y="538" text-anchor="middle" class="s">reports domain state to VMI</text>
+
+  <rect x="500" y="366" width="400" height="200" rx="8" class="box" fill="#ede9fe"/>
+  <text x="700" y="388" text-anchor="middle" class="t">virt-launcher Pod (one per running VMI)</text>
+  <rect x="520" y="400" width="360" height="152" rx="8" fill="#ffffff" stroke="#7c3aed"/>
+  <text x="700" y="420" text-anchor="middle" class="t">"compute" container</text>
+  <rect x="536" y="430" width="160" height="40" rx="6" class="box" fill="#ddd6fe"/>
+  <text x="616" y="455" text-anchor="middle" class="t">virt-launcher</text>
+  <rect x="706" y="430" width="160" height="40" rx="6" class="box" fill="#ddd6fe"/>
+  <text x="786" y="455" text-anchor="middle" class="t">libvirt daemon</text>
+  <rect x="536" y="480" width="330" height="60" rx="6" class="box" fill="#e0f2fe"/>
+  <text x="701" y="502" text-anchor="middle" class="t">QEMU process = the VM</text>
+  <text x="701" y="522" text-anchor="middle" class="s">virtio disk &#8592; PVC; virtio NIC &#8592; Pod network</text>
+
+  <rect x="930" y="366" width="180" height="200" rx="8" class="box" fill="#f1f5f9"/>
+  <text x="1020" y="390" text-anchor="middle" class="t">Pod-level resources</text>
+  <text x="946" y="414" class="s">PVC (EBS gp3 via CSI)</text>
+  <text x="946" y="434" class="s">Pod IP (CNI)</text>
+  <text x="946" y="454" class="s">cgroup CPU/memory</text>
+  <text x="946" y="474" class="s">/dev/kvm device</text>
+  <text x="946" y="494" class="s">/dev/net/tun,</text>
+  <text x="946" y="510" class="s">/dev/vhost-net</text>
+
+  <rect x="260" y="580" width="850" height="38" rx="8" class="box" fill="#fef3c7"/>
+  <text x="685" y="604" text-anchor="middle" class="t">Linux kernel: KVM module (kvm + kvm_intel/kvm_amd) &#8594; VT-x/EPT on the CPU</text>
+
+  <path d="M200,90 L258,110" class="arr" marker-end="url(#a)"/>
+  <path d="M510,186 L828,186 L828,180" class="arr" marker-end="url(#a)" stroke-dasharray="5 3"/>
+  <path d="M1028,176 L1028,190" class="arr" marker-end="url(#a)"/>
+  <path d="M960,282 L960,316 L360,316 L360,364" class="arr" marker-end="url(#a)"/>
+  <path d="M460,512 L534,450" class="arr" marker-end="url(#a)"/>
+  <path d="M701,540 L701,578" class="arr" marker-end="url(#a)"/>
+
+  <circle cx="222" cy="86" r="11" fill="#1d4ed8"/><text x="222" y="90" text-anchor="middle" class="k">1</text>
+  <circle cx="560" cy="186" r="11" fill="#1d4ed8"/><text x="560" y="190" text-anchor="middle" class="k">2</text>
+  <circle cx="1048" cy="186" r="11" fill="#1d4ed8"/><text x="1048" y="190" text-anchor="middle" class="k">3</text>
+  <circle cx="660" cy="316" r="11" fill="#1d4ed8"/><text x="660" y="320" text-anchor="middle" class="k">4</text>
+  <circle cx="497" cy="470" r="11" fill="#1d4ed8"/><text x="497" y="474" text-anchor="middle" class="k">5</text>
+  <circle cx="722" cy="562" r="11" fill="#1d4ed8"/><text x="722" y="566" text-anchor="middle" class="k">6</text>
+
+  <text x="30" y="660" class="st">1  kubectl apply VirtualMachine &#8594; kube-apiserver.   2  virt-api webhooks default + validate it; it is stored in etcd.</text>
+  <text x="30" y="682" class="st">3  virt-controller sees runStrategy=Always &#8594; creates the VMI &#8594; creates the virt-launcher Pod.   4  kube-scheduler binds the Pod to a node; kubelet starts it.</text>
+  <text x="30" y="704" class="st">5  virt-handler on that node sees the VMI assigned to it &#8594; sends the VMI spec to virt-launcher &#8594; libvirt defines + starts the domain.</text>
+  <text x="30" y="726" class="st">6  QEMU opens /dev/kvm; vCPU threads run guest code on the CPU; the guest OS boots. virt-handler writes phase=Running back to the VMI.</text>
+</svg>

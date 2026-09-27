@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="640" viewBox="0 0 1100 640" role="img" aria-labelledby="title desc">
+  <title id="title">Migration controller reconcile loop</title>
+  <desc id="desc">Watch events feed a rate-limited work queue. The reconcile function reads the VirtualMachineMigration, looks at its phase, performs one idempotent step against external systems, observes the result, writes status, and requeues.</desc>
+  <style>
+    .h { font: 700 20px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+    .t { font: 700 14px 'Segoe UI', Arial, sans-serif; fill: #111827; }
+    .s { font: 12px 'Segoe UI', Arial, sans-serif; fill: #374151; }
+    .k { font: 700 12px 'Segoe UI', Arial, sans-serif; fill: #ffffff; }
+    .box { stroke: #334155; stroke-width: 1.3; }
+    .arr { stroke: #1d4ed8; stroke-width: 2; fill: none; }
+    .ext { stroke: #b45309; stroke-width: 1.8; fill: none; stroke-dasharray: 6 4; }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1d4ed8"/></marker>
+    <marker id="e" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b45309"/></marker>
+  </defs>
+  <rect width="1100" height="640" fill="#ffffff"/>
+  <text x="550" y="32" text-anchor="middle" class="h">How the migration controller drives the state machine</text>
+
+  <rect x="40" y="70" width="230" height="110" rx="8" class="box" fill="#e0e7ff"/>
+  <text x="155" y="94" text-anchor="middle" class="t">kube-apiserver</text>
+  <text x="56" y="118" class="s">VirtualMachineMigration CRs</text>
+  <text x="56" y="136" class="s">owned DataVolumes, VMs, Pods</text>
+  <text x="56" y="154" class="s">(watched through informers)</text>
+
+  <rect x="330" y="70" width="230" height="110" rx="8" class="box" fill="#f1f5f9"/>
+  <text x="445" y="94" text-anchor="middle" class="t">Watch + informer cache</text>
+  <text x="346" y="118" class="s">create / update / delete events</text>
+  <text x="346" y="136" class="s">for the CR and its children</text>
+  <text x="346" y="154" class="s">&#8594; mapped to the owner's key</text>
+
+  <rect x="620" y="70" width="230" height="110" rx="8" class="box" fill="#f1f5f9"/>
+  <text x="735" y="94" text-anchor="middle" class="t">Work queue</text>
+  <text x="636" y="118" class="s">key = namespace/name</text>
+  <text x="636" y="136" class="s">deduplicated, rate-limited,</text>
+  <text x="636" y="154" class="s">one worker per key at a time</text>
+
+  <path d="M270,125 L328,125" class="arr" marker-end="url(#a)"/>
+  <path d="M560,125 L618,125" class="arr" marker-end="url(#a)"/>
+  <path d="M735,180 L735,232" class="arr" marker-end="url(#a)"/>
+
+  <rect x="300" y="236" width="690" height="250" rx="10" fill="#eff6ff" stroke="#1d4ed8" stroke-width="1.5"/>
+  <text x="645" y="260" text-anchor="middle" class="t">Reconcile(namespace/name)</text>
+  <circle cx="330" cy="290" r="11" fill="#1d4ed8"/><text x="330" y="294" text-anchor="middle" class="k">1</text>
+  <text x="350" y="294" class="s">Get the CR. If deletionTimestamp is set &#8594; run cleanup for the finalizer, remove it, return.</text>
+  <circle cx="330" cy="320" r="11" fill="#1d4ed8"/><text x="330" y="324" class="k" text-anchor="middle">2</text>
+  <text x="350" y="324" class="s">Read desired state (spec) and last observed state (status.phase, conditions, recorded IDs).</text>
+  <circle cx="330" cy="350" r="11" fill="#1d4ed8"/><text x="330" y="354" class="k" text-anchor="middle">3</text>
+  <text x="350" y="354" class="s">Observe the real world for this phase (does the DataVolume exist? what is its phase?).</text>
+  <circle cx="330" cy="380" r="11" fill="#1d4ed8"/><text x="330" y="384" class="k" text-anchor="middle">4</text>
+  <text x="350" y="384" class="s">If the phase's goal is not met: perform ONE idempotent step (create-if-absent, deterministic names).</text>
+  <circle cx="330" cy="410" r="11" fill="#1d4ed8"/><text x="330" y="414" class="k" text-anchor="middle">5</text>
+  <text x="350" y="414" class="s">If the goal is met: advance status.phase. On error: classify (transient / manual / permanent).</text>
+  <circle cx="330" cy="440" r="11" fill="#1d4ed8"/><text x="330" y="444" class="k" text-anchor="middle">6</text>
+  <text x="350" y="444" class="s">Write status (phase, conditions, progress, observedGeneration) via the status subresource.</text>
+  <circle cx="330" cy="470" r="11" fill="#1d4ed8"/><text x="330" y="474" class="k" text-anchor="middle">7</text>
+  <text x="350" y="474" class="s">Return: requeue after N seconds (polling long work), requeue with backoff (error), or wait for events.</text>
+
+  <path d="M300,460 C180,460 150,300 270,180" class="arr" marker-end="url(#a)"/>
+  <text x="96" y="330" class="s">requeue /</text>
+  <text x="96" y="346" class="s">next event</text>
+
+  <rect x="40" y="520" width="300" height="100" rx="8" class="box" fill="#fef3c7"/>
+  <text x="190" y="544" text-anchor="middle" class="t">ESXi (external)</text>
+  <text x="56" y="566" class="s">SSH: vim-cmd, power off, read .vmx</text>
+  <text x="56" y="584" class="s">copy VMDK</text>
+  <rect x="400" y="520" width="300" height="100" rx="8" class="box" fill="#ede9fe"/>
+  <text x="550" y="544" text-anchor="middle" class="t">Conversion worker (external or Job)</text>
+  <text x="416" y="566" class="s">qemu-img / virt-v2v</text>
+  <text x="416" y="584" class="s">upload image to staging</text>
+  <rect x="760" y="520" width="300" height="100" rx="8" class="box" fill="#dbeafe"/>
+  <text x="910" y="544" text-anchor="middle" class="t">Kubernetes (in-cluster)</text>
+  <text x="776" y="566" class="s">DataVolume (CDI), VirtualMachine</text>
+  <text x="776" y="584" class="s">(KubeVirt), validation Job/Pod</text>
+
+  <path d="M420,486 L240,518" class="ext" marker-end="url(#e)"/>
+  <path d="M580,486 L560,518" class="ext" marker-end="url(#e)"/>
+  <path d="M800,486 L880,518" class="ext" marker-end="url(#e)"/>
+</svg>

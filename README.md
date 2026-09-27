@@ -14,3 +14,7 @@ ESXi → KubeVirt Migration & VM Modernization
 | Status | Foundation environment ready |
 
 Project context: [docs/project-context/project1-5-context-handoff.md](docs/project-context/project1-5-context-handoff.md)
+
+Stage 0 (theory, architecture, feasibility): [docs/stage-0/README.md](docs/stage-0/README.md)
+
+Architecture decisions: [docs/adr/README.md](docs/adr/README.md)

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="820" viewBox="0 0 1120 820" role="img" aria-labelledby="title desc">
+  <title id="title">VMware to KubeVirt cold migration workflow</title>
+  <desc id="desc">Stages from ESXi VM to validation, grouped into source, transformation and destination, with where each stage runs and what it produces.</desc>
+  <style>
+    .h { font: 700 20px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+    .g { font: 700 13px 'Segoe UI', Arial, sans-serif; fill: #ffffff; }
+    .t { font: 600 13px 'Segoe UI', Arial, sans-serif; fill: #111827; }
+    .s { font: 11.5px 'Segoe UI', Arial, sans-serif; fill: #374151; }
+    .hd { font: 700 12px 'Segoe UI', Arial, sans-serif; fill: #475569; }
+    .box { stroke: #334155; stroke-width: 1.2; }
+    .arr { stroke: #475569; stroke-width: 1.8; fill: none; }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#475569"/>
+    </marker>
+  </defs>
+  <rect width="1120" height="820" fill="#ffffff"/>
+  <text x="560" y="32" text-anchor="middle" class="h">Cold migration: ESXi VM &#8594; KubeVirt VM (conceptual)</text>
+  <text x="200" y="62" class="hd">STAGE</text>
+  <text x="420" y="62" class="hd">WHERE IT RUNS</text>
+  <text x="700" y="62" class="hd">OUTPUT / EVIDENCE</text>
+
+  <rect x="30" y="72" width="36" height="252" rx="6" fill="#b45309"/>
+  <text x="48" y="198" text-anchor="middle" class="g" transform="rotate(-90 48 198)">SOURCE (ESXi)</text>
+  <rect x="30" y="332" width="36" height="96" rx="6" fill="#7c3aed"/>
+  <text x="48" y="380" text-anchor="middle" class="g" transform="rotate(-90 48 380)">TRANSFORM</text>
+  <rect x="30" y="436" width="36" height="328" rx="6" fill="#1d4ed8"/>
+  <text x="48" y="600" text-anchor="middle" class="g" transform="rotate(-90 48 600)">DESTINATION (Kubernetes)</text>
+
+  <rect x="80" y="72" width="300" height="44" rx="7" class="box" fill="#fef3c7"/><text x="96" y="92" class="t">0  ESXi VM</text><text x="96" y="108" class="s">legacy-source-vm on migration-datastore</text>
+  <text x="410" y="92" class="s">esxi-8-lab (192.168.50.11)</text>
+  <text x="690" y="92" class="s">the thing we want to move</text>
+  <path d="M230,116 L230,126" class="arr" marker-end="url(#a)"/>
+
+  <rect x="80" y="128" width="300" height="44" rx="7" class="box" fill="#fef3c7"/><text x="96" y="148" class="t">1  Discovery</text><text x="96" y="164" class="s">find VM, read .vmx + disk descriptors</text>
+  <text x="410" y="148" class="s">controller &#8594; ESXi over SSH (vim-cmd)</text><text x="410" y="164" class="s">or read-only vSphere API if it works</text>
+  <text x="690" y="148" class="s">raw facts: vmid, paths, power state</text>
+  <path d="M230,172 L230,182" class="arr" marker-end="url(#a)"/>
+
+  <rect x="80" y="184" width="300" height="44" rx="7" class="box" fill="#fef3c7"/><text x="96" y="204" class="t">2  Assessment</text><text x="96" y="220" class="s">can this VM be migrated? what breaks?</text>
+  <text x="410" y="204" class="s">controller (pure logic, no side effects)</text>
+  <text x="690" y="204" class="s">pass / warn / block list (e.g. snapshots,</text><text x="690" y="220" class="s">RDM, more than 8 vCPU, secure boot, unknown OS)</text>
+  <path d="M230,228 L230,238" class="arr" marker-end="url(#a)"/>
+
+  <rect x="80" y="240" width="300" height="44" rx="7" class="box" fill="#fef3c7"/><text x="96" y="260" class="t">3  Inventory</text><text x="96" y="276" class="s">normalized model of the VM</text>
+  <text x="410" y="260" class="s">stored in CR status.sourceInventory</text>
+  <text x="690" y="260" class="s">CPU, memory, disks, controllers, NICs,</text><text x="690" y="276" class="s">networks, firmware, guest OS</text>
+  <path d="M230,284 L230,294" class="arr" marker-end="url(#a)"/>
+
+  <rect x="80" y="296" width="300" height="28" rx="7" class="box" fill="#fef3c7"/><text x="96" y="315" class="t">4  Source disk acquisition (VM powered off)</text>
+  <text x="410" y="315" class="s">copy VMDK off ESXi (SSH/HTTPS/NFC)</text>
+  <text x="690" y="315" class="s">consistent VMDK + checksum</text>
+  <path d="M230,324 L230,334" class="arr" marker-end="url(#a)"/>
+
+  <rect x="80" y="336" width="300" height="40" rx="7" class="box" fill="#ede9fe"/><text x="96" y="355" class="t">5  Disk conversion</text><text x="96" y="370" class="s">qemu-img (format) / virt-v2v (format + guest)</text>
+  <text x="410" y="355" class="s">Linux conversion worker</text><text x="410" y="370" class="s">(location is a deferred decision)</text>
+  <text x="690" y="355" class="s">qcow2 or raw image; guest has virtio drivers,</text><text x="690" y="370" class="s">no VMware Tools dependency</text>
+  <path d="M230,376 L230,386" class="arr" marker-end="url(#a)"/>
+
+  <rect x="80" y="388" width="300" height="40" rx="7" class="box" fill="#ede9fe"/><text x="96" y="407" class="t">5b Staging</text><text x="96" y="422" class="s">make the image reachable by CDI</text>
+  <text x="410" y="407" class="s">S3 bucket / HTTPS / virtctl upload</text>
+  <text x="690" y="407" class="s">URL or upload session + checksum</text>
+  <path d="M230,428 L230,438" class="arr" marker-end="url(#a)"/>
+
+  <rect x="80" y="440" width="300" height="44" rx="7" class="box" fill="#dbeafe"/><text x="96" y="460" class="t">6  CDI import</text><text x="96" y="476" class="s">DataVolume created by the controller</text>
+  <text x="410" y="460" class="s">CDI importer Pod in the cluster</text>
+  <text x="690" y="460" class="s">DataVolume phase + progress %</text>
+  <path d="M230,484 L230,494" class="arr" marker-end="url(#a)"/>
+
+  <rect x="80" y="496" width="300" height="44" rx="7" class="box" fill="#dbeafe"/><text x="96" y="516" class="t">7  PVC / DataVolume ready</text><text x="96" y="532" class="s">raw disk on EBS gp3</text>
+  <text x="410" y="516" class="s">CSI driver + StorageClass</text>
+  <text x="690" y="516" class="s">DataVolume = Succeeded, PVC Bound</text>
+  <path d="M230,540 L230,550" class="arr" marker-end="url(#a)"/>
+
+  <rect x="80" y="552" width="300" height="44" rx="7" class="box" fill="#dbeafe"/><text x="96" y="572" class="t">8  KubeVirt VirtualMachine</text><text x="96" y="588" class="s">generated from inventory + mappings</text>
+  <text x="410" y="572" class="s">controller &#8594; kube-apiserver</text>
+  <text x="690" y="572" class="s">VM object, ownerReference to the migration</text>
+  <path d="M230,596 L230,606" class="arr" marker-end="url(#a)"/>
+
+  <rect x="80" y="608" width="300" height="44" rx="7" class="box" fill="#dbeafe"/><text x="96" y="628" class="t">9  VMI</text><text x="96" y="644" class="s">created by virt-controller on start</text>
+  <text x="410" y="628" class="s">KubeVirt (not our code)</text>
+  <text x="690" y="628" class="s">VMI phase Scheduling &#8594; Scheduled &#8594; Running</text>
+  <path d="M230,652 L230,662" class="arr" marker-end="url(#a)"/>
+
+  <rect x="80" y="664" width="300" height="44" rx="7" class="box" fill="#dbeafe"/><text x="96" y="684" class="t">10 Guest boot</text><text x="96" y="700" class="s">virt-launcher &#8594; QEMU/KVM &#8594; guest OS</text>
+  <text x="410" y="684" class="s">worker node with /dev/kvm</text>
+  <text x="690" y="684" class="s">serial console log, guest agent connected,</text><text x="690" y="700" class="s">IP reported in VMI status</text>
+  <path d="M230,708 L230,718" class="arr" marker-end="url(#a)"/>
+
+  <rect x="80" y="720" width="300" height="44" rx="7" class="box" fill="#dcfce7"/><text x="96" y="740" class="t">11 Validation</text><text x="96" y="756" class="s">does the workload behave like before?</text>
+  <text x="410" y="740" class="s">controller probes (HTTP, checksum)</text>
+  <text x="690" y="740" class="s">nginx 200 + expected content; marker</text><text x="690" y="756" class="s">file checksum equals the source value</text>
+
+  <text x="80" y="790" class="s">Stages 1 to 5 touch the source (read-only except the planned power-off). Stages 6 to 11 only touch the destination cluster.</text>
+  <text x="80" y="808" class="s">The source VM stays powered off, not deleted, until validation passes (rollback = power it back on).</text>
+</svg>
