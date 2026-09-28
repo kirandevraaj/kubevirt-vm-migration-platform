@@ -20,6 +20,8 @@ This ADR decides **where** the target runs and **how** it is managed (Terraform,
 
 Those are deferred decisions, to be made from test evidence against the KubeVirt host-requirement checklist ([feasibility section 5](../stage-0/feasibility.md#5-eks-host-requirement-compatibility)).
 
+Cross-reference (Stage 1H): the first-migration target topology, instance family, Region and node OS are decided by design in [ADR 007](007-kubevirt-target-platform.md), still subject to a runtime validation gate.
+
 ## Consequences
 
 - Cost is bounded by session length; Git + Terraform are the source of truth.

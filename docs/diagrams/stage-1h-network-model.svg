@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="840" viewBox="0 0 1240 840" role="img" aria-labelledby="title desc">
+  <title id="title">Stage 1H: KubeVirt network model for the first migration (DESIGN)</title>
+  <desc id="desc">On the left, the source VM keeps its original VMware address 192.168.50.31 on the local VMnet8 NAT network, with no route to AWS, so there is no IP continuity. On the right, the EC2 node in a VPC has a private address from its subnet and a public IPv4 address. Inside the node, the virt-launcher pod has a pod IP from the flannel range. The guest's virtio NIC receives 10.0.2.2/24 with gateway 10.0.2.1 by DHCP from the masquerade binding, which NATs traffic to and from the pod IP. Outbound traffic is NATed again to the node address by flannel and mapped to the public IPv4 by the internet gateway. Inbound validation traffic from the operator's /32 reaches the node's public IPv4 on NodePort 30080, then the Service, the pod IP on port 80 and, after DNAT, the guest on port 80. Guest DNS is expected to be cluster DNS. The bottom strip lists the rejected or deferred bindings: pod bridge, Multus bridge and passt.</desc>
+  <style>
+    .h { font: 700 20px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+    .c { font: 700 15px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+    .t { font: 600 13px 'Segoe UI', Arial, sans-serif; fill: #111827; }
+    .s { font: 11.5px 'Segoe UI', Arial, sans-serif; fill: #374151; }
+    .l { font: 700 13px 'Segoe UI', Arial, sans-serif; fill: #ffffff; }
+    .n { font: 12px 'Segoe UI', Arial, sans-serif; fill: #334155; }
+    .r { font: 700 12px 'Segoe UI', Arial, sans-serif; fill: #b91c1c; }
+    .g { font: 700 12px 'Segoe UI', Arial, sans-serif; fill: #15803d; }
+    .box { stroke: #334155; stroke-width: 1.3; }
+    .dash { stroke: #64748b; stroke-width: 1.5; stroke-dasharray: 7 5; fill: #f8fafc; }
+    .arr { stroke: #475569; stroke-width: 1.6; fill: none; marker-end: url(#a); }
+    .garr { stroke: #15803d; stroke-width: 1.8; fill: none; marker-end: url(#gr); }
+    .xarr { stroke: #b91c1c; stroke-width: 1.6; fill: none; stroke-dasharray: 4 4; }
+  </style>
+  <defs>
+    <marker id="a" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker>
+    <marker id="gr" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#15803d"/></marker>
+  </defs>
+  <rect width="1240" height="840" fill="#ffffff"/>
+  <text x="620" y="32" text-anchor="middle" class="h">Stage 1H: network model, pod network + masquerade (ADR 008, DESIGN)</text>
+
+  <!-- Local lab -->
+  <rect x="30" y="60" width="300" height="300" rx="10" class="dash"/>
+  <text x="44" y="84" class="c">Local lab: VMnet8</text>
+  <text x="44" y="102" class="s">192.168.50.0/24, VMware Workstation NAT</text>
+  <rect x="44" y="116" width="272" height="130" rx="8" class="box" fill="#fee2e2"/>
+  <text x="56" y="138" class="t">legacy-source-vm (ESXi, running)</text>
+  <text x="56" y="158" class="s">VMXNET3 ens192, MAC 00:0c:29:0f:3d:15</text>
+  <rect x="56" y="168" width="248" height="26" rx="5" fill="#b91c1c"/>
+  <text x="66" y="186" class="l">Original VMware IP 192.168.50.31</text>
+  <text x="56" y="214" class="s">static, gateway and DNS 192.168.50.2</text>
+  <text x="56" y="232" class="s">stays here as reference and rollback</text>
+  <text x="44" y="272" class="r">IP continuity: NONE (by design)</text>
+  <text x="44" y="292" class="s">not routable from AWS; a VPC drops</text>
+  <text x="44" y="308" class="s">addresses outside its subnet; the</text>
+  <text x="44" y="324" class="s">binding assigns the guest address;</text>
+  <text x="44" y="340" class="s">the source still owns .31</text>
+
+  <!-- Operator -->
+  <rect x="30" y="390" width="300" height="130" rx="10" class="box" fill="#f1f5f9"/>
+  <text x="44" y="414" class="c">Operator workstation</text>
+  <text x="44" y="434" class="s">public /32 (only allowed source)</text>
+  <text x="44" y="456" class="s">curl http://NODE_PUBLIC_IP:30080/</text>
+  <text x="44" y="474" class="s">expects HTTP 200 and page sha256</text>
+  <text x="44" y="490" class="s">b9826e18...0046</text>
+  <text x="44" y="510" class="s">DNS name: deferred (none)</text>
+
+  <!-- AWS -->
+  <rect x="360" y="60" width="850" height="560" rx="12" class="box" fill="#fff7ed"/>
+  <text x="376" y="84" class="c">AWS ap-south-1 VPC, public subnet, one AZ</text>
+  <rect x="376" y="96" width="220" height="92" rx="8" class="box" fill="#ffedd5"/>
+  <text x="388" y="116" class="t">Internet gateway</text>
+  <text x="388" y="134" class="s">public IPv4 1:1 to the</text>
+  <text x="388" y="150" class="s">node's private address</text>
+  <text x="388" y="170" class="r">NAT 3 (AWS)</text>
+  <rect x="612" y="96" width="582" height="92" rx="8" class="box" fill="#ffedd5"/>
+  <text x="624" y="116" class="t">Security group (inbound)</text>
+  <text x="624" y="134" class="s">TCP 22 and TCP 30080 from the operator /32 only; everything else denied.</text>
+  <text x="624" y="150" class="s">ENI: private IPv4 from the subnet range, source/destination check on.</text>
+  <text x="624" y="170" class="s">No Multus, no secondary ENI, no NetworkAttachmentDefinitions.</text>
+
+  <!-- Node -->
+  <rect x="376" y="200" width="818" height="408" rx="10" class="box" fill="#f8fafc"/>
+  <rect x="376" y="200" width="818" height="28" rx="10" fill="#c2410c"/>
+  <text x="390" y="219" class="l">EC2 node: eth0 = VPC private IP (subnet range); CentOS Stream 9; Kubernetes 1.36 single node</text>
+
+  <rect x="392" y="240" width="250" height="110" rx="8" class="box" fill="#fef9c3"/>
+  <text x="404" y="260" class="t">Service: NodePort 30080</text>
+  <text x="404" y="278" class="s">node:30080 -> pod IP:80</text>
+  <text x="404" y="294" class="s">(kube-proxy rules)</text>
+  <text x="404" y="312" class="s">stable across VM restarts</text>
+  <text x="404" y="334" class="g">external HTTP validation point</text>
+
+  <rect x="392" y="362" width="250" height="110" rx="8" class="box" fill="#ede9fe"/>
+  <text x="404" y="382" class="t">flannel pod network</text>
+  <text x="404" y="400" class="s">pod IPs from the flannel range</text>
+  <text x="404" y="416" class="s">(default 10.244.0.0/16)</text>
+  <text x="404" y="436" class="s">egress masquerade to the</text>
+  <text x="404" y="452" class="r">node IP: NAT 2 (flannel)</text>
+
+  <rect x="392" y="484" width="250" height="110" rx="8" class="box" fill="#e0f2fe"/>
+  <text x="404" y="504" class="t">Cluster DNS (CoreDNS)</text>
+  <text x="404" y="522" class="s">guest resolver expected via</text>
+  <text x="404" y="538" class="s">the masquerade DHCP reply</text>
+  <text x="404" y="556" class="s">(INFERRED, verify at build)</text>
+  <text x="404" y="576" class="s">no public DNS name</text>
+
+  <!-- virt-launcher pod -->
+  <rect x="662" y="240" width="516" height="354" rx="10" class="box" fill="#eff6ff"/>
+  <text x="676" y="262" class="c">virt-launcher pod</text>
+  <rect x="676" y="274" width="488" height="58" rx="6" class="box" fill="#ffffff"/>
+  <text x="688" y="294" class="t">pod eth0: pod IP (flannel range)</text>
+  <text x="688" y="312" class="s">nftables SNAT (egress) and DNAT (ingress to ports 80, 22)</text>
+  <rect x="676" y="340" width="488" height="46" rx="6" fill="#b45309"/>
+  <text x="688" y="360" class="l">masquerade binding: NAT 1 (KubeVirt)</text>
+  <text x="688" y="376" class="l">gateway 10.0.2.1, DHCP server for the guest</text>
+  <rect x="676" y="394" width="488" height="40" rx="6" class="box" fill="#ffffff"/>
+  <text x="688" y="419" class="s">in-pod bridge + tap -> QEMU virtio-net (vhost-net)</text>
+
+  <rect x="690" y="446" width="460" height="136" rx="8" class="box" fill="#dcfce7"/>
+  <text x="702" y="468" class="t">Guest Ubuntu 24.04.5</text>
+  <text x="702" y="488" class="s">VirtIO NIC (model: virtio), name set by udev (not relied on)</text>
+  <text x="702" y="506" class="s">netplan: match driver virtio_net, dhcp4: true (ADR 010)</text>
+  <rect x="702" y="516" width="436" height="26" rx="5" fill="#15803d"/>
+  <text x="712" y="534" class="l">Target IP model: 10.0.2.2/24 by DHCP, gw 10.0.2.1</text>
+  <text x="702" y="560" class="s">nginx :80 unchanged; MAC generated by KubeVirt</text>
+  <text x="702" y="576" class="s">guest IP is internal to the pod; clients use the Service</text>
+
+  <!-- arrows -->
+  <path d="M330,455 C 350,455 350,142 374,142" class="garr"/>
+  <path d="M486,188 L486,238" class="garr"/>
+  <path d="M642,296 L674,300" class="garr"/>
+  <path d="M920,332 L920,338" class="garr"/>
+  <path d="M920,386 L920,392" class="garr"/>
+  <path d="M920,434 L920,444" class="garr"/>
+  <path d="M316,210 L358,210" class="xarr"/>
+
+  <!-- rejected bindings -->
+  <rect x="30" y="636" width="1180" height="190" rx="10" class="box" fill="#f8fafc"/>
+  <text x="44" y="660" class="c">Bindings not chosen for the first cold migration (full analysis: Stage 1H section 13)</text>
+  <rect x="44" y="672" width="372" height="100" rx="8" class="box" fill="#ffffff"/>
+  <text x="56" y="692" class="t">Pod network + bridge</text>
+  <text x="56" y="710" class="s">guest gets the pod IP by DHCP anyway;</text>
+  <text x="56" y="726" class="s">live migration not allowed; some CNIs and</text>
+  <text x="56" y="742" class="s">tools break when the MAC moves</text>
+  <text x="56" y="762" class="r">rejected</text>
+  <rect x="428" y="672" width="372" height="100" rx="8" class="box" fill="#ffffff"/>
+  <text x="440" y="692" class="t">Multus secondary + bridge</text>
+  <text x="440" y="710" class="s">needs Multus, NADs and an L2 segment; a VPC</text>
+  <text x="440" y="726" class="s">only delivers ENI-assigned subnet addresses,</text>
+  <text x="440" y="742" class="s">so a guest-chosen IP such as .31 cannot work</text>
+  <text x="440" y="762" class="r">rejected (Multus not installed)</text>
+  <rect x="812" y="672" width="384" height="100" rx="8" class="box" fill="#ffffff"/>
+  <text x="824" y="692" class="t">Pod network + passt (passtBinding)</text>
+  <text x="824" y="710" class="s">userspace NAT, supports live migration;</text>
+  <text x="824" y="726" class="s">PasstBinding is a Beta feature gate in v1.9,</text>
+  <text x="824" y="742" class="s">+250 Mi memory per VM, no benefit here</text>
+  <text x="824" y="762" class="r">deferred</text>
+  <line x1="46" y1="800" x2="86" y2="800" class="garr"/>
+  <text x="94" y="804" class="n">inbound validation path</text>
+  <line x1="290" y1="800" x2="330" y2="800" class="xarr"/>
+  <text x="338" y="804" class="n">no path from VMnet8 to AWS</text>
+  <text x="560" y="804" class="n">NAT locations: 1 = virt-launcher (masquerade), 2 = node (flannel), 3 = internet gateway</text>
+</svg>

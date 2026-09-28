@@ -6,9 +6,9 @@ ESXi → KubeVirt Migration & VM Modernization
 |---|---|
 | Project | Project 1.5 |
 | Purpose | Build a VMware ESXi source environment with legacy VMs and migrate them to KubeVirt on Kubernetes |
-| Current phase | Stage 1 (1A to 1F complete; 1G controlled VMDK conversion and QEMU/KVM boot validation done, awaiting review) |
+| Current phase | Stage 1 (1A to 1G complete; 1H KubeVirt target architecture designed, awaiting review; nothing provisioned) |
 | Source platform | Nested ESXi 8 on VMware Workstation |
-| Target platform | AWS Kubernetes + KubeVirt |
+| Target platform | AWS Kubernetes + KubeVirt: designed as a single-node kubeadm cluster on one nested-virtualization EC2 instance ([ADR 007](docs/adr/007-kubevirt-target-platform.md)); not built yet |
 | Migration approach | Cold migration first |
 | Warm migration | Study/reference phase |
 | Status | Foundation environment ready |

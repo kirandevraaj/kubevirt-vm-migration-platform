@@ -376,3 +376,45 @@ Answers below are backed by the Stage 1G experiments (see [Stage 1G record](../s
 **Short answer:** The disk and boot path are the easy part. The hard parts are network identity, guest-agent provisioning and VM metadata. CDI moves bytes; it does not fix any of these.
 
 **Detail:** virtio storage and UEFI worked without changes. The network needs a remediation designed together with the KubeVirt network binding: a pod network typically hands out an address by DHCP, while a bridged network could keep the static address. virt-v2v's first boot tries to install qemu-guest-agent from the internet, which stalls in an isolated cluster, so pre-install the agent or provide a mirror. `-i disk` guessed 1 vCPU / 2 GiB, so VM sizing must come from the `.vmx`. The target disk format (raw or qcow2 into CDI) remains an explicit decision.
+
+---
+
+## Stage 1H additions: KubeVirt target architecture
+
+Answers below are backed by the Stage 1H design and its sources (see [Stage 1H record](../stage-1/stage-1h-kubevirt-target-feasibility.md)). Nothing was provisioned, so these are design answers, not runtime results.
+
+### 50. "EKS or self-managed Kubernetes for KubeVirt on AWS?"
+
+**Short answer:** Decide from KubeVirt's host requirements, not from "managed is easier" or "self-managed is more flexible". For the first migration I chose a single-node kubeadm cluster on one nested-virtualization EC2 instance and deferred EKS; EKS was not blocked.
+
+**Detail:** KubeVirt needs `/dev/kvm` on the worker, a privileged-capable cluster, a supported runtime, and recommends a host kernel from the same family as the virt-launcher userland, which is CentOS Stream 9. EKS offers Kubernetes 1.36 and allows privileged pods, and the CPU option for nested virtualization is not on the managed node group's prohibited list, but its node images are not EL-based and the `/dev/kvm` path on EKS nodes is undocumented. Self-managed lets the node run CentOS Stream 9 with CRI-O 1.36, the exact combination in KubeVirt's own CI provider for Kubernetes 1.36. EKS would also add USD 0.10 per hour (about 42%) to a lab that runs for a few hours. See [ADR 007](../adr/007-kubevirt-target-platform.md).
+
+### 51. "Do you need bare-metal instances to run KubeVirt on EC2?"
+
+**Short answer:** Not any more for functional work. Some current EC2 families (for example `m8i`, `m7i`) can expose VT-x through a nested-virtualization CPU option, which is much cheaper than metal. Metal remains the fallback if nested KVM does not work in the region.
+
+**Detail:** `m8i.xlarge` costs about USD 0.22 per hour in ap-south-1; the smallest suitable metal size costs about USD 5 per hour. Nested virtualization costs performance, so it suits a functional migration test, not benchmarks. The decision is only accepted once `virt-host-validate qemu` passes on the real node; availability of the option in ap-south-1 is still an unknown until checked with the AWS API.
+
+### 52. "Can the migrated VM keep its VMware IP address?"
+
+**Short answer:** Not in this design, and it should not try. 192.168.50.31 lives on a laptop NAT network with no route to AWS, a VPC only delivers addresses the ENI owns, the masquerade binding assigns the guest address, and the source VM still uses .31. What must continue is the service, not the address.
+
+**Detail:** The guest gets 10.0.2.2 by DHCP inside its virt-launcher pod. Traffic is NATed three times: by masquerade in the pod, by flannel on the node and by the internet gateway. Clients reach nginx through a NodePort Service on port 30080, which stays stable across VM restarts. Continuity is proven by content: HTTP 200, the 267-byte page and its sha256, plus unchanged filesystem UUIDs and configuration hashes. Keeping an IP would need an L2 or routed network that owns that subnet, which is a separate design problem. See [ADR 008](../adr/008-kubevirt-network-model.md).
+
+### 53. "Why masquerade instead of bridge or Multus?"
+
+**Short answer:** Masquerade is the documented pod-network binding that works with any CNI, needs no extra components, and matches what the guest does after remediation (DHCP). Bridge on the pod network forbids live migration and some CNIs dislike the moved MAC; Multus only helps if there is a real secondary L2 network, which a VPC does not provide for guest-chosen addresses.
+
+**Detail:** passt is the other candidate: it supports live migration, but it needs a Beta feature gate and more memory per VM, and live migration is out of scope for a single node with RWO storage anyway. Multus was not assumed; the chosen network model does not require it.
+
+### 54. "raw, qcow2 or VMDK into CDI?"
+
+**Short answer:** Move qcow2 and let CDI store raw. The qcow2 from virt-v2v is about 2.7 GiB instead of 40 GiB, carries the guest changes, and CDI converts it with qemu-img into a raw 40 GiB Block-mode PVC on EBS gp3.
+
+**Detail:** The upload goes through `virtctl image-upload` to `cdi-uploadproxy` over a `kubectl port-forward`, so the proxy is never exposed. CDI needs Filesystem scratch space for the conversion, and `--force-bind` because the StorageClass uses WaitForFirstConsumer. Block mode avoids a filesystem layer under the guest disk. The PVC is ReadWriteOnce, so the VM is not live-migratable; that is accepted and recorded. See [ADR 009](../adr/009-kubevirt-storage-model.md).
+
+### 55. "How do you install the guest agent if the cluster has no internet access at first boot?"
+
+**Short answer:** Do not install it at first boot. Pre-install qemu-guest-agent offline into a disposable copy of the converted disk on the conversion host, remove virt-v2v's first-boot apt job, and treat the agent as optional for passing validation.
+
+**Detail:** In Stage 1G virt-v2v's first-boot job stalled in `apt-get update` on an isolated network. The design downloads the package and its dependencies on the conversion host and installs them offline with libguestfs tools. The exact dependency set is still an unknown. The netplan remediation ([ADR 010](../adr/010-migration-network-remediation.md)) is applied the same way and in the same pass: match by driver `virtio_net`, DHCP.

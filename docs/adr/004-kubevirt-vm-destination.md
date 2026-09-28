@@ -15,6 +15,7 @@ Use upstream **KubeVirt** with **CDI** as the VM destination. Not OpenShift Virt
 - Observed at documentation time (2026-09-27): KubeVirt v1.9 is the newest release (built for Kubernetes 1.36, supported on 1.35 and 1.34); CDI v1.66.1 is the newest CDI release. These are observations, **not pins**.
 - No official KubeVirt-to-CDI pairing statement was found, so this ADR does not claim any specific pairing is supported.
 - The versions are chosen **at deployment time** as one **compatibility tuple** (KubeVirt, Kubernetes, CDI) and accepted only after the runtime validation gate passes ([feasibility section 3](../stage-0/feasibility.md#3-compatibility-tuple-and-runtime-validation-gate)).
+- Cross-reference (Stage 1H): the candidate tuple for the first migration (Kubernetes 1.36, KubeVirt v1.9.0, CDI v1.66.1) is recorded in [ADR 007](007-kubevirt-target-platform.md); it is still accepted only after that runtime gate.
 
 ## Alternatives considered
 

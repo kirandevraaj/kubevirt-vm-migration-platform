@@ -125,6 +125,26 @@ Terms as observed in the Stage 1G experiments (see [Stage 1G record](../stage-1/
 | **User-mode networking (slirp), `restrict=on`, `hostfwd`** | QEMU's built-in NAT network (10.0.2.0/24, gateway .2, DNS .3). `restrict=on` isolates the guest from everything outside; `hostfwd` still forwards chosen host ports into the guest. | Guest :80 reached through 127.0.0.1:18080 on the conversion host; DNS not available |
 | **`virt-diff`** | libguestfs tool that lists file-level differences between two disk images, with inline diffs for changed text files, without booting either. | 396 lines input vs virt-v2v output; exactly 1 file for the netplan remediation |
 
+## KubeVirt target architecture terms (Stage 1H)
+
+Terms used in the Stage 1H design (see [Stage 1H record](../stage-1/stage-1h-kubevirt-target-feasibility.md)). Nothing here was built; the right-hand column is the design, not an observation.
+
+| Term | Definition | In the Stage 1H design |
+|---|---|---|
+| **EC2 nested virtualization** | An EC2 CPU option (`NestedVirtualization=enabled`) on selected non-metal instance families that exposes VT-x to the instance, so the guest OS gets a working `/dev/kvm`. Bare-metal instances have VT-x without it. | `m8i.xlarge` with the option enabled; `m7i.metal-24xl` only as a fallback after a new decision |
+| **Kernel/userspace alignment** | KubeVirt ships QEMU and libvirt inside the virt-launcher image, built on one distribution, and recommends a host kernel from the same family, because QEMU relies on kernel features (KVM, vhost, security modules). | virt-launcher is CentOS Stream 9 based, so the node runs CentOS Stream 9 |
+| **kubevirtci** | KubeVirt's own CI cluster tooling. Its provider definitions show which Kubernetes, runtime and OS versions KubeVirt is actually tested on. | The chosen tuple mirrors its `k8s-1.36` provider (CentOS Stream 9, CRI-O 1.36) |
+| **Single-node kubeadm cluster** | A cluster whose one node is both control plane and worker, made schedulable by removing the control-plane `NoSchedule` taint. | One EC2 instance, no HA; disposable |
+| **`device_ownership_from_security_context`** | CRI-O (and containerd) setting that gives devices mounted into a container the container's user and group instead of root, which KubeVirt needs for non-root virt-launcher access to block PVCs. | `true` in the CRI-O configuration |
+| **passt binding** | KubeVirt network binding using the userspace passt process to translate between the guest's L2 and the pod's sockets; supports live migration and needs a Beta feature gate in v1.9. | Deferred; masquerade chosen |
+| **NAT location** | Each place an address is rewritten on the path to or from the guest. | Three: masquerade in the virt-launcher pod, flannel egress masquerade on the node, and the internet gateway's public IPv4 mapping |
+| **IP continuity vs service continuity** | IP continuity keeps the guest's address; service continuity keeps the service reachable and correct at some (possibly new) address or name. They are independent. | No IP continuity (.31 stays on VMnet8); service continuity proven by HTTP 200 and the page sha256 through NodePort 30080 |
+| **NodePort Service** | A Service exposed on a fixed port on every node's address, forwarded to the selected pods. | NodePort 30080 to the virt-launcher pod's port 80, reachable only from the operator's /32 |
+| **Upload DataVolume** | A DataVolume with source `upload`: CDI creates the PVC and an upload server, and the client (`virtctl image-upload`) streams the image through `cdi-uploadproxy`. | qcow2 streamed from the node through a `kubectl port-forward`, converted to raw on a Block PVC |
+| **`--force-bind`** | `virtctl image-upload` flag that makes CDI bind a WaitForFirstConsumer PVC before any VM consumes it, so the upload can start. | Required with the gp3 StorageClass |
+| **Standalone DataVolume** | A DataVolume created on its own and referenced by a VM, instead of a `dataVolumeTemplate` owned by the VM; deleting the VM does not delete the disk. | The migrated disk survives VM deletion and re-creation |
+| **IMDSv2 hop limit** | Number of network hops an EC2 instance metadata response may travel. 1 blocks pods on the pod network from reaching it; 2 allows it. | 2, so the EBS CSI controller pod can use the instance profile |
+
 ## Disks and conversion
 
 | Term | Definition |

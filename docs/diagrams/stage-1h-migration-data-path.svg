@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="800" viewBox="0 0 1240 800" role="img" aria-labelledby="title desc">
+  <title id="title">Stage 1H: migration data path from VMDK to a running KubeVirt VM (DESIGN for the future steps)</title>
+  <desc id="desc">Row one shows the completed steps: the source VMDK on ESXi was cold-acquired in Stage 1E into a read-only golden copy on Windows, copied to an immutable working copy on conversion-host-01 in Stage 1F, and converted by virt-v2v into a KVM qcow2 disk in Stage 1G. Row two shows the designed future steps: a disposable copy receives the netplan remediation and an offline qemu-guest-agent install, is transferred to the EC2 node with sha256 checks, and is uploaded with virtctl through a port-forward to the CDI upload proxy. CDI stores the upload in Filesystem scratch space, converts qcow2 to raw with qemu-img, and writes it to a 40 GiB Block-mode ReadWriteOnce PVC on EBS gp3 behind a DataVolume. Row three shows the runtime: a VirtualMachine with a virtio disk and EFI boot runs in a virt-launcher pod, where QEMU uses KVM through nested virtualization to boot Ubuntu, which serves nginx. The disk format is VMDK at input, qcow2 in transit and raw at rest.</desc>
+  <style>
+    .h { font: 700 20px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+    .c { font: 700 15px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+    .t { font: 600 13px 'Segoe UI', Arial, sans-serif; fill: #111827; }
+    .s { font: 11.5px 'Segoe UI', Arial, sans-serif; fill: #374151; }
+    .l { font: 700 13px 'Segoe UI', Arial, sans-serif; fill: #ffffff; }
+    .n { font: 12px 'Segoe UI', Arial, sans-serif; fill: #334155; }
+    .r { font: 700 12px 'Segoe UI', Arial, sans-serif; fill: #b91c1c; }
+    .g { font: 700 12px 'Segoe UI', Arial, sans-serif; fill: #15803d; }
+    .box { stroke: #334155; stroke-width: 1.3; }
+    .fut { stroke: #334155; stroke-width: 1.3; stroke-dasharray: 6 4; }
+    .arr { stroke: #475569; stroke-width: 1.6; fill: none; marker-end: url(#a); }
+    .darr { stroke: #94a3b8; stroke-width: 1.6; fill: none; stroke-dasharray: 6 4; marker-end: url(#g); }
+  </style>
+  <defs>
+    <marker id="a" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/></marker>
+    <marker id="g" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#94a3b8"/></marker>
+  </defs>
+  <rect width="1240" height="800" fill="#ffffff"/>
+  <text x="620" y="32" text-anchor="middle" class="h">Stage 1H: migration data path, VMDK to running KubeVirt VM</text>
+
+  <!-- Row 1: done -->
+  <text x="30" y="68" class="c">Done (Stages 1E to 1G, OBSERVED)</text>
+  <rect x="1030" y="52" width="180" height="24" rx="5" fill="#d97706"/>
+  <text x="1040" y="69" class="l">Input format: VMDK</text>
+
+  <rect x="30" y="84" width="200" height="160" rx="8" class="box" fill="#fee2e2"/>
+  <text x="42" y="106" class="t">ESXi source disk</text>
+  <text x="42" y="126" class="s">legacy-source-vm (running)</text>
+  <text x="42" y="142" class="s">VMDK vmfs: descriptor +</text>
+  <text x="42" y="158" class="s">40 GiB flat extent, PVSCSI</text>
+  <text x="42" y="182" class="r">never modified</text>
+
+  <rect x="270" y="84" width="200" height="160" rx="8" class="box" fill="#fef3c7"/>
+  <text x="282" y="106" class="t">Golden VMDK</text>
+  <text x="282" y="126" class="s">Windows, outside Git</text>
+  <text x="282" y="142" class="s">flat sha256 72ca45c7...c9e7</text>
+  <text x="282" y="158" class="s">ReadOnly attribute</text>
+  <text x="282" y="182" class="r">read only, never converted</text>
+
+  <rect x="510" y="84" width="200" height="160" rx="8" class="box" fill="#e0e7ff"/>
+  <text x="522" y="106" class="t">Working copy</text>
+  <text x="522" y="126" class="s">conversion-host-01</text>
+  <text x="522" y="142" class="s">/srv/migration-lab/working/</text>
+  <text x="522" y="158" class="s">mode 0444, chattr +i</text>
+  <text x="522" y="174" class="s">hash = golden</text>
+
+  <rect x="750" y="84" width="200" height="160" rx="8" class="box" fill="#dcfce7"/>
+  <text x="762" y="106" class="t">Guest-aware conversion</text>
+  <text x="762" y="126" class="s">virt-v2v 2.4.0</text>
+  <text x="762" y="142" class="s">-i disk -o local -of qcow2</text>
+  <text x="762" y="158" class="s">purges open-vm-tools,</text>
+  <text x="762" y="174" class="s">rebuilds initramfs</text>
+  <text x="762" y="190" class="s">netplan left unchanged</text>
+
+  <rect x="990" y="84" width="220" height="160" rx="8" class="box" fill="#dcfce7"/>
+  <text x="1002" y="106" class="t">KVM disk (kept artifact)</text>
+  <text x="1002" y="126" class="s">qcow2, 40 GiB virtual,</text>
+  <text x="1002" y="142" class="s">2.73 GiB file</text>
+  <text x="1002" y="158" class="s">sha256 94bc1cd6...91c6</text>
+  <text x="1002" y="174" class="s">boots under QEMU/KVM, UEFI</text>
+  <text x="1002" y="198" class="r">kept read only, not edited</text>
+
+  <path d="M230,164 L268,164" class="arr"/>
+  <text x="236" y="156" class="s">1E</text>
+  <path d="M470,164 L508,164" class="arr"/>
+  <text x="476" y="156" class="s">1F</text>
+  <path d="M710,164 L748,164" class="arr"/>
+  <text x="716" y="156" class="s">1G</text>
+  <path d="M950,164 L988,164" class="arr"/>
+  <text x="44" y="226" class="s">cold scp, sha256 both ends</text>
+  <text x="284" y="226" class="s">scp + re-sparsify, same hash</text>
+  <text x="524" y="226" class="s">protected input only</text>
+  <text x="764" y="226" class="s">136 s, new output path</text>
+
+  <!-- connector to row 2 -->
+  <path d="M1100,244 L1100,270 L130,270 L130,306" class="darr"/>
+
+  <!-- Row 2: future -->
+  <text x="30" y="298" class="c">Designed (future stage, not executed)</text>
+  <rect x="1030" y="282" width="180" height="24" rx="5" fill="#2563eb"/>
+  <text x="1040" y="299" class="l">Transfer format: qcow2</text>
+
+  <rect x="30" y="314" width="200" height="190" rx="8" class="fut" fill="#f0fdf4"/>
+  <text x="42" y="336" class="t">Prepared copy</text>
+  <text x="42" y="356" class="s">new disposable copy of</text>
+  <text x="42" y="372" class="s">the virt-v2v output:</text>
+  <text x="42" y="390" class="s">netplan driver match, DHCP</text>
+  <text x="42" y="406" class="s">(ADR 010)</text>
+  <text x="42" y="424" class="s">qemu-guest-agent .deb</text>
+  <text x="42" y="440" class="s">installed offline</text>
+  <text x="42" y="456" class="s">first-boot apt jobs removed</text>
+  <text x="42" y="474" class="s">qemu-img check, sha256,</text>
+  <text x="42" y="490" class="s">read only</text>
+
+  <rect x="270" y="314" width="200" height="190" rx="8" class="fut" fill="#f8fafc"/>
+  <text x="282" y="336" class="t">Transfer to EC2 node</text>
+  <text x="282" y="356" class="s">scp over SSH (operator /32)</text>
+  <text x="282" y="372" class="s">about 2.7 GiB</text>
+  <text x="282" y="390" class="s">sha256 on both ends</text>
+  <text x="282" y="408" class="s">lands on the node's</text>
+  <text x="282" y="424" class="s">50 GiB gp3 root volume</text>
+
+  <rect x="510" y="314" width="200" height="190" rx="8" class="fut" fill="#f8fafc"/>
+  <text x="522" y="336" class="t">Upload</text>
+  <text x="522" y="356" class="s">kubectl port-forward</text>
+  <text x="522" y="372" class="s">-n cdi svc/cdi-uploadproxy</text>
+  <text x="522" y="390" class="s">virtctl image-upload dv</text>
+  <text x="522" y="406" class="s">--size=40Gi</text>
+  <text x="522" y="422" class="s">--volume-mode=block</text>
+  <text x="522" y="438" class="s">--access-mode=ReadWriteOnce</text>
+  <text x="522" y="454" class="s">--force-bind</text>
+  <text x="522" y="474" class="g">proxy never exposed</text>
+
+  <rect x="750" y="314" width="200" height="190" rx="8" class="fut" fill="#eff6ff"/>
+  <text x="762" y="336" class="t">CDI v1.66.1</text>
+  <text x="762" y="356" class="s">upload server receives</text>
+  <text x="762" y="372" class="s">qcow2 into scratch PVC</text>
+  <text x="762" y="388" class="s">(Filesystem, RWO)</text>
+  <text x="762" y="406" class="s">qemu-img convert</text>
+  <text x="762" y="422" class="s">qcow2 -> raw onto target</text>
+  <text x="762" y="440" class="s">scratch deleted after</text>
+
+  <rect x="990" y="314" width="220" height="190" rx="8" class="fut" fill="#e0f2fe"/>
+  <text x="1002" y="336" class="t">DataVolume -> PVC</text>
+  <text x="1002" y="356" class="s">DataVolume Succeeded</text>
+  <text x="1002" y="372" class="s">PVC 40Gi, volumeMode Block,</text>
+  <text x="1002" y="388" class="s">ReadWriteOnce, Bound</text>
+  <text x="1002" y="406" class="s">EBS gp3 via EBS CSI,</text>
+  <text x="1002" y="422" class="s">one AZ</text>
+  <text x="1002" y="440" class="s">standalone (survives VM</text>
+  <text x="1002" y="456" class="s">deletion)</text>
+
+  <path d="M230,410 L268,410" class="darr"/>
+  <path d="M470,410 L508,410" class="darr"/>
+  <path d="M710,410 L748,410" class="darr"/>
+  <path d="M950,410 L988,410" class="darr"/>
+
+  <!-- connector to row 3 -->
+  <path d="M1100,504 L1100,530 L130,530 L130,566" class="darr"/>
+
+  <!-- Row 3: runtime -->
+  <text x="30" y="558" class="c">Runtime (designed)</text>
+  <rect x="1030" y="542" width="180" height="24" rx="5" fill="#15803d"/>
+  <text x="1040" y="559" class="l">Target format: raw Block</text>
+
+  <rect x="30" y="574" width="200" height="130" rx="8" class="fut" fill="#ecfdf5"/>
+  <text x="42" y="596" class="t">VirtualMachine</text>
+  <text x="42" y="616" class="s">volume: the PVC above</text>
+  <text x="42" y="632" class="s">disk bus: virtio</text>
+  <text x="42" y="648" class="s">EFI, Secure Boot off</text>
+  <text x="42" y="664" class="s">2 vCPU, 4096 Mi (.vmx)</text>
+  <text x="42" y="680" class="s">runStrategy: Manual</text>
+
+  <rect x="270" y="574" width="200" height="130" rx="8" class="fut" fill="#ffffff"/>
+  <text x="282" y="596" class="t">virt-launcher pod</text>
+  <text x="282" y="616" class="s">compute container:</text>
+  <text x="282" y="632" class="s">libvirt 11.10 + QEMU 10.1</text>
+  <text x="282" y="648" class="s">(CentOS Stream 9 builds)</text>
+  <text x="282" y="664" class="s">Block PVC as raw device</text>
+
+  <rect x="510" y="574" width="200" height="130" rx="8" class="fut" fill="#e0e7ff"/>
+  <text x="522" y="596" class="t">QEMU/KVM</text>
+  <text x="522" y="616" class="s">/dev/kvm from EC2 nested</text>
+  <text x="522" y="632" class="s">virtualization (VT-x)</text>
+  <text x="522" y="648" class="s">CentOS Stream 9 EL9 kernel</text>
+  <text x="522" y="664" class="s">m8i.xlarge</text>
+
+  <rect x="750" y="574" width="200" height="130" rx="8" class="fut" fill="#dcfce7"/>
+  <text x="762" y="596" class="t">Ubuntu 24.04.5 guest</text>
+  <text x="762" y="616" class="s">disk vda (virtio-blk)</text>
+  <text x="762" y="632" class="s">same FS UUIDs, machine-id</text>
+  <text x="762" y="648" class="s">NIC via masquerade, DHCP</text>
+  <text x="762" y="664" class="s">10.0.2.2 (ADR 008)</text>
+
+  <rect x="990" y="574" width="220" height="130" rx="8" class="fut" fill="#dcfce7"/>
+  <text x="1002" y="596" class="t">nginx workload</text>
+  <text x="1002" y="616" class="s">HTTP 200, 267 bytes</text>
+  <text x="1002" y="632" class="s">page sha256 b9826e18...0046</text>
+  <text x="1002" y="648" class="s">12 validation checks</text>
+  <text x="1002" y="664" class="s">(Stage 1H section 21)</text>
+
+  <path d="M230,640 L268,640" class="darr"/>
+  <path d="M470,640 L508,640" class="darr"/>
+  <path d="M710,640 L748,640" class="darr"/>
+  <path d="M950,640 L988,640" class="darr"/>
+
+  <!-- legend -->
+  <rect x="30" y="724" width="1180" height="62" rx="8" fill="#f8fafc" stroke="#334155" stroke-width="1.3"/>
+  <line x1="46" y1="746" x2="86" y2="746" class="arr"/>
+  <text x="94" y="750" class="n">done, OBSERVED (Stages 1E to 1G)</text>
+  <line x1="330" y1="746" x2="370" y2="746" class="darr"/>
+  <text x="378" y="750" class="n">designed, not executed (dashed boxes)</text>
+  <text x="46" y="772" class="n">Formats (ADR 009): VMDK at input (read only), qcow2 in transit (guest-adapted, sparse), raw on a Block PVC at rest (CDI converts). Golden and Stage 1G artifacts are never edited.</text>
+</svg>
