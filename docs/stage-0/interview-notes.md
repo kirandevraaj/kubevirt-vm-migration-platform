@@ -334,3 +334,45 @@ Answers below are backed by the Stage 1F conversion lab (see [Stage 1F record](.
 **Short answer:** The guest OS owns the filesystems (ext4, vfat, fstab, netplan). The disk container owns the packaging of the bytes (VMDK descriptor + extent, or raw, or qcow2). The hypervisor's VM metadata owns the virtual hardware and firmware state (`.vmx`, `.nvram`). Each tool works at one layer.
 
 **Detail:** libguestfs works at the guest layer, qemu-img at the container layer, and virt-v2v spans all three: `-i vmx` reads the `.vmx`, it converts the container, and it modifies the guest. CDI works at the container layer on the Kubernetes side. The `.nvram` is never migrated: the target boots with a fresh variable store through the ESP fallback loader (`EFI/BOOT/BOOTX64.EFI`), which the lab disk has.
+
+---
+
+## Stage 1G additions: conversion and KVM boot validation
+
+Answers below are backed by the Stage 1G experiments (see [Stage 1G record](../stage-1/stage-1g-controlled-conversion.md)).
+
+### 44. "If you just run qemu-img convert on a VMware disk, does the VM work on KVM?"
+
+**Short answer:** It may boot, but "boots" is not "works". qemu-img changes only the container, so every VMware assumption inside the guest survives. In the lab the guest booted fine on virtio and served nginx locally, but it had no network.
+
+**Detail:** `qemu-img convert -f vmdk -O qcow2` took 5 s, and `qemu-img compare` reported the images identical. Ubuntu 24.04 has virtio built into the kernel and mounts by UUID, so storage just worked (`/dev/vda`). The NIC appeared as `enp0s3`, but netplan still matched `ens192`, so it stayed unmanaged and DOWN. open-vm-tools was still installed, just skipped by systemd's `ConditionVirtualization=vmware`. A guest that uses `/dev/sdX` in fstab, or whose initramfs lacks the virtio storage driver, would likely have failed earlier (not tested).
+
+### 45. "What does virt-v2v actually change in a Linux guest?"
+
+**Short answer:** Measure it instead of assuming. In the lab it removed VMware Tools, rebuilt the initramfs, added a virtio alias and a first-boot job to install qemu-guest-agent, and generated target metadata. It did **not** fix the network configuration, regenerate GRUB configuration, or change identity.
+
+**Detail:** `virt-diff` between input and output (396 lines) plus the `-v -x` log showed: `dpkg --purge open-vm-tools`; `bochs` added to `/etc/initramfs-tools/modules` and `update-initramfs` (old image kept as `.pre-v2v`); `/etc/modprobe.d/virt-v2v-added.conf` with `alias scsi_hostadapter virtio_blk`; a `guestfs-firstboot` service. It warned that it "could not determine a way to update the configuration of Grub2". netplan, fstab, grub.cfg, the ESP, machine-id, SSH host keys and nginx files were checksum-identical to the source. The input working copy was unchanged (read-only and immutable throughout).
+
+### 46. "Your converted VM boots but has no network. What happened, and how do you fix it safely?"
+
+**Short answer:** The configuration was keyed to the old hypervisor's interface name. Fix it by matching the interface by something that survives the move (driver, or a deliberate MAC policy), keep the guest's own addressing model, and test on an isolated network with a test address, never the production IP while the source is alive.
+
+**Detail:** netplan generated `[Match] Name=ens192`; the virtio NIC was `enp0s3`. On a second disposable copy, one file changed: `match: driver: virtio_net`, 10.0.2.15/24, gateway 10.0.2.2, DNS 10.0.2.3, `dhcp4: false` (the original was static too). `virt-diff` confirmed a single-file change. After boot, the link was routable with a default route, and `curl` through a QEMU port forward returned HTTP 200 with the source page hash. The same guest identity (machine-id, host keys, hostname, IP) must never appear twice on a real network.
+
+### 47. "How do you prove a converted guest really ran on KVM with virtio?"
+
+**Short answer:** Collect evidence on both sides. Host side: the QEMU process holds `/dev/kvm`, a `kvm-vm` fd and one `kvm-vcpu` fd per vCPU, and the monitor says `kvm support: enabled`. Guest side: `systemd-detect-virt` says `kvm`, dmesg shows "Hypervisor detected: KVM", and `lspci` shows virtio devices bound to their drivers.
+
+**Detail:** All three lab boots showed virtio-blk `1af4:1001` (disk `vda`) and virtio-net `1af4:1000` (`virtio_net` driver). QEMU was run directly, without libvirt, so the exact command line is the record. A successful boot alone proves nothing about acceleration: QEMU can fall back to TCG if KVM is not requested or not available.
+
+### 48. "The VMware VM was UEFI. Do you need to migrate its NVRAM?"
+
+**Short answer:** Not for this guest. With an empty variable store, OVMF booted the disk through the ESP fallback loader (`\EFI\BOOT\BOOTX64.EFI`, which is shim), and a `Ubuntu` boot entry appeared afterwards. Match the Secure Boot setting deliberately rather than by accident.
+
+**Detail:** The source runs UEFI with Secure Boot off, so the lab used the non-Secure-Boot `OVMF_CODE_4M.fd` and a fresh `OVMF_VARS_4M.fd` copy per boot. Switching to BIOS would have been a different test, not an equivalent one. Secure Boot on (signed shim and GRUB are present) is untested. On KubeVirt this translates to EFI boot with an explicit Secure Boot choice.
+
+### 49. "What did the lab teach you that matters for KubeVirt and CDI?"
+
+**Short answer:** The disk and boot path are the easy part. The hard parts are network identity, guest-agent provisioning and VM metadata. CDI moves bytes; it does not fix any of these.
+
+**Detail:** virtio storage and UEFI worked without changes. The network needs a remediation designed together with the KubeVirt network binding: a pod network typically hands out an address by DHCP, while a bridged network could keep the static address. virt-v2v's first boot tries to install qemu-guest-agent from the internet, which stalls in an isolated cluster, so pre-install the agent or provide a mirror. `-i disk` guessed 1 vCPU / 2 GiB, so VM sizing must come from the `.vmx`. The target disk format (raw or qcow2 into CDI) remains an explicit decision.

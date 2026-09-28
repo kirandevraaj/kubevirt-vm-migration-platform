@@ -107,6 +107,24 @@ Terms as used on `conversion-host-01` (see [Stage 1F record](../stage-1/stage-1f
 | **virt-v2v input / output mode** | `-i` selects where the source guest comes from (`disk`, `vmx`, `ova`, `libvirt`, `libvirtxml`), and `-o` selects where the converted guest goes (`local`, `qemu`, `libvirt`, `kubevirt`, `openstack`, ...). | virt-v2v 2.4.0; `-o kubevirt` is marked experimental |
 | **nbdkit / NBD** | A pluggable Network Block Device server. virt-v2v uses it internally to expose source disks (local files, SSH, VDDK) to qemu and libguestfs. | nbdkit 1.36.3, installed as a virt-v2v dependency |
 
+## Conversion and boot validation terms (Stage 1G)
+
+Terms as observed in the Stage 1G experiments (see [Stage 1G record](../stage-1/stage-1g-controlled-conversion.md)).
+
+| Term | Definition | Seen in the lab |
+|---|---|---|
+| **Container conversion** | Rewriting a disk image into another format (VMDK to qcow2 or raw) without changing any guest-visible byte. | `qemu-img convert` in 5 s; `qemu-img compare`: "Images are identical." |
+| **Guest-aware conversion** | Converting the container and also changing the guest OS so it runs on the target hypervisor (drivers, initramfs, agents, metadata). | virt-v2v purged open-vm-tools, rebuilt the initramfs, added a first-boot job; netplan untouched |
+| **`qemu-img compare` (strict vs default)** | Default mode compares guest-visible content, treating unallocated and zero ranges as equal. `-s` (strict) also requires the same allocation status, so a sparse copy "differs" even with identical content. | Default: identical; `-s`: "Offset 4096 block status mismatch!" |
+| **qcow2 overlay (backing file)** | A qcow2 file that stores only changed clusters and reads everything else from a read-only backing image. Used to boot a disk without ever writing to it. | One overlay per boot, deleted afterwards; the conversion outputs' hashes never changed |
+| **OVMF CODE / VARS** | QEMU's UEFI firmware is split into a read-only code image and a writable variable store (NVRAM). Each VM needs its own VARS copy. | `OVMF_CODE_4M.fd` (no Secure Boot) + a fresh copy of `OVMF_VARS_4M.fd` per boot |
+| **UEFI fallback (removable-media) boot path** | With no boot entries, UEFI firmware loads `\EFI\BOOT\BOOTX64.EFI` from the ESP. On Ubuntu this is shim, whose fallback helper can recreate the OS boot entry. | `Boot0001 "UEFI Misc Device"` booted the disk; a `Boot0003 "Ubuntu"` entry appeared afterwards |
+| **Predictable interface name** | systemd/udev names a NIC after its hardware location, for example `ens192` (VMware slot) or `enp0s3` (PCI bus 0, slot 3). A different virtual hardware layout gives a different name. | VMXNET3 `ens192` on ESXi became virtio-net `enp0s3` under QEMU q35 |
+| **netplan `match: driver`** | Selects the interface by kernel driver instead of by name, so the configuration survives renaming. The netplan ID becomes a label (for example `primary`). | `driver: virtio_net` produced `[Match] Driver=virtio_net`; the link became routable |
+| **virt-v2v first boot (`guestfs-firstboot`)** | A oneshot service virt-v2v installs to run scripts on the converted guest's first boot, for example installing qemu-guest-agent. | Stalled in `apt-get update` on the isolated network; the system stayed `starting` |
+| **User-mode networking (slirp), `restrict=on`, `hostfwd`** | QEMU's built-in NAT network (10.0.2.0/24, gateway .2, DNS .3). `restrict=on` isolates the guest from everything outside; `hostfwd` still forwards chosen host ports into the guest. | Guest :80 reached through 127.0.0.1:18080 on the conversion host; DNS not available |
+| **`virt-diff`** | libguestfs tool that lists file-level differences between two disk images, with inline diffs for changed text files, without booting either. | 396 lines input vs virt-v2v output; exactly 1 file for the netplan remediation |
+
 ## Disks and conversion
 
 | Term | Definition |
