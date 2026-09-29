@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VM-to-Kubernetes Migration Platform</title>
+<meta name="description" content="Learning portal for the VM-to-Kubernetes Migration Platform: ESXi to KubeVirt migration and VM modernization.">
+<style>
+  :root {
+    --ink: #0f172a; --muted: #475569; --line: #e2e8f0; --bg: #f8fafc;
+    --blue: #1d4ed8; --green: #15803d; --yellow: #a16207; --gray: #475569;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; color: var(--ink); background: var(--bg); line-height: 1.5; }
+  a { color: var(--blue); }
+
+  header { background: #0f172a; color: #fff; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+  .hero { padding: 56px 20px 44px; }
+  .hero h1 { margin: 0; font-size: clamp(28px, 4.4vw, 44px); line-height: 1.15; }
+  .hero p.sub { margin: 10px 0 0; font-size: clamp(17px, 2.2vw, 21px); color: #cbd5e1; }
+  .status { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+  .tag { display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .6px; color: #fff; border-radius: 999px; padding: 4px 12px; white-space: nowrap; }
+  .tag.done { background: var(--green); }
+  .tag.design { background: var(--yellow); }
+  .tag.future { background: var(--gray); }
+
+  main.wrap { padding-top: 32px; padding-bottom: 20px; }
+
+  .featured {
+    display: block; text-decoration: none; color: inherit;
+    background: #fff; border: 3px solid var(--blue); border-radius: 18px;
+    padding: 26px 28px; box-shadow: 0 6px 20px rgba(29, 78, 216, .12);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .featured:hover, .featured:focus-visible { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(29, 78, 216, .2); outline: none; }
+  .featured .kicker { font-size: 12px; font-weight: 800; letter-spacing: 2px; color: var(--blue); }
+  .featured h2 { margin: 6px 0 8px; font-size: clamp(22px, 3vw, 30px); }
+  .featured p { margin: 0; font-size: 16.5px; color: #1e293b; max-width: 760px; }
+  .featured .go { display: inline-block; margin-top: 16px; font-weight: 700; font-size: 15px; color: #fff; background: var(--blue); border-radius: 10px; padding: 9px 16px; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; margin-top: 20px; }
+  .card {
+    display: flex; flex-direction: column; text-decoration: none; color: inherit;
+    background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 20px 20px 18px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .06); transition: border-color .15s, box-shadow .15s;
+  }
+  .card:hover, .card:focus-visible { border-color: var(--blue); box-shadow: 0 4px 14px rgba(15, 23, 42, .1); outline: none; }
+  .card .n { font-size: 12px; font-weight: 800; letter-spacing: 1.5px; color: var(--muted); }
+  .card h3 { margin: 4px 0 6px; font-size: 18.5px; }
+  .card p { margin: 0; font-size: 14.5px; color: var(--muted); flex: 1; }
+  .card .more { margin-top: 12px; font-size: 14px; font-weight: 700; color: var(--blue); }
+
+  .note { margin: 30px 0 0; font-size: 14px; color: var(--muted); }
+  footer { text-align: center; color: var(--muted); font-size: 13px; padding: 24px 20px 40px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap hero">
+    <h1>VM-to-Kubernetes Migration Platform</h1>
+    <p class="sub">ESXi &#8594; KubeVirt Migration &amp; VM Modernization</p>
+    <div class="status" aria-label="Project status">
+      <span class="tag done">STAGE 0: COMPLETE</span>
+      <span class="tag done">STAGE 1A &#8211; 1G: DONE</span>
+      <span class="tag design">STAGE 1H: DESIGN, AWAITING REVIEW</span>
+      <span class="tag future">STAGE 1I: NOT YET DEFINED</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <a class="featured" href="stage-1/stage-1-visual-learning.html">
+    <span class="kicker">START HERE</span>
+    <h2>Stage 1 Visual Learning</h2>
+    <p>The whole of Stage 1 in 18 diagrams: from a VMware VM on ESXi, through a cold disk copy and conversion to QEMU/KVM, to the designed KubeVirt target. Picture first, with optional short explanations.</p>
+    <span class="go">Open the visual guide &#8594;</span>
+  </a>
+
+  <div class="grid">
+    <a class="card" href="stage-0/">
+      <span class="n">STAGE 0</span>
+      <h3>Stage 0 Documentation</h3>
+      <p>Theory, architecture and feasibility: virtualization fundamentals, KubeVirt, CDI, networking, the migration state machine and the glossary.</p>
+      <span class="more">Read Stage 0 &#8594;</span>
+    </a>
+    <a class="card" href="stage-1/">
+      <span class="n">STAGE 1</span>
+      <h3>Stage 1 Technical Documentation</h3>
+      <p>The detailed record of sub-stages 1A to 1H: scope, commands, evidence and results for each step.</p>
+      <span class="more">Read Stage 1 &#8594;</span>
+    </a>
+    <a class="card" href="adr/">
+      <span class="n">ARCHITECTURE</span>
+      <h3>Architecture / ADRs</h3>
+      <p>Architecture Decision Records 001 to 010: the source, target platform, network, storage and remediation decisions.</p>
+      <span class="more">Read the ADRs &#8594;</span>
+    </a>
+    <a class="card" href="https://github.com/kirandevraaj/kubevirt-vm-migration-platform">
+      <span class="n">SOURCE</span>
+      <h3>Project Repository</h3>
+      <p>All documents, diagrams and history on GitHub.</p>
+      <span class="more">Open on GitHub &#8594;</span>
+    </a>
+  </div>
+
+  <p class="note">This portal is documentation only. The Kubernetes / KubeVirt target is a design; nothing has been provisioned yet.</p>
+</main>
+
+<footer>VM-to-Kubernetes Migration Platform &#183; Project 1.5</footer>
+
+</body>
+</html>
