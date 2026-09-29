@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="880" viewBox="0 0 1200 880" role="img" aria-labelledby="title desc">
+  <title id="title">The virtualization stack: what stays and what changes</title>
+  <desc id="desc">Generic layers: physical hardware, hypervisor, virtual hardware, guest OS, application, and the management layer. Compared for VMware, plain KVM, and KubeVirt-managed KVM. Physical hardware, guest OS and application are the same; the hypervisor, the virtual hardware and the management layer change.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs></defs>
+  <rect width="1200" height="880" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">The virtualization stack</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">Same five layers everywhere. Only some of them change.</text>
+  <rect x="300" y="104" width="270" height="44" rx="10" fill="#0f172a" stroke="#0f172a" stroke-width="1.6"/>
+  <text x="435" y="132" class="t" text-anchor="middle" style="font-size:16px;fill:#ffffff">VMware</text>
+  <rect x="590" y="104" width="270" height="44" rx="10" fill="#0f172a" stroke="#0f172a" stroke-width="1.6"/>
+  <text x="725" y="132" class="t" text-anchor="middle" style="font-size:16px;fill:#ffffff">KVM</text>
+  <rect x="880" y="104" width="270" height="44" rx="10" fill="#0f172a" stroke="#0f172a" stroke-width="1.6"/>
+  <text x="1015" y="132" class="t" text-anchor="middle" style="font-size:16px;fill:#ffffff">KubeVirt-managed KVM</text>
+  <rect x="40" y="166" width="240" height="78" rx="10" fill="#f1f5f9" stroke="#334155" stroke-width="1.6"/>
+  <text x="56" y="200" class="t" text-anchor="start" style="font-size:15px">Physical hardware</text>
+  <rect x="56" y="212" width="44" height="20" rx="10.0" fill="#334155"/>
+  <text x="78.0" y="225.96" class="pill" text-anchor="middle" style="font-size:11px">SAME</text>
+  <rect x="40" y="260" width="240" height="78" rx="10" fill="#f1f5f9" stroke="#334155" stroke-width="1.6"/>
+  <text x="56" y="294" class="t" text-anchor="start" style="font-size:15px">Hypervisor</text>
+  <rect x="56" y="306" width="66" height="20" rx="10.0" fill="#b45309"/>
+  <text x="89.0" y="319.96" class="pill" text-anchor="middle" style="font-size:11px">CHANGES</text>
+  <rect x="40" y="354" width="240" height="78" rx="10" fill="#f1f5f9" stroke="#334155" stroke-width="1.6"/>
+  <text x="56" y="388" class="t" text-anchor="start" style="font-size:15px">Virtual hardware</text>
+  <rect x="56" y="400" width="66" height="20" rx="10.0" fill="#b45309"/>
+  <text x="89.0" y="413.96" class="pill" text-anchor="middle" style="font-size:11px">CHANGES</text>
+  <rect x="40" y="448" width="240" height="78" rx="10" fill="#f1f5f9" stroke="#334155" stroke-width="1.6"/>
+  <text x="56" y="482" class="t" text-anchor="start" style="font-size:15px">Guest OS</text>
+  <rect x="56" y="494" width="44" height="20" rx="10.0" fill="#334155"/>
+  <text x="78.0" y="507.96" class="pill" text-anchor="middle" style="font-size:11px">SAME</text>
+  <rect x="40" y="542" width="240" height="78" rx="10" fill="#f1f5f9" stroke="#334155" stroke-width="1.6"/>
+  <text x="56" y="576" class="t" text-anchor="start" style="font-size:15px">Application</text>
+  <rect x="56" y="588" width="44" height="20" rx="10.0" fill="#334155"/>
+  <text x="78.0" y="601.96" class="pill" text-anchor="middle" style="font-size:11px">SAME</text>
+  <rect x="40" y="636" width="240" height="78" rx="10" fill="#f1f5f9" stroke="#334155" stroke-width="1.6"/>
+  <text x="56" y="670" class="t" text-anchor="start" style="font-size:15px">Managed through</text>
+  <rect x="56" y="682" width="66" height="20" rx="10.0" fill="#b45309"/>
+  <text x="89.0" y="695.96" class="pill" text-anchor="middle" style="font-size:11px">CHANGES</text>
+  <rect x="300" y="166" width="850" height="78" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="725.0" y="200.87" class="t" text-anchor="middle" style="font-size:16px">Physical CPU (VT-x / AMD-V), RAM, NICs, disks</text>
+  <text x="725.0" y="220.0" class="s" text-anchor="middle" style="font-size:12.5px">the hardware does not care who manages it</text>
+  <rect x="300" y="260" width="270" height="78" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="435.0" y="294.55" class="t" text-anchor="middle" style="font-size:15px">ESXi VMkernel</text>
+  <text x="435.0" y="313.5" class="s" text-anchor="middle" style="font-size:12.5px">purpose-built hypervisor OS</text>
+  <rect x="590" y="260" width="270" height="78" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="725.0" y="294.55" class="t" text-anchor="middle" style="font-size:15px">Linux kernel + KVM</text>
+  <text x="725.0" y="313.5" class="s" text-anchor="middle" style="font-size:12.5px">general-purpose kernel</text>
+  <rect x="880" y="260" width="270" height="78" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="1015.0" y="294.55" class="t" text-anchor="middle" style="font-size:15px">Linux + KVM on a node</text>
+  <text x="1015.0" y="313.5" class="s" text-anchor="middle" style="font-size:12.5px">a Kubernetes worker</text>
+  <rect x="300" y="354" width="270" height="78" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="435.0" y="388.55" class="t" text-anchor="middle" style="font-size:15px">VMX process</text>
+  <text x="435.0" y="407.5" class="s" text-anchor="middle" style="font-size:12.5px">PVSCSI, VMXNET3, firmware</text>
+  <rect x="590" y="354" width="270" height="78" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="725.0" y="388.55" class="t" text-anchor="middle" style="font-size:15px">QEMU process</text>
+  <text x="725.0" y="407.5" class="s" text-anchor="middle" style="font-size:12.5px">virtio devices, BIOS/UEFI</text>
+  <rect x="880" y="354" width="270" height="78" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="1015.0" y="388.55" class="t" text-anchor="middle" style="font-size:15px">QEMU in virt-launcher</text>
+  <text x="1015.0" y="407.5" class="s" text-anchor="middle" style="font-size:12.5px">virtio devices, inside a Pod</text>
+  <rect x="300" y="448" width="850" height="78" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="725.0" y="482.87" class="t" text-anchor="middle" style="font-size:16px">The same Linux guest: kernel, packages, config</text>
+  <text x="725.0" y="502.0" class="s" text-anchor="middle" style="font-size:12.5px">drivers switch from VMware devices to virtio</text>
+  <rect x="300" y="542" width="850" height="78" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="725.0" y="576.87" class="t" text-anchor="middle" style="font-size:16px">The same nginx and website</text>
+  <text x="725.0" y="596.0" class="s" text-anchor="middle" style="font-size:12.5px">no application change in a migration</text>
+  <rect x="300" y="636" width="270" height="78" rx="10" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.8"/>
+  <text x="435.0" y="670.55" class="t" text-anchor="middle" style="font-size:15px">hostd / vCenter</text>
+  <text x="435.0" y="689.5" class="s" text-anchor="middle" style="font-size:12.5px">Host Client, vim-cmd</text>
+  <rect x="590" y="636" width="270" height="78" rx="10" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.8"/>
+  <text x="725.0" y="670.55" class="t" text-anchor="middle" style="font-size:15px">libvirt</text>
+  <text x="725.0" y="689.5" class="s" text-anchor="middle" style="font-size:12.5px">virsh, domain XML</text>
+  <rect x="880" y="636" width="270" height="78" rx="10" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.8"/>
+  <text x="1015.0" y="670.55" class="t" text-anchor="middle" style="font-size:15px">Kubernetes API + KubeVirt</text>
+  <text x="1015.0" y="689.5" class="s" text-anchor="middle" style="font-size:12.5px">libvirt runs inside each Pod</text>
+  <rect x="30" y="736" width="1140" height="54" rx="12" fill="#f8fafc" stroke="#0f172a" stroke-width="2"/>
+  <text x="600.0" y="772" class="t" text-anchor="middle" style="font-size:20px;fill:#0f172a">Migration changes the lower machinery and the manager, not the guest.</text>
+  <rect x="326.4" y="846" width="34" height="20" rx="5" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <rect x="368.4" y="846" width="80" height="20" rx="10.0" fill="#1d4ed8"/>
+  <text x="408.4" y="859.96" class="pill" text-anchor="middle" style="font-size:11px">COMPONENT</text>
+  <text x="456.4" y="861" class="xs" text-anchor="start">technology (documented)</text>
+  <rect x="629.6" y="846" width="34" height="20" rx="5" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.8"/>
+  <rect x="671.6" y="846" width="66" height="20" rx="10.0" fill="#6d28d9"/>
+  <text x="704.6" y="859.96" class="pill" text-anchor="middle" style="font-size:11px">CONCEPT</text>
+  <text x="745.6" y="861" class="xs" text-anchor="start">control logic / idea</text>
+</svg>

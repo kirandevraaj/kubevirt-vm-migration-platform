@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1050" viewBox="0 0 1200 1050" role="img" aria-labelledby="title desc">
+  <title id="title">Stage 0 big picture: one VMware VM, two possible futures</title>
+  <desc id="desc">A traditional VMware VM faces the migration problem. Path 1, migration: KubeVirt rehosts it as a KubeVirt VM managed by Kubernetes; the VM remains a VM. Path 2, modernization: the application is packaged as a container image, run by a Deployment and exposed by a Service; the VM dependency is removed. Stage 0 designed both paths; nothing was built in Stage 0.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker></defs>
+  <rect width="1200" height="1050" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">Stage 0 big picture: one VM, two possible futures</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">Stage 0 is theory and design. Nothing on this map was built in Stage 0.</text>
+  <rect x="450" y="100" width="300" height="62" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="600.0" y="126.55" class="t" text-anchor="middle" style="font-size:15px">Traditional VMware</text>
+  <text x="600.0" y="145.5" class="s" text-anchor="middle" style="font-size:12.5px">ESXi runs the VM today</text>
+  <rect x="450" y="196" width="300" height="62" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="600.0" y="222.55" class="t" text-anchor="middle" style="font-size:15px">VMware VM</text>
+  <text x="600.0" y="241.5" class="s" text-anchor="middle" style="font-size:12.5px">Linux guest + nginx</text>
+  <path d="M600.0,164 L600.0,193" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="450" y="292" width="300" height="62" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <text x="600.0" y="318.55" class="t" text-anchor="middle" style="font-size:15px">The migration problem</text>
+  <text x="600.0" y="337.5" class="s" text-anchor="middle" style="font-size:12.5px">how do we move it to Kubernetes?</text>
+  <path d="M600.0,260 L600.0,289" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M600,356 L600,380 L300,380 L300,462" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M600,380 L900,380 L900,462" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="60" y="396" width="480" height="470" rx="14" fill="#eff6ff" stroke="#1d4ed8" stroke-width="1.5"/>
+  <text x="76" y="422" class="lab" text-anchor="start">MIGRATION</text>
+  <text x="76" y="442" class="xs" text-anchor="start">rehost: keep the whole VM</text>
+  <rect x="660" y="396" width="480" height="470" rx="14" fill="#f0fdf4" stroke="#15803d" stroke-width="1.5"/>
+  <text x="676" y="422" class="lab" text-anchor="start">MODERNIZATION</text>
+  <text x="676" y="442" class="xs" text-anchor="start">replatform: package only the app</text>
+  <rect x="150" y="466" width="300" height="66" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="300.0" y="494.55" class="t" text-anchor="middle" style="font-size:15px">KubeVirt migration</text>
+  <text x="300.0" y="513.5" class="s" text-anchor="middle" style="font-size:12.5px">copy + convert the disk</text>
+  <rect x="150" y="568" width="300" height="66" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="300.0" y="596.55" class="t" text-anchor="middle" style="font-size:15px">KubeVirt VM</text>
+  <text x="300.0" y="615.5" class="s" text-anchor="middle" style="font-size:12.5px">same guest OS and app</text>
+  <path d="M300.0,534 L300.0,565" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="150" y="670" width="300" height="66" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="300.0" y="698.55" class="t" text-anchor="middle" style="font-size:15px">Kubernetes</text>
+  <text x="300.0" y="717.5" class="s" text-anchor="middle" style="font-size:12.5px">manages the VM as an object</text>
+  <path d="M300.0,636 L300.0,667" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="750" y="466" width="300" height="66" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="900.0" y="494.55" class="t" text-anchor="middle" style="font-size:15px">Application modernization</text>
+  <text x="900.0" y="513.5" class="s" text-anchor="middle" style="font-size:12.5px">assess, then containerize</text>
+  <rect x="750" y="568" width="300" height="66" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="900.0" y="596.55" class="t" text-anchor="middle" style="font-size:15px">Container image</text>
+  <text x="900.0" y="615.5" class="s" text-anchor="middle" style="font-size:12.5px">app + config, no guest OS</text>
+  <path d="M900.0,534 L900.0,565" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="750" y="670" width="300" height="66" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="900.0" y="698.55" class="t" text-anchor="middle" style="font-size:15px">Deployment</text>
+  <text x="900.0" y="717.5" class="s" text-anchor="middle" style="font-size:12.5px">replicas, probes, rollouts</text>
+  <path d="M900.0,636 L900.0,667" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="750" y="772" width="300" height="66" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="900.0" y="800.55" class="t" text-anchor="middle" style="font-size:15px">Service</text>
+  <text x="900.0" y="819.5" class="s" text-anchor="middle" style="font-size:12.5px">stable name + load balancing</text>
+  <path d="M900.0,738 L900.0,769" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="60" y="890" width="480" height="84" rx="12" fill="#dbeafe" stroke="#1d4ed8" stroke-width="2.2"/>
+  <rect x="84" y="904" width="86" height="21" rx="10.5" fill="#1d4ed8"/>
+  <text x="127.0" y="918.82" class="pill" text-anchor="middle" style="font-size:12px">MIGRATION</text>
+  <text x="300" y="950" class="t" text-anchor="middle" style="font-size:21px">= the VM remains a VM</text>
+  <rect x="660" y="890" width="480" height="84" rx="12" fill="#dcfce7" stroke="#15803d" stroke-width="2.2"/>
+  <rect x="684" y="904" width="117" height="21" rx="10.5" fill="#15803d"/>
+  <text x="742.5" y="918.82" class="pill" text-anchor="middle" style="font-size:12px">MODERNIZATION</text>
+  <text x="900" y="950" class="t" text-anchor="middle" style="font-size:21px">= the VM dependency is removed</text>
+  <rect x="176.19999999999993" y="1004" width="34" height="20" rx="5" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <rect x="218.19999999999993" y="1004" width="80" height="20" rx="10.0" fill="#1d4ed8"/>
+  <text x="258.19999999999993" y="1017.96" class="pill" text-anchor="middle" style="font-size:11px">COMPONENT</text>
+  <text x="306.19999999999993" y="1019" class="xs" text-anchor="start">technology (documented)</text>
+  <rect x="479.4" y="1004" width="34" height="20" rx="5" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <rect x="521.4" y="1004" width="73" height="20" rx="10.0" fill="#b45309"/>
+  <text x="557.9" y="1017.96" class="pill" text-anchor="middle" style="font-size:11px">DECISION</text>
+  <text x="602.4" y="1019" class="xs" text-anchor="start">choice or caution</text>
+  <rect x="737.2" y="1004" width="34" height="20" rx="5" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <rect x="779.2" y="1004" width="115" height="20" rx="10.0" fill="#a16207"/>
+  <text x="836.7" y="1017.96" class="pill" text-anchor="middle" style="font-size:11px">STAGE 0 DESIGN</text>
+  <text x="902.2" y="1019" class="xs" text-anchor="start">on paper, not built</text>
+</svg>

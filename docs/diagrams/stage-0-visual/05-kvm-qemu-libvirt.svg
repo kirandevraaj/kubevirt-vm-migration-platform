@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="960" viewBox="0 0 1200 960" role="img" aria-labelledby="title desc">
+  <title id="title">KVM, QEMU and libvirt: three jobs</title>
+  <desc id="desc">The chain: application or user, libvirt, QEMU, KVM, physical CPU. libvirt is the management API and tooling. QEMU is the virtual machine process and its virtual devices. KVM is the kernel virtualization mechanism. On the right, a rough VMware analogy: vim-cmd, hostd and vCenter; the VMX process; the VMkernel. It is an analogy, not an equivalence.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker></defs>
+  <rect width="1200" height="960" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">KVM, QEMU and libvirt: three jobs, one VM</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">The most important mental model in Stage 0</text>
+  <rect x="90" y="110" width="330" height="84" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="255.0" y="147.55" class="t" text-anchor="middle" style="font-size:15px">Application / user</text>
+  <text x="255.0" y="166.5" class="s" text-anchor="middle" style="font-size:12.5px">virsh by hand, or KubeVirt</text>
+  <rect x="90" y="240" width="330" height="84" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="255.0" y="268.3" class="t" text-anchor="middle" style="font-size:15px">libvirt</text>
+  <text x="255.0" y="287.25" class="s" text-anchor="middle" style="font-size:12.5px">management API + daemon</text>
+  <text x="255.0" y="305.75" class="s" text-anchor="middle" style="font-size:12.5px">VM described as domain XML</text>
+  <path d="M255.0,196 L255.0,237" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="265.0" y="221.0" class="xs" text-anchor="start" style="font-weight:600">API call</text>
+  <rect x="90" y="370" width="330" height="84" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="255.0" y="398.3" class="t" text-anchor="middle" style="font-size:15px">QEMU</text>
+  <text x="255.0" y="417.25" class="s" text-anchor="middle" style="font-size:12.5px">one user-space process per VM</text>
+  <text x="255.0" y="435.75" class="s" text-anchor="middle" style="font-size:12.5px">firmware, chipset, virtual devices</text>
+  <path d="M255.0,326 L255.0,367" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="265.0" y="351.0" class="xs" text-anchor="start" style="font-weight:600">starts + manages</text>
+  <rect x="90" y="500" width="330" height="84" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="255.0" y="528.3" class="t" text-anchor="middle" style="font-size:15px">KVM</text>
+  <text x="255.0" y="547.25" class="s" text-anchor="middle" style="font-size:12.5px">Linux kernel module</text>
+  <text x="255.0" y="565.75" class="s" text-anchor="middle" style="font-size:12.5px">exposes /dev/kvm</text>
+  <path d="M255.0,456 L255.0,497" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="265.0" y="481.0" class="xs" text-anchor="start" style="font-weight:600">ioctl() on /dev/kvm</text>
+  <rect x="90" y="630" width="330" height="84" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="255.0" y="667.55" class="t" text-anchor="middle" style="font-size:15px">Physical CPU</text>
+  <text x="255.0" y="686.5" class="s" text-anchor="middle" style="font-size:12.5px">VT-x / AMD-V + EPT / NPT</text>
+  <path d="M255.0,586 L255.0,627" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="265.0" y="611.0" class="xs" text-anchor="start" style="font-weight:600">runs guest code natively</text>
+  <text x="452" y="289.0" class="t" text-anchor="start" style="font-size:19px;fill:#1d4ed8">= management API / tooling</text>
+  <text x="452" y="419.0" class="t" text-anchor="start" style="font-size:19px;fill:#1d4ed8">= the VM process + virtual devices</text>
+  <text x="452" y="549.0" class="t" text-anchor="start" style="font-size:19px;fill:#1d4ed8">= the kernel virtualization mechanism</text>
+  <rect x="800" y="96" width="370" height="696" rx="14" fill="#fffbeb" stroke="#b45309" stroke-width="2" stroke-dasharray="9 5"/>
+  <text x="985" y="124" class="lab" text-anchor="middle">VMWARE</text>
+  <rect x="931.0" y="134" width="108" height="20" rx="10.0" fill="#b45309"/>
+  <text x="985.0" y="147.96" class="pill" text-anchor="middle" style="font-size:11px">ROUGH ANALOGY</text>
+  <text x="985" y="172" class="xs" text-anchor="middle">not an equivalence</text>
+  <rect x="830" y="240" width="310" height="84" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="985.0" y="277.55" class="t" text-anchor="middle" style="font-size:15px">hostd / vCenter</text>
+  <text x="985.0" y="296.5" class="s" text-anchor="middle" style="font-size:12.5px">Host Client, vim-cmd</text>
+  <text x="812" y="290.0" class="t" text-anchor="middle" style="font-size:24px;fill:#b45309">&#8776;</text>
+  <rect x="830" y="370" width="310" height="84" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="985.0" y="407.55" class="t" text-anchor="middle" style="font-size:15px">VMX process</text>
+  <text x="985.0" y="426.5" class="s" text-anchor="middle" style="font-size:12.5px">per-VM process + device emulation</text>
+  <text x="812" y="420.0" class="t" text-anchor="middle" style="font-size:24px;fill:#b45309">&#8776;</text>
+  <rect x="830" y="500" width="310" height="84" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="985.0" y="537.55" class="t" text-anchor="middle" style="font-size:15px">VMkernel (its VMM)</text>
+  <text x="985.0" y="556.5" class="s" text-anchor="middle" style="font-size:12.5px">CPU + memory virtualization</text>
+  <text x="812" y="550.0" class="t" text-anchor="middle" style="font-size:24px;fill:#b45309">&#8776;</text>
+  <rect x="830" y="630" width="310" height="84" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="985.0" y="667.55" class="t" text-anchor="middle" style="font-size:15px">Physical CPU</text>
+  <text x="985.0" y="686.5" class="s" text-anchor="middle" style="font-size:12.5px">same hardware features</text>
+  <text x="812" y="680.0" class="t" text-anchor="middle" style="font-size:24px;fill:#b45309">&#8776;</text>
+  <rect x="30" y="816" width="1140" height="74" rx="12" fill="#f8fafc" stroke="#0f172a" stroke-width="2"/>
+  <text x="600.0" y="848" class="t" text-anchor="middle" style="font-size:20px;fill:#0f172a">KVM runs the vCPUs. QEMU builds the machine. libvirt manages it.</text>
+  <text x="600.0" y="872" class="s" text-anchor="middle" style="font-size:14px;fill:#334155">ESXi does all three jobs as one integrated product; the KVM stack is assembled from separate parts.</text>
+  <rect x="283.0" y="914" width="34" height="20" rx="5" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <rect x="325.0" y="914" width="80" height="20" rx="10.0" fill="#1d4ed8"/>
+  <text x="365.0" y="927.96" class="pill" text-anchor="middle" style="font-size:11px">COMPONENT</text>
+  <text x="413.0" y="929" class="xs" text-anchor="start">technology (documented)</text>
+  <rect x="586.2" y="914" width="34" height="20" rx="5" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <rect x="628.2" y="914" width="108" height="20" rx="10.0" fill="#b45309"/>
+  <text x="682.2" y="927.96" class="pill" text-anchor="middle" style="font-size:11px">ROUGH ANALOGY</text>
+  <text x="744.2" y="929" class="xs" text-anchor="start">comparison, not equivalence</text>
+</svg>

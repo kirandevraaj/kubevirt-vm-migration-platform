@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">The reconciliation loop</title>
+  <desc id="desc">A circular loop: desired state, observe actual state, compare, difference?, act, observe again, desired equals actual, wait and watch, then back to desired state. If there is no difference, the controller goes straight to waiting. Example: a VM crashes, actual no longer equals desired, the controller reconciles, and the VM is running again. Controller equals state convergence.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker><marker id="mb45309" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#b45309"/></marker></defs>
+  <rect width="1200" height="900" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">The reconciliation loop</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">The controller does not run a script once; it keeps converging reality to the spec</text>
+  <path d="M236,200 L277,200" fill="none" stroke="#475569" stroke-width="2.6" marker-end="url(#m475569)"/>
+  <path d="M491,200 L532,200" fill="none" stroke="#475569" stroke-width="2.6" marker-end="url(#m475569)"/>
+  <path d="M640,235 L640,433" fill="none" stroke="#475569" stroke-width="2.6" marker-end="url(#m475569)"/>
+  <path d="M640,505 L640,703" fill="none" stroke="#475569" stroke-width="2.6" marker-end="url(#m475569)"/>
+  <path d="M534,740 L493,740" fill="none" stroke="#475569" stroke-width="2.6" marker-end="url(#m475569)"/>
+  <path d="M279,740 L238,740" fill="none" stroke="#475569" stroke-width="2.6" marker-end="url(#m475569)"/>
+  <path d="M130,705 L130,507" fill="none" stroke="#475569" stroke-width="2.6" marker-end="url(#m475569)"/>
+  <path d="M130,435 L130,237" fill="none" stroke="#475569" stroke-width="2.6" marker-end="url(#m475569)"/>
+  <rect x="30" y="171" width="200" height="58" rx="10" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.8"/>
+  <text x="130.0" y="195.8" class="t" text-anchor="middle" style="font-size:15px">Desired state</text>
+  <text x="130.0" y="214.34" class="s" text-anchor="middle" style="font-size:12px">spec: what should be true</text>
+  <rect x="285" y="171" width="200" height="58" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="385.0" y="195.8" class="t" text-anchor="middle" style="font-size:15px">Observe actual state</text>
+  <text x="385.0" y="214.34" class="s" text-anchor="middle" style="font-size:12px">look at the real system</text>
+  <rect x="540" y="171" width="200" height="58" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="640.0" y="195.8" class="t" text-anchor="middle" style="font-size:15px">Compare</text>
+  <text x="640.0" y="214.34" class="s" text-anchor="middle" style="font-size:12px">desired vs observed</text>
+  <rect x="540" y="441" width="200" height="58" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <text x="640.0" y="465.8" class="t" text-anchor="middle" style="font-size:15px">Difference?</text>
+  <text x="640.0" y="484.34" class="s" text-anchor="middle" style="font-size:12px">a gap to close?</text>
+  <rect x="540" y="711" width="200" height="58" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="640.0" y="735.8" class="t" text-anchor="middle" style="font-size:15px">Act</text>
+  <text x="640.0" y="754.34" class="s" text-anchor="middle" style="font-size:12px">one idempotent step</text>
+  <rect x="285" y="711" width="200" height="58" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="385.0" y="735.8" class="t" text-anchor="middle" style="font-size:15px">Observe again</text>
+  <text x="385.0" y="754.34" class="s" text-anchor="middle" style="font-size:12px">did it work?</text>
+  <rect x="30" y="711" width="200" height="58" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="130.0" y="735.8" class="t" text-anchor="middle" style="font-size:15px">Desired == Actual</text>
+  <text x="130.0" y="754.34" class="s" text-anchor="middle" style="font-size:12px">converged</text>
+  <rect x="30" y="441" width="200" height="58" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="130.0" y="465.8" class="t" text-anchor="middle" style="font-size:15px">Wait / watch</text>
+  <text x="130.0" y="484.34" class="s" text-anchor="middle" style="font-size:12px">until the next event</text>
+  <path d="M538.0,470 L234.0,470" fill="none" stroke="#b45309" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#mb45309)"/>
+  <text x="385" y="460" class="xs halo" text-anchor="middle" style="font-weight:600">no gap: nothing to do</text>
+  <text x="385" y="330" class="s" text-anchor="middle" style="font-size:26px;fill:#5b21b6;font-weight:800">Controller = state</text>
+  <text x="385" y="364" class="s" text-anchor="middle" style="font-size:26px;fill:#5b21b6;font-weight:800">convergence</text>
+  <text x="385" y="590" class="s" text-anchor="middle" style="font-size:14px;fill:#334155">It never assumes a step worked:</text>
+  <text x="385" y="610" class="s" text-anchor="middle" style="font-size:14px;fill:#334155">it observes again, every time.</text>
+  <rect x="760" y="110" width="400" height="640" rx="16" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.6"/>
+  <text x="960" y="142" class="lab" text-anchor="middle">EXAMPLE: THE VM CRASHES</text>
+  <rect x="916.5" y="152" width="87" height="20" rx="10.0" fill="#1d4ed8"/>
+  <text x="960.0" y="165.96" class="pill" text-anchor="middle" style="font-size:11px">DOCUMENTED</text>
+  <rect x="790" y="196" width="340" height="74" rx="10" fill="#fee2e2" stroke="#b91c1c" stroke-width="1.8"/>
+  <text x="960.0" y="228.55" class="t" text-anchor="middle" style="font-size:15px">VM crashes</text>
+  <text x="960.0" y="247.5" class="s" text-anchor="middle" style="font-size:12.5px">the VMI stops unexpectedly</text>
+  <rect x="790" y="310" width="340" height="74" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <text x="960.0" y="342.55" class="t" text-anchor="middle" style="font-size:15px">Actual &#8800; Desired</text>
+  <text x="960.0" y="361.5" class="s" text-anchor="middle" style="font-size:12.5px">runStrategy: Always, but no VMI</text>
+  <path d="M960.0,272 L960.0,307" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="790" y="424" width="340" height="74" rx="10" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.8"/>
+  <text x="960.0" y="456.55" class="t" text-anchor="middle" style="font-size:15px">Controller reconciles</text>
+  <text x="960.0" y="475.5" class="s" text-anchor="middle" style="font-size:12.5px">virt-controller creates a new VMI</text>
+  <path d="M960.0,386 L960.0,421" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="790" y="538" width="340" height="74" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="960.0" y="570.55" class="t" text-anchor="middle" style="font-size:15px">VM running again</text>
+  <text x="960.0" y="589.5" class="s" text-anchor="middle" style="font-size:12.5px">actual matches desired</text>
+  <path d="M960.0,500 L960.0,535" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="960" y="680" class="s" text-anchor="middle" style="font-size:13px;fill:#334155">Behavior of runStrategy: Always,</text>
+  <text x="960" y="699" class="s" text-anchor="middle" style="font-size:13px;fill:#334155">from KubeVirt documentation.</text>
+  <text x="960" y="718" class="s" text-anchor="middle" style="font-size:13px;fill:#334155">Not tested in Stage 0.</text>
+  <rect x="30" y="790" width="1140" height="54" rx="12" fill="#f8fafc" stroke="#0f172a" stroke-width="2"/>
+  <text x="600.0" y="826" class="t" text-anchor="middle" style="font-size:20px;fill:#0f172a">Same loop for the migration controller: each phase is a desired state it keeps working toward.</text>
+  <rect x="83.09999999999991" y="862" width="34" height="20" rx="5" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <rect x="125.09999999999991" y="862" width="80" height="20" rx="10.0" fill="#1d4ed8"/>
+  <text x="165.0999999999999" y="875.96" class="pill" text-anchor="middle" style="font-size:11px">COMPONENT</text>
+  <text x="213.0999999999999" y="877" class="xs" text-anchor="start">technology (documented)</text>
+  <rect x="386.29999999999995" y="862" width="34" height="20" rx="5" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.8"/>
+  <rect x="428.29999999999995" y="862" width="66" height="20" rx="10.0" fill="#6d28d9"/>
+  <text x="461.29999999999995" y="875.96" class="pill" text-anchor="middle" style="font-size:11px">CONCEPT</text>
+  <text x="502.29999999999995" y="877" class="xs" text-anchor="start">control logic / idea</text>
+  <rect x="656.3" y="862" width="34" height="20" rx="5" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <rect x="698.3" y="862" width="73" height="20" rx="10.0" fill="#b45309"/>
+  <text x="734.8" y="875.96" class="pill" text-anchor="middle" style="font-size:11px">DECISION</text>
+  <text x="779.3" y="877" class="xs" text-anchor="start">choice or caution</text>
+  <rect x="914.0999999999999" y="862" width="34" height="20" rx="5" fill="#fee2e2" stroke="#b91c1c" stroke-width="1.8"/>
+  <rect x="956.0999999999999" y="862" width="44" height="20" rx="10.0" fill="#b91c1c"/>
+  <text x="978.0999999999999" y="875.96" class="pill" text-anchor="middle" style="font-size:11px">RISK</text>
+  <text x="1008.0999999999999" y="877" class="xs" text-anchor="start">failure / blocker</text>
+</svg>

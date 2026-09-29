@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">Storage object stack</title>
+  <desc id="desc">Nested storage layers from the guest down to hardware: the VM disk, the DataVolume, the PVC, the StorageClass, the CSI provisioner and the storage backend, each with a plain-language meaning and a rough VMware analogy where one exists. On AWS the planned backend is an EBS gp3 volume, which is ReadWriteOnce and bound to one Availability Zone.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker></defs>
+  <rect width="1200" height="900" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">Storage object stack</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">From the disk the guest sees down to the real volume</text>
+  <text x="300" y="110" class="lab" text-anchor="middle">LAYER</text>
+  <text x="600" y="110" class="lab" text-anchor="start">WHAT IT MEANS</text>
+  <text x="1055" y="110" class="lab" text-anchor="middle">VMWARE</text>
+  <rect x="1001.0" y="118" width="108" height="20" rx="10.0" fill="#b45309"/>
+  <text x="1055.0" y="131.96" class="pill" text-anchor="middle" style="font-size:11px">ROUGH ANALOGY</text>
+  <rect x="150.0" y="150" width="300" height="76" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="300.0" y="194.07999999999998" class="t" text-anchor="middle" style="font-size:19px">VM disk</text>
+  <text x="600" y="194" class="s" text-anchor="start" style="font-size:15px">the virtio disk inside the VM spec</text>
+  <rect x="950" y="162" width="210" height="52" rx="10" fill="#fffbeb" stroke="#b45309" stroke-width="1.5" stroke-dasharray="9 5"/>
+  <text x="1055" y="194" class="s" text-anchor="middle" style="font-size:13px">the guest's virtual disk</text>
+  <rect x="130.0" y="246" width="340" height="76" rx="10" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.8"/>
+  <text x="300.0" y="290.08" class="t" text-anchor="middle" style="font-size:19px">DataVolume</text>
+  <path d="M300,228 L300,243" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="600" y="290" class="s" text-anchor="start" style="font-size:15px">CDI object: "fill a PVC from this source"</text>
+  <rect x="950" y="258" width="210" height="52" rx="10" fill="#fffbeb" stroke="#b45309" stroke-width="1.5" stroke-dasharray="9 5"/>
+  <text x="1055" y="290" class="s" text-anchor="middle" style="font-size:13px">datastore upload / import</text>
+  <rect x="110.0" y="342" width="380" height="76" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="300.0" y="386.08" class="t" text-anchor="middle" style="font-size:19px">PVC</text>
+  <path d="M300,324 L300,339" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="600" y="386" class="s" text-anchor="start" style="font-size:15px">a claim: size + access mode + StorageClass</text>
+  <rect x="950" y="354" width="210" height="52" rx="10" fill="#fffbeb" stroke="#b45309" stroke-width="1.5" stroke-dasharray="9 5"/>
+  <text x="1055" y="386" class="s" text-anchor="middle" style="font-size:13px">a VMDK (one disk = one PVC)</text>
+  <rect x="90.0" y="438" width="420" height="76" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="300.0" y="482.08" class="t" text-anchor="middle" style="font-size:19px">StorageClass</text>
+  <path d="M300,420 L300,435" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="600" y="482" class="s" text-anchor="start" style="font-size:15px">a policy that creates one volume per claim</text>
+  <rect x="950" y="450" width="210" height="52" rx="10" fill="#fffbeb" stroke="#b45309" stroke-width="1.5" stroke-dasharray="9 5"/>
+  <text x="1055" y="482" class="s" text-anchor="middle" style="font-size:13px">datastore + storage policy</text>
+  <rect x="70.0" y="534" width="460" height="76" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="300.0" y="578.08" class="t" text-anchor="middle" style="font-size:19px">CSI provisioner</text>
+  <path d="M300,516 L300,531" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="600" y="578" class="s" text-anchor="start" style="font-size:15px">the driver that creates the real volume</text>
+  <rect x="950" y="546" width="210" height="52" rx="10" fill="#fffbeb" stroke="#b45309" stroke-width="1.5" stroke-dasharray="9 5"/>
+  <text x="1055" y="578" class="s" text-anchor="middle" style="font-size:13px">-</text>
+  <rect x="50.0" y="630" width="500" height="76" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="300.0" y="674.08" class="t" text-anchor="middle" style="font-size:19px">Storage backend</text>
+  <path d="M300,612 L300,627" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="600" y="674" class="s" text-anchor="start" style="font-size:15px">the real disk, e.g. an EBS gp3 volume</text>
+  <rect x="950" y="642" width="210" height="52" rx="10" fill="#fffbeb" stroke="#b45309" stroke-width="1.5" stroke-dasharray="9 5"/>
+  <text x="1055" y="674" class="s" text-anchor="middle" style="font-size:13px">the LUN / VMFS volume</text>
+  <rect x="40" y="740" width="1120" height="110" rx="12" fill="#f8fafc" stroke="#0f172a" stroke-width="2"/>
+  <rect x="60" y="752" width="87" height="20" rx="10.0" fill="#1d4ed8"/>
+  <text x="103.5" y="765.96" class="pill" text-anchor="middle" style="font-size:11px">DOCUMENTED</text>
+  <rect x="180" y="752" width="115" height="20" rx="10.0" fill="#a16207"/>
+  <text x="237.5" y="765.96" class="pill" text-anchor="middle" style="font-size:11px">STAGE 0 DESIGN</text>
+  <text x="60" y="800" class="s" text-anchor="start" style="font-size:15px;fill:#334155">A StorageClass is not a pool you browse: it is a policy that creates one volume per claim.</text>
+  <text x="60" y="826" class="s" text-anchor="start" style="font-size:15px;fill:#334155">EBS gp3 is ReadWriteOnce and lives in one Availability Zone, so no live migration between nodes with EBS alone.</text>
+</svg>

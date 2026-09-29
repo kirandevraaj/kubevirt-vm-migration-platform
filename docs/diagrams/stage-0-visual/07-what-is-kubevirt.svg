@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="860" viewBox="0 0 1200 860" role="img" aria-labelledby="title desc">
+  <title id="title">What is KubeVirt?</title>
+  <desc id="desc">Kubernetes serves built-in types such as Pod, Deployment and Service. KubeVirt adds a new type, VirtualMachine. KubeVirt turns it into a VMI, a virt-launcher Pod, a QEMU process and KVM, which run the VM. KubeVirt makes VMs manageable through Kubernetes.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker></defs>
+  <rect width="1200" height="860" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">What is KubeVirt?</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">A Kubernetes add-on: new object types + controllers + a node agent</text>
+  <rect x="350" y="104" width="500" height="64" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="600.0" y="132.51" class="t" text-anchor="middle" style="font-size:18px">Kubernetes</text>
+  <text x="600.0" y="152.0" class="s" text-anchor="middle" style="font-size:12.5px">one API, one scheduler, one set of tools</text>
+  <rect x="70" y="228" width="190" height="60" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="165.0" y="253.87" class="t" text-anchor="middle" style="font-size:16px">Pod</text>
+  <text x="165.0" y="273.0" class="s" text-anchor="middle" style="font-size:12.5px">built-in</text>
+  <path d="M600,170 L600,196 L165,196 L165,225" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="290" y="228" width="190" height="60" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="385.0" y="253.87" class="t" text-anchor="middle" style="font-size:16px">Deployment</text>
+  <text x="385.0" y="273.0" class="s" text-anchor="middle" style="font-size:12.5px">built-in</text>
+  <path d="M600,170 L600,196 L385,196 L385,225" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="510" y="228" width="190" height="60" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="605.0" y="253.87" class="t" text-anchor="middle" style="font-size:16px">Service</text>
+  <text x="605.0" y="273.0" class="s" text-anchor="middle" style="font-size:12.5px">built-in</text>
+  <path d="M600,170 L600,196 L605,196 L605,225" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="800" y="222" width="300" height="72" rx="10" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.8"/>
+  <text x="950.0" y="254.19" class="t" text-anchor="middle" style="font-size:17px">VirtualMachine</text>
+  <text x="950.0" y="273.5" class="s" text-anchor="middle" style="font-size:12.5px">new type added by KubeVirt (CRD)</text>
+  <rect x="1024" y="212" width="66" height="20" rx="10.0" fill="#6d28d9"/>
+  <text x="1057.0" y="225.96" class="pill" text-anchor="middle" style="font-size:11px">CONCEPT</text>
+  <path d="M600,196 L950,196 L950,219" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="800" y="340" width="300" height="50" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="950.0" y="360.55" class="t" text-anchor="middle" style="font-size:15px">KubeVirt</text>
+  <text x="950.0" y="379.5" class="s" text-anchor="middle" style="font-size:12.5px">controllers reconcile it</text>
+  <rect x="800" y="414" width="300" height="50" rx="10" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.8"/>
+  <text x="950.0" y="434.55" class="t" text-anchor="middle" style="font-size:15px">VMI</text>
+  <text x="950.0" y="453.5" class="s" text-anchor="middle" style="font-size:12.5px">the running instance</text>
+  <path d="M950.0,392 L950.0,411" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="800" y="488" width="300" height="50" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="950.0" y="508.55" class="t" text-anchor="middle" style="font-size:15px">virt-launcher Pod</text>
+  <text x="950.0" y="527.5" class="s" text-anchor="middle" style="font-size:12.5px">a normal Pod</text>
+  <path d="M950.0,466 L950.0,485" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="800" y="562" width="300" height="50" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="950.0" y="582.55" class="t" text-anchor="middle" style="font-size:15px">QEMU</text>
+  <text x="950.0" y="601.5" class="s" text-anchor="middle" style="font-size:12.5px">machine + devices</text>
+  <path d="M950.0,540 L950.0,559" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="800" y="636" width="300" height="50" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="950.0" y="656.55" class="t" text-anchor="middle" style="font-size:15px">KVM</text>
+  <text x="950.0" y="675.5" class="s" text-anchor="middle" style="font-size:12.5px">node kernel</text>
+  <path d="M950.0,614 L950.0,633" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="800" y="710" width="300" height="50" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="950.0" y="730.55" class="t" text-anchor="middle" style="font-size:15px">VM (guest OS)</text>
+  <text x="950.0" y="749.5" class="s" text-anchor="middle" style="font-size:12.5px">Linux + nginx</text>
+  <path d="M950.0,688 L950.0,707" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M950,296 L950,337" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="60" y="330" width="690" height="400" rx="16" fill="#f8fafc" stroke="#0f172a" stroke-width="2.5"/>
+  <text x="405" y="408" class="s" text-anchor="middle" style="font-size:40px;fill:#0f172a;font-weight:800">KubeVirt makes</text>
+  <text x="405" y="460" class="s" text-anchor="middle" style="font-size:40px;fill:#0f172a;font-weight:800">VMs manageable</text>
+  <text x="405" y="512" class="s" text-anchor="middle" style="font-size:40px;fill:#0f172a;font-weight:800">through Kubernetes.</text>
+  <text x="405" y="594" class="s" text-anchor="middle" style="font-size:15px;fill:#334155">A VM becomes a Kubernetes object: kubectl apply, GitOps,</text>
+  <text x="405" y="615" class="s" text-anchor="middle" style="font-size:15px;fill:#334155">RBAC, scheduling, storage and networking, next to Pods.</text>
+  <text x="405" y="660" class="s" text-anchor="middle" style="font-size:16px;fill:#1d4ed8;font-weight:700">KubeVirt does not replace KVM.</text>
+  <text x="405" y="682" class="s" text-anchor="middle" style="font-size:16px;fill:#1d4ed8;font-weight:700">It drives QEMU and KVM from inside Pods.</text>
+  <rect x="326.4" y="790" width="34" height="20" rx="5" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <rect x="368.4" y="790" width="80" height="20" rx="10.0" fill="#1d4ed8"/>
+  <text x="408.4" y="803.96" class="pill" text-anchor="middle" style="font-size:11px">COMPONENT</text>
+  <text x="456.4" y="805" class="xs" text-anchor="start">technology (documented)</text>
+  <rect x="629.6" y="790" width="34" height="20" rx="5" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.8"/>
+  <rect x="671.6" y="790" width="66" height="20" rx="10.0" fill="#6d28d9"/>
+  <text x="704.6" y="803.96" class="pill" text-anchor="middle" style="font-size:11px">CONCEPT</text>
+  <text x="745.6" y="805" class="xs" text-anchor="start">control logic / idea</text>
+</svg>

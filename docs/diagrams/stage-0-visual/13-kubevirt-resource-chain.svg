@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1000" viewBox="0 0 1200 1000" role="img" aria-labelledby="title desc">
+  <title id="title">KubeVirt resource chain and who owns each layer</title>
+  <desc id="desc">A vertical chain: VirtualMachine, VirtualMachineInstance, virt-launcher Pod, libvirt domain, QEMU, KVM, guest OS. Beside each layer, who owns it: you or the migration controller; virt-controller; virt-controller, kube-scheduler and kubelet; virt-handler; libvirt; the node kernel; the application team. On the left, a rough ESXi analogy for each layer.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m15803d" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#15803d"/></marker><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker></defs>
+  <rect width="1200" height="1000" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">The KubeVirt resource chain</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">Seven layers, seven owners: the key interview diagram</text>
+  <text x="170" y="110" class="lab" text-anchor="middle">ESXi</text>
+  <rect x="116.0" y="118" width="108" height="20" rx="10.0" fill="#b45309"/>
+  <text x="170.0" y="131.96" class="pill" text-anchor="middle" style="font-size:11px">ROUGH ANALOGY</text>
+  <text x="600" y="118" class="lab" text-anchor="middle">LAYER</text>
+  <text x="960" y="118" class="lab" text-anchor="middle">WHO OWNS THIS?</text>
+  <rect x="440" y="140" width="320" height="74" rx="10" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.8"/>
+  <text x="600.0" y="172.55" class="t" text-anchor="middle" style="font-size:15px">VirtualMachine</text>
+  <text x="600.0" y="191.5" class="s" text-anchor="middle" style="font-size:12.5px">persistent desired state</text>
+  <rect x="440" y="246" width="320" height="74" rx="10" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.8"/>
+  <text x="600.0" y="278.55" class="t" text-anchor="middle" style="font-size:15px">VirtualMachineInstance</text>
+  <text x="600.0" y="297.5" class="s" text-anchor="middle" style="font-size:12.5px">one running instance</text>
+  <path d="M600.0,216 L600.0,243" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="440" y="352" width="320" height="74" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="600.0" y="384.55" class="t" text-anchor="middle" style="font-size:15px">virt-launcher Pod</text>
+  <text x="600.0" y="403.5" class="s" text-anchor="middle" style="font-size:12.5px">a normal Pod: cgroups, pod IP, PVCs</text>
+  <path d="M600.0,322 L600.0,349" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="440" y="458" width="320" height="74" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="600.0" y="490.55" class="t" text-anchor="middle" style="font-size:15px">libvirt domain</text>
+  <text x="600.0" y="509.5" class="s" text-anchor="middle" style="font-size:12.5px">generated from the VMI</text>
+  <path d="M600.0,428 L600.0,455" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="440" y="564" width="320" height="74" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="600.0" y="596.55" class="t" text-anchor="middle" style="font-size:15px">QEMU</text>
+  <text x="600.0" y="615.5" class="s" text-anchor="middle" style="font-size:12.5px">user-space process: machine + devices</text>
+  <path d="M600.0,534 L600.0,561" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="440" y="670" width="320" height="74" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="600.0" y="702.55" class="t" text-anchor="middle" style="font-size:15px">KVM</text>
+  <text x="600.0" y="721.5" class="s" text-anchor="middle" style="font-size:12.5px">kernel module, /dev/kvm</text>
+  <path d="M600.0,640 L600.0,667" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="440" y="776" width="320" height="74" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="600.0" y="808.55" class="t" text-anchor="middle" style="font-size:15px">Guest OS</text>
+  <text x="600.0" y="827.5" class="s" text-anchor="middle" style="font-size:12.5px">the same Linux + nginx</text>
+  <path d="M600.0,746 L600.0,773" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="800" y="140" width="360" height="74" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.4"/>
+  <text x="820" y="172.0" class="s" text-anchor="start" style="font-size:14px;fill:#334155;font-weight:600">You (kubectl, GitOps)</text>
+  <text x="820" y="192.0" class="s" text-anchor="start" style="font-size:14px;fill:#334155;font-weight:600">or our migration controller</text>
+  <rect x="40" y="148" width="260" height="58" rx="10" fill="#fffbeb" stroke="#b45309" stroke-width="1.6" stroke-dasharray="9 5"/>
+  <text x="170" y="182.0" class="s" text-anchor="middle" style="font-size:13.5px">VM in inventory (.vmx)</text>
+  <text x="370" y="185.0" class="t" text-anchor="middle" style="font-size:22px;fill:#b45309">&#8776;</text>
+  <rect x="800" y="246" width="360" height="74" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.4"/>
+  <text x="820" y="278.0" class="s" text-anchor="start" style="font-size:14px;fill:#334155;font-weight:600">virt-controller</text>
+  <text x="820" y="298.0" class="s" text-anchor="start" style="font-size:14px;fill:#334155;font-weight:600">(owner reference to the VM)</text>
+  <rect x="40" y="254" width="260" height="58" rx="10" fill="#fffbeb" stroke="#b45309" stroke-width="1.6" stroke-dasharray="9 5"/>
+  <text x="170" y="288.0" class="s" text-anchor="middle" style="font-size:13.5px">a powered-on VM</text>
+  <text x="370" y="291.0" class="t" text-anchor="middle" style="font-size:22px;fill:#b45309">&#8776;</text>
+  <rect x="800" y="352" width="360" height="74" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.4"/>
+  <text x="820" y="384.0" class="s" text-anchor="start" style="font-size:14px;fill:#334155;font-weight:600">virt-controller creates it,</text>
+  <text x="820" y="404.0" class="s" text-anchor="start" style="font-size:14px;fill:#334155;font-weight:600">kube-scheduler places it, kubelet runs it</text>
+  <rect x="40" y="360" width="260" height="58" rx="10" fill="#fffbeb" stroke="#b45309" stroke-width="1.6" stroke-dasharray="9 5"/>
+  <text x="170" y="394.0" class="s" text-anchor="middle" style="font-size:13.5px">the VMX "world" on a host</text>
+  <text x="370" y="397.0" class="t" text-anchor="middle" style="font-size:22px;fill:#b45309">&#8776;</text>
+  <rect x="800" y="458" width="360" height="74" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.4"/>
+  <text x="820" y="490.0" class="s" text-anchor="start" style="font-size:14px;fill:#334155;font-weight:600">virt-handler asks virt-launcher</text>
+  <text x="820" y="510.0" class="s" text-anchor="start" style="font-size:14px;fill:#334155;font-weight:600">to define it</text>
+  <rect x="40" y="466" width="260" height="58" rx="10" fill="#fffbeb" stroke="#b45309" stroke-width="1.6" stroke-dasharray="9 5"/>
+  <text x="170" y="500.0" class="s" text-anchor="middle" style="font-size:13.5px">VMX config in memory</text>
+  <text x="370" y="503.0" class="t" text-anchor="middle" style="font-size:22px;fill:#b45309">&#8776;</text>
+  <rect x="800" y="564" width="360" height="74" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.4"/>
+  <text x="820" y="606.0" class="s" text-anchor="start" style="font-size:14px;fill:#334155;font-weight:600">libvirt inside virt-launcher</text>
+  <rect x="40" y="572" width="260" height="58" rx="10" fill="#fffbeb" stroke="#b45309" stroke-width="1.6" stroke-dasharray="9 5"/>
+  <text x="170" y="606.0" class="s" text-anchor="middle" style="font-size:13.5px">VMX process + devices</text>
+  <text x="370" y="609.0" class="t" text-anchor="middle" style="font-size:22px;fill:#b45309">&#8776;</text>
+  <rect x="800" y="670" width="360" height="74" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.4"/>
+  <text x="820" y="712.0" class="s" text-anchor="start" style="font-size:14px;fill:#334155;font-weight:600">the node Linux kernel</text>
+  <rect x="40" y="678" width="260" height="58" rx="10" fill="#fffbeb" stroke="#b45309" stroke-width="1.6" stroke-dasharray="9 5"/>
+  <text x="170" y="712.0" class="s" text-anchor="middle" style="font-size:13.5px">the VMM part of VMkernel</text>
+  <text x="370" y="715.0" class="t" text-anchor="middle" style="font-size:22px;fill:#b45309">&#8776;</text>
+  <rect x="800" y="776" width="360" height="74" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.4"/>
+  <text x="820" y="818.0" class="s" text-anchor="start" style="font-size:14px;fill:#334155;font-weight:600">the application / OS team</text>
+  <rect x="40" y="784" width="260" height="58" rx="10" fill="#fffbeb" stroke="#b45309" stroke-width="1.6" stroke-dasharray="9 5"/>
+  <text x="170" y="818.0" class="s" text-anchor="middle" style="font-size:13.5px">same guest</text>
+  <text x="370" y="821.0" class="t" text-anchor="middle" style="font-size:22px;fill:#b45309">&#8776;</text>
+  <path d="M428,816 L428,160" fill="none" stroke="#15803d" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m15803d)"/>
+  <text x="416" y="488.0" class="xs" text-anchor="middle" transform="rotate(-90 416 488.0)" style="font-weight:700;fill:#15803d">status flows back up: domain - VMI phase - VM printableStatus</text>
+  <rect x="30" y="884" width="1140" height="74" rx="12" fill="#f8fafc" stroke="#0f172a" stroke-width="2"/>
+  <text x="600.0" y="916" class="t" text-anchor="middle" style="font-size:20px;fill:#0f172a">VM &#8594; VMI &#8594; virt-launcher Pod &#8594; libvirt &#8594; QEMU &#8594; KVM &#8594; guest</text>
+  <text x="600.0" y="940" class="s" text-anchor="middle" style="font-size:14px;fill:#334155">Every layer has a different owner. That is how a VM fits into Kubernetes.</text>
+  <rect x="148.0" y="966" width="34" height="20" rx="5" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <rect x="190.0" y="966" width="80" height="20" rx="10.0" fill="#1d4ed8"/>
+  <text x="230.0" y="979.96" class="pill" text-anchor="middle" style="font-size:11px">COMPONENT</text>
+  <text x="278.0" y="981" class="xs" text-anchor="start">technology (documented)</text>
+  <rect x="451.20000000000005" y="966" width="34" height="20" rx="5" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.8"/>
+  <rect x="493.20000000000005" y="966" width="66" height="20" rx="10.0" fill="#6d28d9"/>
+  <text x="526.2" y="979.96" class="pill" text-anchor="middle" style="font-size:11px">CONCEPT</text>
+  <text x="567.2" y="981" class="xs" text-anchor="start">control logic / idea</text>
+  <rect x="721.2" y="966" width="34" height="20" rx="5" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <rect x="763.2" y="966" width="108" height="20" rx="10.0" fill="#b45309"/>
+  <text x="817.2" y="979.96" class="pill" text-anchor="middle" style="font-size:11px">ROUGH ANALOGY</text>
+  <text x="879.2" y="981" class="xs" text-anchor="start">comparison, not equivalence</text>
+</svg>

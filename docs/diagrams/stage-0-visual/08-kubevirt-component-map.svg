@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1010" viewBox="0 0 1200 1010" role="img" aria-labelledby="title desc">
+  <title id="title">KubeVirt component map</title>
+  <desc id="desc">Cluster level: the Kubernetes API with virt-api webhooks, virt-operator installing KubeVirt, the VirtualMachine and VMI objects, and virt-controller reconciling VM to VMI to virt-launcher Pod. Node level: the virt-launcher Pod containing libvirt and QEMU, KVM in the node kernel, and virt-handler, a privileged DaemonSet that tells virt-launcher to define and start the domain.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker></defs>
+  <rect width="1200" height="1010" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">KubeVirt component map</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">Who does what, at cluster level and on the node</text>
+  <rect x="30" y="92" width="1140" height="390" rx="14" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="46" y="118" class="lab" text-anchor="start">CLUSTER LEVEL</text>
+  <text x="46" y="138" class="xs" text-anchor="start">KubeVirt components run as Pods</text>
+  <rect x="430" y="116" width="340" height="64" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="600.0" y="143.87" class="t" text-anchor="middle" style="font-size:16px">Kubernetes API</text>
+  <text x="600.0" y="163.0" class="s" text-anchor="middle" style="font-size:12.5px">kube-apiserver, objects in etcd</text>
+  <rect x="60" y="190" width="300" height="70" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="210.0" y="211.3" class="t" text-anchor="middle" style="font-size:15px">virt-operator</text>
+  <text x="210.0" y="230.25" class="s" text-anchor="middle" style="font-size:12.5px">installs + upgrades KubeVirt</text>
+  <text x="210.0" y="248.75" class="s" text-anchor="middle" style="font-size:12.5px">watches the KubeVirt CR</text>
+  <rect x="840" y="116" width="300" height="70" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="990.0" y="137.3" class="t" text-anchor="middle" style="font-size:15px">virt-api</text>
+  <text x="990.0" y="156.25" class="s" text-anchor="middle" style="font-size:12.5px">admission webhooks (default, validate)</text>
+  <text x="990.0" y="174.75" class="s" text-anchor="middle" style="font-size:12.5px">start / stop / console subresources</text>
+  <path d="M772,148 L837,148" fill="none" stroke="#475569" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m475569)"/>
+  <text x="804" y="138" class="xs halo" text-anchor="middle" style="font-weight:600">webhooks</text>
+  <path d="M210,188 L210,148 L427,148" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="150" y="290" width="300" height="64" rx="10" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.8"/>
+  <text x="300.0" y="317.87" class="t" text-anchor="middle" style="font-size:16px">VirtualMachine</text>
+  <text x="300.0" y="337.0" class="s" text-anchor="middle" style="font-size:12.5px">API object: desired state</text>
+  <rect x="150" y="396" width="300" height="64" rx="10" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.8"/>
+  <text x="300.0" y="423.87" class="t" text-anchor="middle" style="font-size:16px">VirtualMachineInstance</text>
+  <text x="300.0" y="443.0" class="s" text-anchor="middle" style="font-size:12.5px">API object: running instance</text>
+  <path d="M520,182 L520,322 L453,322" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="526" y="262" class="xs halo" text-anchor="start" style="font-weight:600">stored</text>
+  <rect x="750" y="290" width="330" height="80" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="915.0" y="316.62" class="t" text-anchor="middle" style="font-size:16px">virt-controller</text>
+  <text x="915.0" y="335.75" class="s" text-anchor="middle" style="font-size:12.5px">cluster-wide reconciliation:</text>
+  <text x="915.0" y="354.25" class="s" text-anchor="middle" style="font-size:12.5px">VM -&gt; VMI -&gt; virt-launcher Pod</text>
+  <path d="M747,310 L453,310" fill="none" stroke="#475569" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m475569)"/>
+  <text x="640" y="300" class="xs halo" text-anchor="middle" style="font-weight:600">watches VMs</text>
+  <path d="M800,372 L800,428 L453,428" fill="none" stroke="#475569" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m475569)"/>
+  <text x="640" y="420" class="xs halo" text-anchor="middle" style="font-weight:600">creates VMI + Pod</text>
+  <path d="M300,356 L300,393" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="30" y="506" width="1140" height="424" rx="14" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="9 5"/>
+  <text x="46" y="532" class="lab" text-anchor="start">VM NODE</text>
+  <text x="46" y="552" class="xs" text-anchor="start">every node that can run VMs</text>
+  <rect x="110" y="560" width="380" height="260" rx="14" fill="#eff6ff" stroke="#1d4ed8" stroke-width="2"/>
+  <text x="300" y="586" class="t" text-anchor="middle" style="font-size:14px;fill:#1d4ed8">virt-launcher Pod (one per running VMI)</text>
+  <rect x="150" y="604" width="300" height="70" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="300.0" y="625.3" class="t" text-anchor="middle" style="font-size:15px">libvirt</text>
+  <text x="300.0" y="644.25" class="s" text-anchor="middle" style="font-size:12.5px">private libvirtd for this one VM</text>
+  <text x="300.0" y="662.75" class="s" text-anchor="middle" style="font-size:12.5px">receives domain XML</text>
+  <rect x="150" y="720" width="300" height="70" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="300.0" y="750.55" class="t" text-anchor="middle" style="font-size:15px">QEMU</text>
+  <text x="300.0" y="769.5" class="s" text-anchor="middle" style="font-size:12.5px">the VM process + devices</text>
+  <path d="M300,676 L300,717" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="150" y="846" width="300" height="60" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="300.0" y="871.55" class="t" text-anchor="middle" style="font-size:15px">KVM</text>
+  <text x="300.0" y="890.5" class="s" text-anchor="middle" style="font-size:12.5px">node kernel, /dev/kvm</text>
+  <path d="M300,792 L300,843" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="310" y="824" class="xs halo" text-anchor="start" style="font-weight:600">/dev/kvm</text>
+  <path d="M300,462 L300,557" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="310" y="520" class="xs halo" text-anchor="start" style="font-weight:600">scheduled to a node</text>
+  <rect x="750" y="610" width="330" height="110" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="915.0" y="633.12" class="t" text-anchor="middle" style="font-size:16px">virt-handler</text>
+  <text x="915.0" y="652.25" class="s" text-anchor="middle" style="font-size:12.5px">DaemonSet (privileged) on each node</text>
+  <text x="915.0" y="670.75" class="s" text-anchor="middle" style="font-size:12.5px">tells virt-launcher to define + start</text>
+  <text x="915.0" y="689.25" class="s" text-anchor="middle" style="font-size:12.5px">the domain; syncs VMI status;</text>
+  <text x="915.0" y="707.75" class="s" text-anchor="middle" style="font-size:12.5px">advertises /dev/kvm</text>
+  <path d="M747,640 L453,640" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="600" y="630" class="xs halo" text-anchor="middle" style="font-weight:600">define + start domain</text>
+  <path d="M1000,430 L1000,607" fill="none" stroke="#475569" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m475569)"/>
+  <text x="1010" y="540" class="xs halo" text-anchor="start" style="font-weight:600">watches VMIs</text>
+  <path d="M1000,430 L1000,430" />
+  <path d="M453,440 L1000,440" fill="none" stroke="#475569" stroke-width="2.2" stroke-dasharray="9 6"/>
+  <rect x="326.4" y="958" width="34" height="20" rx="5" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <rect x="368.4" y="958" width="80" height="20" rx="10.0" fill="#1d4ed8"/>
+  <text x="408.4" y="971.96" class="pill" text-anchor="middle" style="font-size:11px">COMPONENT</text>
+  <text x="456.4" y="973" class="xs" text-anchor="start">technology (documented)</text>
+  <rect x="629.6" y="958" width="34" height="20" rx="5" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.8"/>
+  <rect x="671.6" y="958" width="66" height="20" rx="10.0" fill="#6d28d9"/>
+  <text x="704.6" y="971.96" class="pill" text-anchor="middle" style="font-size:11px">CONCEPT</text>
+  <text x="745.6" y="973" class="xs" text-anchor="start">control logic / idea</text>
+</svg>

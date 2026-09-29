@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">The VMware source model: metadata, disk data and runtime state</title>
+  <desc id="desc">An ESXi host holds a VM inventory, VM configuration in the .vmx file, firmware settings with the .nvram file, network wiring with vNICs and port groups, the disk as VMDK files, and runtime state such as power, guest IP and VMware Tools status. They fall into three classes: metadata is translated, disk data is copied and converted, runtime state is only observed and controlled.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker></defs>
+  <rect width="1200" height="900" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">The VMware source model</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">Three kinds of information, three different treatments</text>
+  <rect x="60" y="100" width="260" height="64" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="190.0" y="128.19" class="t" text-anchor="middle" style="font-size:17px">ESXi host</text>
+  <text x="190.0" y="147.5" class="s" text-anchor="middle" style="font-size:12.5px">VMkernel, datastores, vSwitches</text>
+  <path d="M100,166 L100,682.0" stroke="#334155" stroke-width="2.5" fill="none"/>
+  <path d="M100,232.0 L147,232.0" stroke="#334155" stroke-width="2.5"/>
+  <rect x="150" y="200" width="270" height="64" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="285.0" y="227.55" class="t" text-anchor="middle" style="font-size:15px">VM inventory</text>
+  <text x="285.0" y="246.5" class="s" text-anchor="middle" style="font-size:12.5px">name, UUID, vCPU, memory</text>
+  <path d="M100,322.0 L147,322.0" stroke="#334155" stroke-width="2.5"/>
+  <rect x="150" y="290" width="270" height="64" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="285.0" y="317.55" class="t" text-anchor="middle" style="font-size:15px">VM configuration</text>
+  <text x="285.0" y="336.5" class="s" text-anchor="middle" style="font-size:12.5px">hardware, devices, wiring</text>
+  <path d="M420,322.0 L447,322.0" stroke="#94a3b8" stroke-width="2"/>
+  <rect x="450" y="298" width="260" height="48" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="580.0" y="326.32" class="t" text-anchor="middle" style="font-size:13.5px">.vmx</text>
+  <path d="M100,412.0 L147,412.0" stroke="#334155" stroke-width="2.5"/>
+  <rect x="150" y="380" width="270" height="64" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="285.0" y="407.55" class="t" text-anchor="middle" style="font-size:15px">Firmware</text>
+  <text x="285.0" y="426.5" class="s" text-anchor="middle" style="font-size:12.5px">BIOS or UEFI, Secure Boot</text>
+  <path d="M420,412.0 L447,412.0" stroke="#94a3b8" stroke-width="2"/>
+  <rect x="450" y="388" width="260" height="48" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="580.0" y="416.32" class="t" text-anchor="middle" style="font-size:13.5px">.nvram</text>
+  <path d="M100,502.0 L147,502.0" stroke="#334155" stroke-width="2.5"/>
+  <rect x="150" y="470" width="270" height="64" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="285.0" y="497.55" class="t" text-anchor="middle" style="font-size:15px">Network</text>
+  <text x="285.0" y="516.5" class="s" text-anchor="middle" style="font-size:12.5px">NIC model, MAC, port group</text>
+  <path d="M420,502.0 L447,502.0" stroke="#94a3b8" stroke-width="2"/>
+  <rect x="450" y="478" width="260" height="48" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="580.0" y="506.32" class="t" text-anchor="middle" style="font-size:13.5px">vNIC (VMXNET3) + port group</text>
+  <path d="M100,592.0 L147,592.0" stroke="#334155" stroke-width="2.5"/>
+  <rect x="150" y="560" width="270" height="64" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <text x="285.0" y="587.55" class="t" text-anchor="middle" style="font-size:15px">Disk</text>
+  <text x="285.0" y="606.5" class="s" text-anchor="middle" style="font-size:12.5px">the guest's bytes</text>
+  <path d="M420,592.0 L447,592.0" stroke="#94a3b8" stroke-width="2"/>
+  <rect x="450" y="568" width="260" height="48" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="580.0" y="596.32" class="t" text-anchor="middle" style="font-size:13.5px">VMDK: descriptor + extent(s)</text>
+  <path d="M100,682.0 L147,682.0" stroke="#334155" stroke-width="2.5"/>
+  <rect x="150" y="650" width="270" height="64" rx="10" fill="#f1f5f9" stroke="#64748b" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="285.0" y="677.55" class="t" text-anchor="middle" style="font-size:15px">Runtime state</text>
+  <text x="285.0" y="696.5" class="s" text-anchor="middle" style="font-size:12.5px">what is happening now</text>
+  <path d="M420,682.0 L447,682.0" stroke="#94a3b8" stroke-width="2"/>
+  <rect x="450" y="658" width="260" height="48" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="580.0" y="686.32" class="t" text-anchor="middle" style="font-size:13.5px">power, guest IP, VMware Tools</text>
+  <path d="M730,200 L745,200 L745,534 L730,534" fill="none" stroke="#334155" stroke-width="2"/>
+  <path d="M747,367.0 L777,367.0" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="780" y="321.0" width="380" height="92" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="970.0" y="353.44" class="t" text-anchor="middle" style="font-size:17px">METADATA</text>
+  <text x="970.0" y="373.16" class="s" text-anchor="middle" style="font-size:13px">kilobytes, changes rarely</text>
+  <text x="970.0" y="392.16" class="s" text-anchor="middle" style="font-size:13px">TRANSLATED into a VM spec</text>
+  <path d="M730,560 L745,560 L745,624 L730,624" fill="none" stroke="#334155" stroke-width="2"/>
+  <path d="M747,592.0 L777,592.0" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="780" y="558.0" width="380" height="68" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <text x="970.0" y="578.44" class="t" text-anchor="middle" style="font-size:17px">DISK DATA</text>
+  <text x="970.0" y="598.16" class="s" text-anchor="middle" style="font-size:13px">gigabytes, changes constantly</text>
+  <text x="970.0" y="617.16" class="s" text-anchor="middle" style="font-size:13px">COPIED + CONVERTED after power-off</text>
+  <path d="M730,650 L745,650 L745,714 L730,714" fill="none" stroke="#334155" stroke-width="2"/>
+  <path d="M747,682.0 L777,682.0" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="780" y="648.0" width="380" height="68" rx="10" fill="#f1f5f9" stroke="#64748b" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="970.0" y="668.44" class="t" text-anchor="middle" style="font-size:17px">RUNTIME STATE</text>
+  <text x="970.0" y="688.16" class="s" text-anchor="middle" style="font-size:13px">power, memory, IP lease, Tools</text>
+  <text x="970.0" y="707.16" class="s" text-anchor="middle" style="font-size:13px">NOT MIGRATED: observed + controlled</text>
+  <rect x="30" y="752" width="1140" height="74" rx="12" fill="#f8fafc" stroke="#0f172a" stroke-width="2"/>
+  <text x="600.0" y="784" class="t" text-anchor="middle" style="font-size:20px;fill:#0f172a">They are handled differently during a migration.</text>
+  <text x="600.0" y="808" class="s" text-anchor="middle" style="font-size:14px;fill:#334155">Metadata is frozen at discovery; disk data is read only after power-off; runtime state is re-checked before every irreversible step.</text>
+  <rect x="240.8" y="854" width="34" height="20" rx="5" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <rect x="282.8" y="854" width="73" height="20" rx="10.0" fill="#1d4ed8"/>
+  <text x="319.3" y="867.96" class="pill" text-anchor="middle" style="font-size:11px">METADATA</text>
+  <text x="363.8" y="869" class="xs" text-anchor="start">translated</text>
+  <rect x="453.8" y="854" width="34" height="20" rx="5" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <rect x="495.8" y="854" width="80" height="20" rx="10.0" fill="#b45309"/>
+  <text x="535.8" y="867.96" class="pill" text-anchor="middle" style="font-size:11px">DISK DATA</text>
+  <text x="583.8" y="869" class="xs" text-anchor="start">copied + converted</text>
+  <rect x="725.0" y="854" width="34" height="20" rx="5" fill="#f1f5f9" stroke="#64748b" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <rect x="767.0" y="854" width="101" height="20" rx="10.0" fill="#475569"/>
+  <text x="817.5" y="867.96" class="pill" text-anchor="middle" style="font-size:11px">NOT MIGRATED</text>
+  <text x="876.0" y="869" class="xs" text-anchor="start">only observed</text>
+</svg>

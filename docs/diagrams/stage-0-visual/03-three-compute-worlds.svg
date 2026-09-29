@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1000" viewBox="0 0 1200 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Three compute worlds: traditional VM, KubeVirt VM, native container</title>
+  <desc id="desc">World A: ESXi, VM, guest OS, application. World B: Kubernetes, KubeVirt, VMI, virt-launcher Pod, QEMU, KVM, guest OS, application. World C: Kubernetes, Pod, container, application, with no guest OS. VM migration moves a workload from A to B. Modernization moves it from A or B to C.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker></defs>
+  <rect width="1200" height="1000" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">Three compute worlds</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">Same nginx, three ways to run it</text>
+  <rect x="40" y="96" width="353" height="690" rx="14" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="56" y="122" class="lab" text-anchor="start">WORLD A - TRADITIONAL VM</text>
+  <text x="56" y="142" class="xs" text-anchor="start">unit: the VM (hostd / vCenter)</text>
+  <rect x="423" y="96" width="353" height="690" rx="14" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="439" y="122" class="lab" text-anchor="start">WORLD B - KUBEVIRT VM</text>
+  <text x="439" y="142" class="xs" text-anchor="start">unit: VirtualMachine custom resource</text>
+  <rect x="806" y="96" width="353" height="690" rx="14" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="822" y="122" class="lab" text-anchor="start">WORLD C - NATIVE CONTAINER</text>
+  <text x="822" y="142" class="xs" text-anchor="start">unit: Deployment / Pod</text>
+  <rect x="92" y="170" width="250" height="50" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="217.0" y="190.8" class="t" text-anchor="middle" style="font-size:15px">ESXi</text>
+  <text x="217.0" y="209.34" class="s" text-anchor="middle" style="font-size:12px">hypervisor (VMkernel)</text>
+  <rect x="92" y="242" width="250" height="50" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="217.0" y="262.8" class="t" text-anchor="middle" style="font-size:15px">VM</text>
+  <text x="217.0" y="281.34" class="s" text-anchor="middle" style="font-size:12px">VMX process + VMDK</text>
+  <path d="M217.0,222 L217.0,239" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="92" y="602" width="250" height="50" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="217.0" y="622.8" class="t" text-anchor="middle" style="font-size:15px">Guest OS</text>
+  <text x="217.0" y="641.34" class="s" text-anchor="middle" style="font-size:12px">its own Linux kernel</text>
+  <path d="M217.0,294 L217.0,599" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="92" y="674" width="250" height="50" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="217.0" y="694.8" class="t" text-anchor="middle" style="font-size:15px">Application</text>
+  <text x="217.0" y="713.34" class="s" text-anchor="middle" style="font-size:12px">nginx</text>
+  <path d="M217.0,654 L217.0,671" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="475" y="170" width="250" height="50" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="600.0" y="190.8" class="t" text-anchor="middle" style="font-size:15px">Kubernetes</text>
+  <text x="600.0" y="209.34" class="s" text-anchor="middle" style="font-size:12px">API + scheduler</text>
+  <rect x="475" y="242" width="250" height="50" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="600.0" y="262.8" class="t" text-anchor="middle" style="font-size:15px">KubeVirt</text>
+  <text x="600.0" y="281.34" class="s" text-anchor="middle" style="font-size:12px">CRDs + controllers</text>
+  <path d="M600.0,222 L600.0,239" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="475" y="314" width="250" height="50" rx="10" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.8"/>
+  <text x="600.0" y="334.8" class="t" text-anchor="middle" style="font-size:15px">VMI</text>
+  <text x="600.0" y="353.34" class="s" text-anchor="middle" style="font-size:12px">running VM instance</text>
+  <path d="M600.0,294 L600.0,311" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="475" y="386" width="250" height="50" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="600.0" y="406.8" class="t" text-anchor="middle" style="font-size:15px">virt-launcher Pod</text>
+  <text x="600.0" y="425.34" class="s" text-anchor="middle" style="font-size:12px">one Pod per VM</text>
+  <path d="M600.0,366 L600.0,383" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="475" y="458" width="250" height="50" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="600.0" y="478.8" class="t" text-anchor="middle" style="font-size:15px">QEMU</text>
+  <text x="600.0" y="497.34" class="s" text-anchor="middle" style="font-size:12px">machine + devices</text>
+  <path d="M600.0,438 L600.0,455" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="475" y="530" width="250" height="50" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="600.0" y="550.8" class="t" text-anchor="middle" style="font-size:15px">KVM</text>
+  <text x="600.0" y="569.34" class="s" text-anchor="middle" style="font-size:12px">node kernel module</text>
+  <path d="M600.0,510 L600.0,527" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="475" y="602" width="250" height="50" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="600.0" y="622.8" class="t" text-anchor="middle" style="font-size:15px">Guest OS</text>
+  <text x="600.0" y="641.34" class="s" text-anchor="middle" style="font-size:12px">its own Linux kernel</text>
+  <path d="M600.0,582 L600.0,599" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="475" y="674" width="250" height="50" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="600.0" y="694.8" class="t" text-anchor="middle" style="font-size:15px">Application</text>
+  <text x="600.0" y="713.34" class="s" text-anchor="middle" style="font-size:12px">nginx</text>
+  <path d="M600.0,654 L600.0,671" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="858" y="170" width="250" height="50" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="983.0" y="190.8" class="t" text-anchor="middle" style="font-size:15px">Kubernetes</text>
+  <text x="983.0" y="209.34" class="s" text-anchor="middle" style="font-size:12px">API + scheduler</text>
+  <rect x="858" y="386" width="250" height="50" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="983.0" y="406.8" class="t" text-anchor="middle" style="font-size:15px">Pod</text>
+  <text x="983.0" y="425.34" class="s" text-anchor="middle" style="font-size:12px">namespaces + cgroups</text>
+  <path d="M983.0,222 L983.0,383" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="858" y="458" width="250" height="50" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="983.0" y="478.8" class="t" text-anchor="middle" style="font-size:15px">Container</text>
+  <text x="983.0" y="497.34" class="s" text-anchor="middle" style="font-size:12px">image layers</text>
+  <path d="M983.0,438 L983.0,455" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="858" y="602" width="250" height="50" rx="10" fill="#f1f5f9" stroke="#64748b" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="983.0" y="622.48" class="t" text-anchor="middle" style="font-size:14px">no guest OS</text>
+  <text x="983.0" y="640.84" class="s" text-anchor="middle" style="font-size:12px">shares the node kernel</text>
+  <rect x="858" y="674" width="250" height="50" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="983.0" y="694.8" class="t" text-anchor="middle" style="font-size:15px">Application</text>
+  <text x="983.0" y="713.34" class="s" text-anchor="middle" style="font-size:12px">nginx</text>
+  <path d="M880,510 L880,671" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="40" y="806" width="736" height="64" rx="12" fill="#dbeafe" stroke="#1d4ed8" stroke-width="2"/>
+  <text x="70" y="846" class="t" text-anchor="start" style="font-size:18px;fill:#1d4ed8">VM MIGRATION</text>
+  <text x="560" y="846" class="t" text-anchor="middle" style="font-size:18px">A &#8594; B   (rehost: the VM stays a VM)</text>
+  <rect x="40" y="884" width="1120" height="64" rx="12" fill="#dcfce7" stroke="#15803d" stroke-width="2"/>
+  <text x="70" y="924" class="t" text-anchor="start" style="font-size:18px;fill:#15803d">MODERNIZATION</text>
+  <text x="640" y="924" class="t" text-anchor="middle" style="font-size:18px">A or B &#8594; C   (replatform: the VM and guest OS go away)</text>
+  <text x="1160" y="846" class="xs" text-anchor="end">dotted box = layer that does not exist</text>
+</svg>

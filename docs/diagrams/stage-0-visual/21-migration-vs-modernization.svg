@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="870" viewBox="0 0 1200 870" role="img" aria-labelledby="title desc">
+  <title id="title">VM migration versus application modernization</title>
+  <desc id="desc">Migration, or rehost, moves the whole machine and ends as a KubeVirt VirtualMachine with its guest OS kept. Modernization, or replatform, moves only the application into a container image run by a Deployment, and the guest OS goes away. The comparison covers what moves, the unit after the move, guest OS, application change, scaling, updates, speed and risk, and when to choose each.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs></defs>
+  <rect width="1200" height="870" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">Migration vs modernization</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">Two different goals that share one Kubernetes platform</text>
+  <rect x="250" y="96" width="440" height="120" rx="14" fill="#dbeafe" stroke="#1d4ed8" stroke-width="3"/>
+  <rect x="424.0" y="108" width="92" height="22" rx="11.0" fill="#1d4ed8"/>
+  <text x="470.0" y="123.68" class="pill" text-anchor="middle" style="font-size:13px">MIGRATION</text>
+  <text x="470" y="160" class="t" text-anchor="middle" style="font-size:21px">rehost: keep the VM</text>
+  <text x="470" y="190" class="s" text-anchor="middle" style="font-size:14px">unit after the move: VirtualMachine</text>
+  <rect x="720" y="96" width="440" height="120" rx="14" fill="#dcfce7" stroke="#15803d" stroke-width="3"/>
+  <rect x="877.5" y="108" width="125" height="22" rx="11.0" fill="#15803d"/>
+  <text x="940.0" y="123.68" class="pill" text-anchor="middle" style="font-size:13px">MODERNIZATION</text>
+  <text x="940" y="160" class="t" text-anchor="middle" style="font-size:21px">replatform: package the app</text>
+  <text x="940" y="190" class="s" text-anchor="middle" style="font-size:14px">unit after the move: Deployment</text>
+  <rect x="40" y="236" width="1120" height="54" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="60" y="269" class="t" text-anchor="start" style="font-size:15px">What moves</text>
+  <text x="470" y="269" class="s" text-anchor="middle" style="font-size:14px">the whole machine: OS, kernel, config, data</text>
+  <text x="940" y="269" class="s" text-anchor="middle" style="font-size:14px">only the app + its config / content</text>
+  <rect x="40" y="298" width="1120" height="54" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="60" y="331" class="t" text-anchor="start" style="font-size:15px">Guest OS</text>
+  <text x="470" y="331" class="s" text-anchor="middle" style="font-size:14px">kept: still patched and backed up like a VM</text>
+  <text x="940" y="331" class="s" text-anchor="middle" style="font-size:14px">gone: the node kernel is shared</text>
+  <rect x="40" y="360" width="1120" height="54" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="60" y="393" class="t" text-anchor="start" style="font-size:15px">App change</text>
+  <text x="470" y="393" class="s" text-anchor="middle" style="font-size:14px">none</text>
+  <text x="940" y="393" class="s" text-anchor="middle" style="font-size:14px">some: packaging, config, logs, health</text>
+  <rect x="40" y="422" width="1120" height="54" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="60" y="455" class="t" text-anchor="start" style="font-size:15px">Scaling</text>
+  <text x="470" y="455" class="s" text-anchor="middle" style="font-size:14px">vertical (bigger VM), one instance</text>
+  <text x="940" y="455" class="s" text-anchor="middle" style="font-size:14px">horizontal replicas, autoscaling</text>
+  <rect x="40" y="484" width="1120" height="54" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="60" y="517" class="t" text-anchor="start" style="font-size:15px">Updates</text>
+  <text x="470" y="517" class="s" text-anchor="middle" style="font-size:14px">in place (apt / yum inside the guest)</text>
+  <text x="940" y="517" class="s" text-anchor="middle" style="font-size:14px">new image, rolled out by digest</text>
+  <rect x="40" y="546" width="1120" height="54" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="60" y="579" class="t" text-anchor="start" style="font-size:15px">Speed + risk</text>
+  <text x="470" y="579" class="s" text-anchor="middle" style="font-size:14px">fast, low risk, repeatable at scale</text>
+  <text x="940" y="579" class="s" text-anchor="middle" style="font-size:14px">slower, needs app knowledge + tests</text>
+  <rect x="40" y="608" width="1120" height="54" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="60" y="641" class="t" text-anchor="start" style="font-size:15px">Choose when</text>
+  <text x="470" y="641" class="s" text-anchor="middle" style="font-size:14px">many VMs, deadlines, apps you cannot change</text>
+  <text x="940" y="641" class="s" text-anchor="middle" style="font-size:14px">apps you own, where K8s benefits matter</text>
+  <rect x="30" y="690" width="1140" height="74" rx="12" fill="#f8fafc" stroke="#0f172a" stroke-width="2"/>
+  <text x="600.0" y="722" class="t" text-anchor="middle" style="font-size:20px;fill:#0f172a">Migration keeps the VM. Modernization removes it.</text>
+  <text x="600.0" y="746" class="s" text-anchor="middle" style="font-size:14px;fill:#334155">A VM on KubeVirt is still a VM: migrating it does not modernize it.</text>
+  <text x="600" y="810" class="s" text-anchor="middle" style="font-size:14px;fill:#334155">KubeVirt lets both live on one platform: migrate first, then modernize the workloads that justify it, one by one.</text>
+  <text x="600" y="836" class="s" text-anchor="middle" style="font-size:14px;fill:#334155">Worked example (design): the nginx VM is a containerization candidate: stateless, port 80, no OS dependencies.</text>
+</svg>

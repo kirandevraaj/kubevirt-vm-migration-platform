@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1010" viewBox="0 0 1200 1010" role="img" aria-labelledby="title desc">
+  <title id="title">VMware to KubeVirt: same guest, different stack</title>
+  <desc id="desc">Left: the VMware world, ESXi runs a VM that runs Ubuntu and nginx. Right: the Kubernetes world, Kubernetes, KubeVirt, VirtualMachine, VMI, virt-launcher Pod, QEMU and KVM run the same Ubuntu and nginx. The guest OS stays the same; the management and virtualization stack is different. The Kubernetes side is a Stage 0 design.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker></defs>
+  <rect width="1200" height="1010" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">VMware to KubeVirt: same guest, different stack</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">The guest OS and application stay. Everything that manages and virtualizes them changes.</text>
+  <rect x="40" y="100" width="460" height="740" rx="14" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="56" y="126" class="lab" text-anchor="start">VMWARE WORLD (SOURCE)</text>
+  <text x="56" y="146" class="xs" text-anchor="start">one integrated product</text>
+  <rect x="560" y="100" width="600" height="740" rx="14" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="576" y="126" class="lab" text-anchor="start">KUBERNETES WORLD (TARGET)</text>
+  <text x="576" y="146" class="xs" text-anchor="start">assembled from parts</text>
+  <rect x="1031" y="110" width="115" height="20" rx="10.0" fill="#a16207"/>
+  <text x="1088.5" y="123.96" class="pill" text-anchor="middle" style="font-size:11px">STAGE 0 DESIGN</text>
+  <rect x="40" y="664" width="1120" height="154" rx="14" fill="#ede9fe" stroke="#6d28d9" stroke-width="2" stroke-dasharray="9 5"/>
+  <text x="565" y="714" class="t" text-anchor="middle" style="font-size:18px;fill:#5b21b6">SAME GUEST</text>
+  <text x="565" y="738" class="t" text-anchor="middle" style="font-size:18px;fill:#5b21b6">OS + APP</text>
+  <rect x="120" y="160" width="300" height="52" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="270.0" y="181.8" class="t" text-anchor="middle" style="font-size:15px">ESXi</text>
+  <text x="270.0" y="200.34" class="s" text-anchor="middle" style="font-size:12px">VMkernel + hostd</text>
+  <rect x="120" y="234" width="300" height="52" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="270.0" y="255.8" class="t" text-anchor="middle" style="font-size:15px">VMware VM</text>
+  <text x="270.0" y="274.34" class="s" text-anchor="middle" style="font-size:12px">VMX process, .vmx + VMDK</text>
+  <path d="M270,214 L270,231" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M270,288 L270,675" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="284" y="392.0" class="s" text-anchor="start" style="font-size:12.5px;fill:#334155">virtual hardware:</text>
+  <text x="284" y="410.5" class="s" text-anchor="start" style="font-size:12.5px;fill:#334155">PVSCSI disk controller</text>
+  <text x="284" y="429.0" class="s" text-anchor="start" style="font-size:12.5px;fill:#334155">VMXNET3 NIC</text>
+  <rect x="120" y="678" width="300" height="52" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="270.0" y="699.8" class="t" text-anchor="middle" style="font-size:15px">Ubuntu</text>
+  <text x="270.0" y="718.34" class="s" text-anchor="middle" style="font-size:12px">guest OS + kernel</text>
+  <rect x="120" y="752" width="300" height="52" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="270.0" y="773.8" class="t" text-anchor="middle" style="font-size:15px">nginx</text>
+  <text x="270.0" y="792.34" class="s" text-anchor="middle" style="font-size:12px">the application</text>
+  <path d="M270,732 L270,749" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="710" y="160" width="300" height="52" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="860.0" y="181.8" class="t" text-anchor="middle" style="font-size:15px">Kubernetes</text>
+  <text x="860.0" y="200.34" class="s" text-anchor="middle" style="font-size:12px">API, scheduler, storage, network</text>
+  <rect x="710" y="234" width="300" height="52" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="860.0" y="255.8" class="t" text-anchor="middle" style="font-size:15px">KubeVirt</text>
+  <text x="860.0" y="274.34" class="s" text-anchor="middle" style="font-size:12px">add-on: CRDs + controllers</text>
+  <path d="M860,214 L860,231" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="710" y="308" width="300" height="52" rx="10" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.8"/>
+  <text x="860.0" y="329.8" class="t" text-anchor="middle" style="font-size:15px">VirtualMachine</text>
+  <text x="860.0" y="348.34" class="s" text-anchor="middle" style="font-size:12px">persistent desired state</text>
+  <path d="M860,288 L860,305" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="710" y="382" width="300" height="52" rx="10" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.8"/>
+  <text x="860.0" y="403.8" class="t" text-anchor="middle" style="font-size:15px">VMI</text>
+  <text x="860.0" y="422.34" class="s" text-anchor="middle" style="font-size:12px">one running instance</text>
+  <path d="M860,362 L860,379" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="710" y="456" width="300" height="52" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="860.0" y="477.8" class="t" text-anchor="middle" style="font-size:15px">virt-launcher Pod</text>
+  <text x="860.0" y="496.34" class="s" text-anchor="middle" style="font-size:12px">a normal Pod per running VM</text>
+  <path d="M860,436 L860,453" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="710" y="530" width="300" height="52" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="860.0" y="551.8" class="t" text-anchor="middle" style="font-size:15px">QEMU</text>
+  <text x="860.0" y="570.34" class="s" text-anchor="middle" style="font-size:12px">machine + virtual devices</text>
+  <path d="M860,510 L860,527" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="710" y="604" width="300" height="52" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="860.0" y="625.8" class="t" text-anchor="middle" style="font-size:15px">KVM</text>
+  <text x="860.0" y="644.34" class="s" text-anchor="middle" style="font-size:12px">kernel module, /dev/kvm</text>
+  <path d="M860,584 L860,601" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="710" y="678" width="300" height="52" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="860.0" y="699.8" class="t" text-anchor="middle" style="font-size:15px">Ubuntu</text>
+  <text x="860.0" y="718.34" class="s" text-anchor="middle" style="font-size:12px">guest OS + kernel</text>
+  <path d="M860,658 L860,675" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="710" y="752" width="300" height="52" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="860.0" y="773.8" class="t" text-anchor="middle" style="font-size:15px">nginx</text>
+  <text x="860.0" y="792.34" class="s" text-anchor="middle" style="font-size:12px">the application</text>
+  <path d="M860,732 L860,749" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M1024,160 L1034,160 L1034,508 L1024,508" fill="none" stroke="#334155" stroke-width="2"/>
+  <text x="1044" y="326.0" class="s" text-anchor="start" style="font-size:13px;fill:#334155;font-weight:700">Kubernetes</text>
+  <text x="1044" y="345.0" class="s" text-anchor="start" style="font-size:13px;fill:#334155;font-weight:700">management</text>
+  <path d="M1024,530 L1034,530 L1034,656 L1024,656" fill="none" stroke="#334155" stroke-width="2"/>
+  <text x="1044" y="585.0" class="s" text-anchor="start" style="font-size:13px;fill:#334155;font-weight:700">virtualization</text>
+  <rect x="40" y="870" width="540" height="70" rx="12" fill="#ede9fe" stroke="#6d28d9" stroke-width="2"/>
+  <text x="310" y="913" class="t" text-anchor="middle" style="font-size:20px">SAME guest OS and application</text>
+  <rect x="620" y="870" width="540" height="70" rx="12" fill="#dbeafe" stroke="#1d4ed8" stroke-width="2"/>
+  <text x="890" y="913" class="t" text-anchor="middle" style="font-size:19px">DIFFERENT management + virtualization stack</text>
+  <rect x="170.09999999999997" y="966" width="34" height="20" rx="5" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <rect x="212.09999999999997" y="966" width="80" height="20" rx="10.0" fill="#1d4ed8"/>
+  <text x="252.09999999999997" y="979.96" class="pill" text-anchor="middle" style="font-size:11px">COMPONENT</text>
+  <text x="300.09999999999997" y="981" class="xs" text-anchor="start">technology (documented)</text>
+  <rect x="473.3" y="966" width="34" height="20" rx="5" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.8"/>
+  <rect x="515.3" y="966" width="66" height="20" rx="10.0" fill="#6d28d9"/>
+  <text x="548.3" y="979.96" class="pill" text-anchor="middle" style="font-size:11px">CONCEPT</text>
+  <text x="589.3" y="981" class="xs" text-anchor="start">control logic / idea</text>
+  <rect x="743.3" y="966" width="34" height="20" rx="5" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <rect x="785.3" y="966" width="115" height="20" rx="10.0" fill="#a16207"/>
+  <text x="842.8" y="979.96" class="pill" text-anchor="middle" style="font-size:11px">STAGE 0 DESIGN</text>
+  <text x="908.3" y="981" class="xs" text-anchor="start">on paper, not built</text>
+</svg>

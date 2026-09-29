@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="820" viewBox="0 0 1200 820" role="img" aria-labelledby="title desc">
+  <title id="title">Stage 0 feasibility decision map</title>
+  <desc id="desc">Stage 0 findings in five categories as recorded at the end of Stage 0. Validated: nested ESXi, VMFS datastore, static management network, key-based SSH, read-only discovery, local disk space. Documented: free ESXi API limits, virt-v2v over SSH, KubeVirt and Kubernetes versions, AWS nested virtualization, EBS gp3, pod networking. Unvalidated: nested guest boot, reboot persistence, CDI tuple, EKS and self-managed host requirements, lab to AWS transfer. Blocked by lab mode: local conversion tooling, AWS credentials. Deferred: source VM, instance type, Kubernetes topology, conversion host location.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs></defs>
+  <rect width="1200" height="820" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">Feasibility decision map</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">What Stage 0 knew, and how sure it was (as recorded at the end of Stage 0)</text>
+  <rect x="40" y="100" width="212" height="66" rx="12" fill="#15803d" stroke="#15803d" stroke-width="1.6"/>
+  <text x="146" y="128" class="pill" text-anchor="middle" style="font-size:13px">VALIDATED</text>
+  <text x="146" y="150" class="pill" text-anchor="middle" style="font-size:11.5px;font-weight:500">observed in our lab</text>
+  <rect x="40" y="184" width="212" height="64" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="146.0" y="211.48" class="t" text-anchor="middle" style="font-size:14px">nested ESXi runs</text>
+  <text x="146.0" y="229.84" class="s" text-anchor="middle" style="font-size:12px">HV Support: 3</text>
+  <text x="50" y="200" class="xs" text-anchor="start" style="fill:#15803d;font-weight:700">F1</text>
+  <rect x="40" y="258" width="212" height="64" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="146.0" y="285.48" class="t" text-anchor="middle" style="font-size:14px">VMFS-6 datastore</text>
+  <text x="146.0" y="303.84" class="s" text-anchor="middle" style="font-size:12px">198 GB free</text>
+  <text x="50" y="274" class="xs" text-anchor="start" style="fill:#15803d;font-weight:700">F2</text>
+  <rect x="40" y="332" width="212" height="64" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="146.0" y="359.48" class="t" text-anchor="middle" style="font-size:14px">static mgmt network</text>
+  <text x="146.0" y="377.84" class="s" text-anchor="middle" style="font-size:12px">vmk0 on vSwitch0</text>
+  <text x="50" y="348" class="xs" text-anchor="start" style="fill:#15803d;font-weight:700">F3</text>
+  <rect x="40" y="406" width="212" height="64" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="146.0" y="433.48" class="t" text-anchor="middle" style="font-size:14px">key-based SSH</text>
+  <text x="146.0" y="451.84" class="s" text-anchor="middle" style="font-size:12px">to ESXi</text>
+  <text x="50" y="422" class="xs" text-anchor="start" style="fill:#15803d;font-weight:700">F4</text>
+  <rect x="40" y="480" width="212" height="64" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="146.0" y="507.48" class="t" text-anchor="middle" style="font-size:14px">read-only discovery</text>
+  <text x="146.0" y="525.84" class="s" text-anchor="middle" style="font-size:12px">vim-cmd works</text>
+  <text x="50" y="496" class="xs" text-anchor="start" style="fill:#15803d;font-weight:700">P8</text>
+  <rect x="40" y="554" width="212" height="64" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="146.0" y="581.48" class="t" text-anchor="middle" style="font-size:14px">local disk space</text>
+  <text x="146.0" y="599.84" class="s" text-anchor="middle" style="font-size:12px">enough for images</text>
+  <text x="50" y="570" class="xs" text-anchor="start" style="fill:#15803d;font-weight:700">F22</text>
+  <rect x="267" y="100" width="212" height="66" rx="12" fill="#1d4ed8" stroke="#1d4ed8" stroke-width="1.6"/>
+  <text x="373" y="128" class="pill" text-anchor="middle" style="font-size:13px">DOCUMENTED</text>
+  <text x="373" y="150" class="pill" text-anchor="middle" style="font-size:11.5px;font-weight:500">docs say so; not run by us</text>
+  <rect x="267" y="184" width="212" height="64" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="373.0" y="211.48" class="t" text-anchor="middle" style="font-size:14px">free ESXi API</text>
+  <text x="373.0" y="229.84" class="s" text-anchor="middle" style="font-size:12px">unsupported / read-only</text>
+  <text x="277" y="200" class="xs" text-anchor="start" style="fill:#1d4ed8;font-weight:700">F5</text>
+  <rect x="267" y="258" width="212" height="64" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="373.0" y="285.48" class="t" text-anchor="middle" style="font-size:14px">virt-v2v over SSH</text>
+  <text x="373.0" y="303.84" class="s" text-anchor="middle" style="font-size:12px">-i vmx -it ssh</text>
+  <text x="277" y="274" class="xs" text-anchor="start" style="fill:#1d4ed8;font-weight:700">F9</text>
+  <rect x="267" y="332" width="212" height="64" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="373.0" y="359.48" class="t" text-anchor="middle" style="font-size:14px">KubeVirt v1.9</text>
+  <text x="373.0" y="377.84" class="s" text-anchor="middle" style="font-size:12px">Kubernetes 1.34 to 1.36</text>
+  <text x="277" y="348" class="xs" text-anchor="start" style="fill:#1d4ed8;font-weight:700">F10</text>
+  <rect x="267" y="406" width="212" height="64" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="373.0" y="433.48" class="t" text-anchor="middle" style="font-size:14px">AWS nested virt</text>
+  <text x="373.0" y="451.84" class="s" text-anchor="middle" style="font-size:12px">non-bare-metal EC2</text>
+  <text x="277" y="422" class="xs" text-anchor="start" style="fill:#1d4ed8;font-weight:700">F12</text>
+  <rect x="267" y="480" width="212" height="64" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="373.0" y="507.48" class="t" text-anchor="middle" style="font-size:14px">EBS gp3</text>
+  <text x="373.0" y="525.84" class="s" text-anchor="middle" style="font-size:12px">RWO, one AZ</text>
+  <text x="277" y="496" class="xs" text-anchor="start" style="fill:#1d4ed8;font-weight:700">F18</text>
+  <rect x="267" y="554" width="212" height="64" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="373.0" y="581.48" class="t" text-anchor="middle" style="font-size:14px">pod network</text>
+  <text x="373.0" y="599.84" class="s" text-anchor="middle" style="font-size:12px">+ masquerade is enough</text>
+  <text x="277" y="570" class="xs" text-anchor="start" style="fill:#1d4ed8;font-weight:700">F19</text>
+  <rect x="494" y="100" width="212" height="66" rx="12" fill="#b45309" stroke="#b45309" stroke-width="1.6"/>
+  <text x="600" y="128" class="pill" text-anchor="middle" style="font-size:13px">UNVALIDATED</text>
+  <text x="600" y="150" class="pill" text-anchor="middle" style="font-size:11.5px;font-weight:500">unknown until tested</text>
+  <rect x="494" y="184" width="212" height="64" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <text x="600.0" y="211.48" class="t" text-anchor="middle" style="font-size:14px">nested guest boot</text>
+  <text x="600.0" y="229.84" class="s" text-anchor="middle" style="font-size:12px">L2 VM under ESXi</text>
+  <text x="504" y="200" class="xs" text-anchor="start" style="fill:#b45309;font-weight:700">F7</text>
+  <rect x="494" y="258" width="212" height="64" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <text x="600.0" y="285.48" class="t" text-anchor="middle" style="font-size:14px">reboot persistence</text>
+  <text x="600.0" y="303.84" class="s" text-anchor="middle" style="font-size:12px">ESXi config survives</text>
+  <text x="504" y="274" class="xs" text-anchor="start" style="fill:#b45309;font-weight:700">F8</text>
+  <rect x="494" y="332" width="212" height="64" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <text x="600.0" y="359.48" class="t" text-anchor="middle" style="font-size:14px">CDI tuple</text>
+  <text x="600.0" y="377.84" class="s" text-anchor="middle" style="font-size:12px">no official matrix</text>
+  <text x="504" y="348" class="xs" text-anchor="start" style="fill:#b45309;font-weight:700">F11</text>
+  <rect x="494" y="406" width="212" height="64" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <text x="600.0" y="433.48" class="t" text-anchor="middle" style="font-size:14px">EKS host needs</text>
+  <text x="600.0" y="451.84" class="s" text-anchor="middle" style="font-size:12px">H1 to H11 unproven</text>
+  <text x="504" y="422" class="xs" text-anchor="start" style="fill:#b45309;font-weight:700">F14</text>
+  <rect x="494" y="480" width="212" height="64" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <text x="600.0" y="507.48" class="t" text-anchor="middle" style="font-size:14px">self-managed host</text>
+  <text x="600.0" y="525.84" class="s" text-anchor="middle" style="font-size:12px">parallel option</text>
+  <text x="504" y="496" class="xs" text-anchor="start" style="fill:#b45309;font-weight:700">F15</text>
+  <rect x="494" y="554" width="212" height="64" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <text x="600.0" y="581.48" class="t" text-anchor="middle" style="font-size:14px">lab to AWS path</text>
+  <text x="600.0" y="599.84" class="s" text-anchor="middle" style="font-size:12px">outbound HTTPS only</text>
+  <text x="504" y="570" class="xs" text-anchor="start" style="fill:#b45309;font-weight:700">F21</text>
+  <rect x="721" y="100" width="212" height="66" rx="12" fill="#b91c1c" stroke="#b91c1c" stroke-width="1.6"/>
+  <text x="827" y="128" class="pill" text-anchor="middle" style="font-size:11.5px">BLOCKED BY LAB MODE</text>
+  <text x="827" y="150" class="pill" text-anchor="middle" style="font-size:11.5px;font-weight:500">not possible right now</text>
+  <rect x="721" y="184" width="212" height="64" rx="10" fill="#fee2e2" stroke="#b91c1c" stroke-width="1.8"/>
+  <text x="827.0" y="211.48" class="t" text-anchor="middle" style="font-size:14px">local conversion</text>
+  <text x="827.0" y="229.84" class="s" text-anchor="middle" style="font-size:12px">no WSL2 / Docker</text>
+  <text x="731" y="200" class="xs" text-anchor="start" style="fill:#b91c1c;font-weight:700">F17</text>
+  <rect x="721" y="258" width="212" height="64" rx="10" fill="#fee2e2" stroke="#b91c1c" stroke-width="1.8"/>
+  <text x="827.0" y="285.48" class="t" text-anchor="middle" style="font-size:14px">AWS credentials</text>
+  <text x="827.0" y="303.84" class="s" text-anchor="middle" style="font-size:12px">Docker volume unreadable</text>
+  <text x="731" y="274" class="xs" text-anchor="start" style="fill:#b91c1c;font-weight:700">F20</text>
+  <rect x="948" y="100" width="212" height="66" rx="12" fill="#475569" stroke="#475569" stroke-width="1.6"/>
+  <text x="1054" y="128" class="pill" text-anchor="middle" style="font-size:11.5px">DEFERRED DECISION</text>
+  <text x="1054" y="150" class="pill" text-anchor="middle" style="font-size:11.5px;font-weight:500">intentionally not chosen</text>
+  <rect x="948" y="184" width="212" height="64" rx="10" fill="#f1f5f9" stroke="#64748b" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="1054.0" y="211.48" class="t" text-anchor="middle" style="font-size:14px">source VM</text>
+  <text x="1054.0" y="229.84" class="s" text-anchor="middle" style="font-size:12px">OS + sizing</text>
+  <text x="958" y="200" class="xs" text-anchor="start" style="fill:#475569;font-weight:700">F6</text>
+  <rect x="948" y="258" width="212" height="64" rx="10" fill="#f1f5f9" stroke="#64748b" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="1054.0" y="285.48" class="t" text-anchor="middle" style="font-size:14px">EC2 family, Region</text>
+  <text x="1054.0" y="303.84" class="s" text-anchor="middle" style="font-size:12px">AMI not chosen</text>
+  <text x="958" y="274" class="xs" text-anchor="start" style="fill:#475569;font-weight:700">F13</text>
+  <rect x="948" y="332" width="212" height="64" rx="10" fill="#f1f5f9" stroke="#64748b" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="1054.0" y="359.48" class="t" text-anchor="middle" style="font-size:14px">EKS vs self-managed</text>
+  <text x="1054.0" y="377.84" class="s" text-anchor="middle" style="font-size:12px">topology open</text>
+  <text x="958" y="348" class="xs" text-anchor="start" style="fill:#475569;font-weight:700">F16</text>
+  <rect x="948" y="406" width="212" height="64" rx="10" fill="#f1f5f9" stroke="#64748b" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="1054.0" y="433.48" class="t" text-anchor="middle" style="font-size:14px">conversion host</text>
+  <text x="1054.0" y="451.84" class="s" text-anchor="middle" style="font-size:12px">where it runs</text>
+  <text x="958" y="422" class="xs" text-anchor="start" style="fill:#475569;font-weight:700">F17</text>
+  <rect x="30" y="650" width="1140" height="74" rx="12" fill="#f8fafc" stroke="#0f172a" stroke-width="2"/>
+  <text x="600.0" y="682" class="t" text-anchor="middle" style="font-size:20px;fill:#0f172a">Architecture decisions are different from proven runtime facts.</text>
+  <text x="600.0" y="706" class="s" text-anchor="middle" style="font-size:14px;fill:#334155">"Documented" means someone else says it works. Only "Validated" means we saw it work.</text>
+  <text x="600" y="770" class="s" text-anchor="middle" style="font-size:14px;fill:#334155">Several rows were resolved later in Stage 1: ESXi reboot persistence, nested guest boot,</text>
+  <text x="600" y="794" class="s" text-anchor="middle" style="font-size:14px;fill:#334155">disk acquisition and conversion were proven; the target platform was chosen in ADR 007.</text>
+</svg>

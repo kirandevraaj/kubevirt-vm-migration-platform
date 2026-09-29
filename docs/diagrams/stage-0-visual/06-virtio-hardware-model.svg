@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="830" viewBox="0 0 1200 830" role="img" aria-labelledby="title desc">
+  <title id="title">VirtIO hardware model: VMware devices to virtio devices</title>
+  <desc id="desc">VMware virtual hardware presents PVSCSI for the disk and VMXNET3 for the network. After migration the KVM guest sees virtio-blk or virtio-scsi for the disk and virtio-net for the network. VirtIO is a paravirtualized device model: the guest knows it is virtual and uses shared-memory queues. qemu-img changes only the disk format; virt-v2v also prepares the guest for virtio.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker></defs>
+  <rect width="1200" height="830" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">VirtIO: the hardware changes under the guest</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">VirtIO is a paravirtualized device model commonly used by KVM guests</text>
+  <rect x="30" y="92" width="1140" height="52" rx="12" fill="#f8fafc" stroke="#0f172a" stroke-width="2"/>
+  <text x="600.0" y="128" class="t" text-anchor="middle" style="font-size:20px;fill:#0f172a">The guest knows it is virtual and talks to the host through shared-memory queues (virtqueues).</text>
+  <rect x="190" y="176" width="280" height="70" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="330.0" y="207.19" class="t" text-anchor="middle" style="font-size:17px">VMware VM</text>
+  <text x="330.0" y="226.5" class="s" text-anchor="middle" style="font-size:12.5px">VMX process presents the devices</text>
+  <rect x="740" y="176" width="320" height="70" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="900.0" y="207.19" class="t" text-anchor="middle" style="font-size:17px">KVM guest</text>
+  <text x="900.0" y="226.5" class="s" text-anchor="middle" style="font-size:12.5px">QEMU process presents the devices</text>
+  <text x="60" y="336" class="lab" text-anchor="start">DISK</text>
+  <rect x="190" y="290" width="280" height="80" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="330.0" y="326.19" class="t" text-anchor="middle" style="font-size:17px">PVSCSI</text>
+  <text x="330.0" y="345.5" class="s" text-anchor="middle" style="font-size:12.5px">VMware paravirtual SCSI</text>
+  <rect x="740" y="290" width="320" height="80" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="900.0" y="326.19" class="t" text-anchor="middle" style="font-size:17px">virtio-blk or virtio-scsi</text>
+  <text x="900.0" y="345.5" class="s" text-anchor="middle" style="font-size:12.5px">paravirtual disk</text>
+  <path d="M474,330 L736,330" fill="none" stroke="#475569" stroke-width="3" marker-end="url(#m475569)"/>
+  <text x="605" y="320" class="t halo" text-anchor="middle" style="font-size:14px">migration</text>
+  <text x="605" y="354" class="xs halo" text-anchor="middle">guest driver changes</text>
+  <text x="60" y="446" class="lab" text-anchor="start">NETWORK</text>
+  <rect x="190" y="400" width="280" height="80" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="330.0" y="436.19" class="t" text-anchor="middle" style="font-size:17px">VMXNET3</text>
+  <text x="330.0" y="455.5" class="s" text-anchor="middle" style="font-size:12.5px">VMware paravirtual NIC</text>
+  <rect x="740" y="400" width="320" height="80" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="900.0" y="436.19" class="t" text-anchor="middle" style="font-size:17px">virtio-net</text>
+  <text x="900.0" y="455.5" class="s" text-anchor="middle" style="font-size:12.5px">paravirtual NIC</text>
+  <path d="M474,440 L736,440" fill="none" stroke="#475569" stroke-width="3" marker-end="url(#m475569)"/>
+  <text x="605" y="430" class="t halo" text-anchor="middle" style="font-size:14px">migration</text>
+  <text x="605" y="464" class="xs halo" text-anchor="middle">guest driver changes</text>
+  <text x="900" y="506" class="xs" text-anchor="middle">also: virtio-balloon, virtio-rng, virtio-serial</text>
+  <rect x="190" y="530" width="870" height="84" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="625.0" y="558.62" class="t" text-anchor="middle" style="font-size:16px">Linux guest</text>
+  <text x="625.0" y="577.75" class="s" text-anchor="middle" style="font-size:12.5px">virtio drivers are in the mainline kernel, but they must be in the initramfs to boot</text>
+  <text x="625.0" y="596.25" class="s" text-anchor="middle" style="font-size:12.5px">Windows guests need the virtio-win drivers installed</text>
+  <rect x="190" y="644" width="410" height="96" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="395.0" y="678.62" class="t" text-anchor="middle" style="font-size:16px">qemu-img</text>
+  <text x="395.0" y="697.75" class="s" text-anchor="middle" style="font-size:12.5px">changes the disk container format only</text>
+  <text x="395.0" y="716.25" class="s" text-anchor="middle" style="font-size:12.5px">does not touch guest drivers</text>
+  <rect x="650" y="644" width="410" height="96" rx="10" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.8"/>
+  <text x="855.0" y="678.62" class="t" text-anchor="middle" style="font-size:16px">virt-v2v</text>
+  <text x="855.0" y="697.75" class="s" text-anchor="middle" style="font-size:12.5px">converts the whole guest for KVM:</text>
+  <text x="855.0" y="716.25" class="s" text-anchor="middle" style="font-size:12.5px">virtio modules, VMware Tools, bootloader, fstab</text>
+  <rect x="326.4" y="782" width="34" height="20" rx="5" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <rect x="368.4" y="782" width="80" height="20" rx="10.0" fill="#1d4ed8"/>
+  <text x="408.4" y="795.96" class="pill" text-anchor="middle" style="font-size:11px">COMPONENT</text>
+  <text x="456.4" y="797" class="xs" text-anchor="start">technology (documented)</text>
+  <rect x="629.6" y="782" width="34" height="20" rx="5" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.8"/>
+  <rect x="671.6" y="782" width="66" height="20" rx="10.0" fill="#6d28d9"/>
+  <text x="704.6" y="795.96" class="pill" text-anchor="middle" style="font-size:11px">CONCEPT</text>
+  <text x="745.6" y="797" class="xs" text-anchor="start">control logic / idea</text>
+</svg>

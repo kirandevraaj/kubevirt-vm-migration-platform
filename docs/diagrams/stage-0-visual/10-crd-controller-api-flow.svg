@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1060" viewBox="0 0 1200 1060" role="img" aria-labelledby="title desc">
+  <title id="title">CRD, controller and VM: how a Kubernetes object becomes a running VM</title>
+  <desc id="desc">A user runs kubectl apply. The Kubernetes API server validates and stores a VirtualMachine custom resource, whose type was defined by a CRD. A controller watches the resource, compares desired and actual state, and reconciles by creating or updating resources: VMI, virt-launcher Pod, QEMU. The result is the actual running VM, and status flows back to the resource. A CRD defines a new API type; a controller implements the behavior.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m15803d" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#15803d"/></marker><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker><marker id="m6d28d9" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#6d28d9"/></marker><marker id="mb45309" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#b45309"/></marker></defs>
+  <rect width="1200" height="1060" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">CRD &#8594; controller &#8594; VM</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">The Kubernetes control model, applied to virtual machines</text>
+  <rect x="420" y="100" width="360" height="56" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="600.0" y="123.87" class="t" text-anchor="middle" style="font-size:16px">User</text>
+  <text x="600.0" y="143.0" class="s" text-anchor="middle" style="font-size:12.5px">writes YAML: spec = what I want</text>
+  <rect x="420" y="206" width="360" height="64" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="600.0" y="233.87" class="t" text-anchor="middle" style="font-size:16px">Kubernetes API server</text>
+  <text x="600.0" y="253.0" class="s" text-anchor="middle" style="font-size:12.5px">validates + stores the object in etcd</text>
+  <path d="M600,158 L600,203" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="612" y="186" class="xs halo" text-anchor="start" style="font-weight:600">kubectl apply -f vm.yaml</text>
+  <rect x="420" y="318" width="360" height="64" rx="10" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.8"/>
+  <text x="600.0" y="345.87" class="t" text-anchor="middle" style="font-size:16px">VirtualMachine CR</text>
+  <text x="600.0" y="365.0" class="s" text-anchor="middle" style="font-size:12.5px">one object of the new type: its spec</text>
+  <path d="M600,272 L600,315" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="40" y="170" width="300" height="170" rx="14" fill="#fef3c7" stroke="#b45309" stroke-width="2.5"/>
+  <rect x="132.5" y="186" width="115" height="20" rx="10.0" fill="#b45309"/>
+  <text x="190.0" y="199.96" class="pill" text-anchor="middle" style="font-size:11px">DEFINES A TYPE</text>
+  <text x="190" y="236" class="t" text-anchor="middle" style="font-size:30px;fill:#92400e">CRD</text>
+  <text x="190" y="268" class="s" text-anchor="middle" style="font-size:13px;fill:#334155">CustomResourceDefinition</text>
+  <text x="190" y="287" class="s" text-anchor="middle" style="font-size:13px;fill:#334155">group, kind, schema</text>
+  <text x="190" y="306" class="s" text-anchor="middle" style="font-size:13px;fill:#334155">stores data; does nothing</text>
+  <path d="M342,238 L417,238" fill="none" stroke="#b45309" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#mb45309)"/>
+  <text x="380" y="226" class="xs halo" text-anchor="middle" style="font-weight:600">registers</text>
+  <rect x="380" y="420" width="440" height="330" rx="16" fill="#f5f3ff" stroke="#6d28d9" stroke-width="2.5"/>
+  <rect x="400" y="410" width="151" height="20" rx="10.0" fill="#6d28d9"/>
+  <text x="475.5" y="423.96" class="pill" text-anchor="middle" style="font-size:11px">IMPLEMENTS BEHAVIOR</text>
+  <text x="804" y="448" class="lab" text-anchor="end">CONTROLLER</text>
+  <rect x="420" y="468" width="360" height="60" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="600.0" y="493.55" class="t" text-anchor="middle" style="font-size:15px">Watch the resource</text>
+  <text x="600.0" y="512.5" class="s" text-anchor="middle" style="font-size:12.5px">informer + work queue</text>
+  <rect x="420" y="566" width="360" height="60" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="600.0" y="591.55" class="t" text-anchor="middle" style="font-size:15px">Compare desired vs actual</text>
+  <text x="600.0" y="610.5" class="s" text-anchor="middle" style="font-size:12.5px">spec vs what exists right now</text>
+  <rect x="420" y="664" width="360" height="60" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="600.0" y="689.55" class="t" text-anchor="middle" style="font-size:15px">Reconcile: act</text>
+  <text x="600.0" y="708.5" class="s" text-anchor="middle" style="font-size:12.5px">create / update what is missing</text>
+  <path d="M600,384 L600,465" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="612" y="406" class="xs halo" text-anchor="start" style="font-weight:600">watch event</text>
+  <path d="M600,530 L600,563" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M600,628 L600,661" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M418,694 L396,694 L396,498 L417,498" fill="none" stroke="#6d28d9" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m6d28d9)"/>
+  <text x="360" y="600" class="xs halo" text-anchor="middle" style="font-weight:600">repeat</text>
+  <rect x="420" y="790" width="360" height="64" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="600.0" y="817.87" class="t" text-anchor="middle" style="font-size:16px">VMI &#8594; virt-launcher Pod &#8594; QEMU</text>
+  <text x="600.0" y="837.0" class="s" text-anchor="middle" style="font-size:12.5px">resources the controllers create</text>
+  <path d="M600,726 L600,787" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="420" y="900" width="360" height="60" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="600.0" y="925.87" class="t" text-anchor="middle" style="font-size:16px">Actual VM running</text>
+  <text x="600.0" y="945.0" class="s" text-anchor="middle" style="font-size:12.5px">the guest boots on KVM</text>
+  <path d="M600,856 L600,897" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M782,930 L850,930 L850,350 L783,350" fill="none" stroke="#15803d" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m15803d)"/>
+  <text x="862" y="900" class="s" text-anchor="start" style="font-size:13px;fill:#15803d;font-weight:700">status flows back:</text>
+  <text x="862" y="919" class="s" text-anchor="start" style="font-size:13px;fill:#15803d;font-weight:700">what actually happened</text>
+  <text x="1010" y="480" class="s" text-anchor="middle" style="font-size:24px;fill:#5b21b6;font-weight:800">Controller</text>
+  <text x="1010" y="512" class="s" text-anchor="middle" style="font-size:24px;fill:#5b21b6;font-weight:800">= implements</text>
+  <text x="1010" y="544" class="s" text-anchor="middle" style="font-size:24px;fill:#5b21b6;font-weight:800">the behavior</text>
+  <text x="190" y="400" class="s" text-anchor="middle" style="font-size:24px;fill:#92400e;font-weight:800">CRD</text>
+  <text x="190" y="432" class="s" text-anchor="middle" style="font-size:24px;fill:#92400e;font-weight:800">= defines a new</text>
+  <text x="190" y="464" class="s" text-anchor="middle" style="font-size:24px;fill:#92400e;font-weight:800">API type</text>
+  <text x="190" y="560" class="s" text-anchor="middle" style="font-size:14px;fill:#334155">KubeVirt ships CRDs</text>
+  <text x="190" y="580" class="s" text-anchor="middle" style="font-size:14px;fill:#334155">(VirtualMachine, VMI, ...)</text>
+  <text x="190" y="600" class="s" text-anchor="middle" style="font-size:14px;fill:#334155">and the controllers</text>
+  <text x="190" y="620" class="s" text-anchor="middle" style="font-size:14px;fill:#334155">that give them meaning</text>
+  <text x="1010" y="640" class="s" text-anchor="middle" style="font-size:14px;fill:#334155">for VMs: virt-controller</text>
+  <text x="1010" y="660" class="s" text-anchor="middle" style="font-size:14px;fill:#334155">(cluster) and virt-handler</text>
+  <text x="1010" y="680" class="s" text-anchor="middle" style="font-size:14px;fill:#334155">(node) are the controllers</text>
+  <rect x="30" y="986" width="1140" height="54" rx="12" fill="#f8fafc" stroke="#0f172a" stroke-width="2"/>
+  <text x="600.0" y="1022" class="t" text-anchor="middle" style="font-size:20px;fill:#0f172a">A CRD alone only stores data. Without a controller, nothing happens.</text>
+</svg>

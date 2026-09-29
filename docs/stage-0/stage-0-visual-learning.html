@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stage 0 Visual Learning - VM-to-Kubernetes Migration Platform</title>
+<style>
+  :root {
+    --ink: #0f172a; --muted: #475569; --line: #cbd5e1; --bg: #f8fafc;
+    --green: #15803d; --blue: #1d4ed8; --yellow: #a16207; --gray: #475569; --red: #b91c1c; --purple: #6d28d9; --amber: #b45309;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 130px; }
+  body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; color: var(--ink); background: var(--bg); line-height: 1.45; }
+  a { color: var(--blue); }
+  a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px solid #2563eb; outline-offset: 2px; }
+  .skip { position: absolute; left: -999px; top: 0; background: #fff; padding: 8px 12px; z-index: 100; }
+  .skip:focus { left: 8px; top: 8px; }
+
+  header { position: sticky; top: 0; z-index: 20; background: #0f172a; color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,.25); }
+  .bar { max-width: 1320px; margin: 0 auto; padding: 8px 18px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+  .brand { font-weight: 700; font-size: 15px; white-space: nowrap; color: #fff; text-decoration: none; }
+  .brand small { display: block; font-weight: 400; font-size: 12px; color: #cbd5e1; }
+  .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-left: auto; }
+  nav { display: flex; flex-wrap: wrap; gap: 5px; flex: 1 1 100%; order: 3; }
+  nav a {
+    font-size: 12px; font-weight: 700; letter-spacing: .4px; color: #fff; text-decoration: none; white-space: nowrap;
+    background: #1e293b; border: 1px solid #334155; border-radius: 999px; padding: 4px 10px;
+  }
+  nav a:hover, nav a:focus-visible { background: #334155; outline: 2px solid #93c5fd; outline-offset: 1px; }
+  nav a.active { background: #1d4ed8; border-color: #1d4ed8; }
+  .ctl { font: inherit; font-size: 12.5px; font-weight: 700; letter-spacing: .4px; color: #fff; background: #1e293b; border: 1px solid #475569; border-radius: 999px; padding: 5px 12px; cursor: pointer; white-space: nowrap; }
+  .ctl:hover { background: #334155; }
+  .ctl:focus-visible { outline: 2px solid #93c5fd; outline-offset: 2px; }
+  .ctl[aria-pressed="true"].vm { background: #92400e; border-color: #f59e0b; }
+  .ctl.story { background: #14532d; border-color: #22c55e; }
+  .toggle { display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 700; white-space: nowrap; cursor: pointer; }
+  .toggle input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .switch { width: 42px; height: 22px; border-radius: 11px; background: #475569; position: relative; transition: background .2s; }
+  .switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: left .2s; }
+  .toggle input:checked + .switch { background: #15803d; }
+  .toggle input:checked + .switch::after { left: 23px; }
+  .toggle input:focus-visible + .switch { outline: 2px solid #93c5fd; outline-offset: 2px; }
+  .mode { min-width: 62px; }
+
+  main { max-width: 1320px; margin: 0 auto; padding: 18px; }
+  .hero { text-align: center; padding: 24px 10px 6px; }
+  .hero h1 { margin: 0; font-size: clamp(24px, 3.4vw, 40px); }
+  .hero .subtitle { margin: 8px 0 0; color: var(--muted); font-size: 18px; }
+  .hero .motto { margin: 10px 0 0; font-weight: 700; font-size: 15px; letter-spacing: .5px; }
+  .status { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 14px 0 6px; }
+
+  .tag { display: inline-block; font-size: 11.5px; font-weight: 700; letter-spacing: .6px; color: #fff; border-radius: 999px; padding: 3px 10px; white-space: nowrap; }
+  .tag.done { background: var(--green); }
+  .tag.comp { background: var(--blue); }
+  .tag.design { background: var(--yellow); }
+  .tag.future { background: var(--gray); }
+  .tag.risk { background: var(--red); }
+  .tag.concept { background: var(--purple); }
+  .tag.analogy { background: var(--amber); }
+  .tag.big { font-size: 13px; padding: 5px 14px; }
+
+  .legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 20px; margin: 14px auto 4px; font-size: 13px; color: var(--muted); }
+  .legend .k { display: inline-flex; align-items: center; gap: 7px; }
+  .sw { display: inline-block; width: 30px; height: 18px; border-radius: 5px; border: 2px solid; }
+  .sw.done { background: #dcfce7; border-color: var(--green); }
+  .sw.comp { background: #dbeafe; border-color: var(--blue); }
+  .sw.design { background: #fef9c3; border-color: var(--yellow); border-style: dashed; }
+  .sw.future { background: #f1f5f9; border-color: #64748b; border-style: dotted; }
+  .sw.risk { background: #fee2e2; border-color: var(--red); }
+  .sw.concept { background: #ede9fe; border-color: var(--purple); }
+  .vocab { text-align: center; font-size: 12px; color: var(--muted); margin: 8px auto 0; max-width: 900px; }
+
+  .block { background: #fff; border: 1px solid var(--line); border-radius: 16px; margin: 22px 0; padding: 16px 18px; }
+  .block h2 { margin: 0 0 10px; font-size: clamp(19px, 2.2vw, 25px); }
+  .block .lead { margin: 0 0 12px; color: var(--muted); }
+  .lvl-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
+  .lvl-card { display: flex; flex-direction: column; gap: 4px; text-decoration: none; color: var(--ink); border: 2px solid var(--ink); border-radius: 12px; padding: 10px 12px; background: #fff; }
+  .lvl-card:hover { background: #f1f5f9; }
+  .lvl-card small { color: var(--muted); }
+  .lv { align-self: flex-start; font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #fff; background: var(--ink); border-radius: 6px; padding: 2px 8px; }
+  .concepts { display: flex; flex-wrap: wrap; gap: 6px; }
+  .cpt { font-size: 13px; font-weight: 700; text-decoration: none; color: #4c1d95; background: #ede9fe; border: 1.5px solid var(--purple); border-radius: 999px; padding: 3px 11px; }
+  .cpt:hover { background: #ddd6fe; }
+
+  .minis { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; }
+  .mini { display: flex; flex-direction: column; gap: 3px; text-decoration: none; color: var(--ink); border: 1.5px solid var(--line); border-left: 6px solid var(--blue); border-radius: 12px; padding: 10px 12px; background: #fff; }
+  .mini:hover { border-color: var(--blue); }
+  .mini .c { font-size: 11.5px; font-weight: 800; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; }
+  .mini b { font-size: 18px; }
+  .mini span:last-child { font-size: 14px; color: #334155; }
+
+  #vmware-panel { display: none; border: 3px dashed var(--amber); background: #fffbeb; }
+  body.vmware #vmware-panel { display: block; }
+  table.vmw { width: 100%; border-collapse: collapse; font-size: 15px; }
+  table.vmw th, table.vmw td { text-align: left; padding: 7px 8px; border-bottom: 1px solid #fde68a; vertical-align: top; }
+  table.vmw th { width: 150px; }
+  table.vmw td:nth-child(2) { width: 24px; color: var(--amber); font-weight: 800; }
+  .vmw-note { display: none; margin: 10px 4px 0; padding: 8px 12px; background: #fffbeb; border: 2px dashed var(--amber); border-radius: 8px; font-size: 14.5px; }
+  body.vmware .vmw-note { display: block; }
+  body.vmware .fig.has-vmw { border: 3px dashed var(--amber); }
+
+  .level { margin: 36px 0 10px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; border-bottom: 3px solid var(--ink); padding-bottom: 8px; }
+  .level .lv { align-self: auto; font-size: 13px; padding: 3px 10px; }
+  .level h2 { margin: 0; font-size: clamp(20px, 2.4vw, 28px); }
+  .level .hint { color: var(--muted); font-size: 14px; }
+
+  .fig { background: #fff; border: 1px solid var(--line); border-radius: 16px; margin: 18px 0; padding: 14px 16px 16px; box-shadow: 0 1px 3px rgba(15,23,42,.06); transition: box-shadow .3s; }
+  .fig.key { border: 3px solid var(--yellow); }
+  .fig.flash, .fig.story-on { box-shadow: 0 0 0 4px #2563eb; }
+  .fig-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 10px; }
+  .num { font-weight: 800; font-size: 13px; color: #fff; background: #334155; border-radius: 6px; padding: 2px 8px; }
+  .fig-head h3 { margin: 0; font-size: clamp(17px, 1.9vw, 22px); flex: 1; min-width: 200px; }
+  .fig-head .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  button.img { display: block; width: 100%; padding: 0; margin: 0; border: 0; background: none; cursor: zoom-in; border-radius: 8px; }
+  button.img img { display: block; width: 100%; max-width: 1100px; height: auto; margin: 0 auto; border-radius: 8px; }
+  .learn { display: none; margin: 12px 4px 0; padding: 10px 14px; background: #f1f5f9; border-left: 4px solid var(--blue); border-radius: 6px; font-size: 15px; color: #1e293b; }
+  body.learning .learn { display: block; }
+  .learn p { margin: 0 0 8px; }
+  .learn .rem { font-weight: 600; }
+  .tech { margin-top: 6px; }
+  .tech summary { cursor: pointer; font-weight: 700; color: var(--blue); }
+  .tech p { margin: 8px 0 0; font-size: 14px; }
+
+  .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+  .col { border-radius: 12px; padding: 12px 14px; border: 2px solid; }
+  .col h3 { margin: 0; }
+  .col .sub { margin: 6px 0 4px; font-size: 13px; color: var(--muted); }
+  .col ul { margin: 6px 0 0; padding-left: 18px; }
+  .col li { margin: 4px 0; }
+  .col.design { background: #fef9c3; border-color: var(--yellow); border-style: dashed; }
+  .col.done { background: #dcfce7; border-color: var(--green); }
+  .col.future { background: #f1f5f9; border-color: #64748b; border-style: dotted; }
+
+  .q { border: 1.5px solid var(--line); border-radius: 10px; margin: 8px 0; background: #fff; }
+  .q summary { cursor: pointer; padding: 10px 12px; font-weight: 700; font-size: 15.5px; }
+  .q .qn { display: inline-block; min-width: 36px; font-size: 12px; font-weight: 800; color: #fff; background: var(--purple); border-radius: 6px; padding: 2px 6px; text-align: center; margin-right: 6px; }
+  .q p { margin: 0 14px 10px; }
+
+  .fmap { text-align: center; }
+  .fmap .over, .fmap .under { font-size: clamp(18px, 2.2vw, 24px); font-weight: 800; margin: 6px 0 14px; }
+  .fmap .under { margin: 14px 0 4px; color: var(--green); }
+  .flow { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px; }
+  .flow .step { text-decoration: none; color: var(--ink); font-weight: 700; font-size: 15px; background: #dbeafe; border: 2px solid var(--blue); border-radius: 10px; padding: 8px 12px; }
+  .flow .step:hover { background: #bfdbfe; }
+  .flow .step.fut { background: #f1f5f9; border: 2px dotted #64748b; color: #334155; }
+  .flow .arr { font-size: 20px; color: var(--muted); }
+
+  .five { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin: 16px 0 8px; }
+  .card { background: #fff; border: 2px solid var(--ink); border-radius: 16px; padding: 18px 18px 20px; min-height: 160px; }
+  .card .n { font-size: 44px; font-weight: 800; line-height: 1; color: var(--blue); }
+  .card p { margin: 10px 0 0; font-size: 19px; font-weight: 700; }
+  .card:nth-child(2) .n { color: var(--purple); }
+  .card:nth-child(3) .n { color: var(--yellow); }
+  .card:nth-child(4) .n { color: var(--green); }
+  .card:nth-child(5) .n { color: var(--red); }
+
+  .srcs { margin: 30px 0 10px; font-size: 13px; color: var(--muted); }
+  .srcs ul { margin: 6px 0 0; padding-left: 18px; columns: 3 240px; }
+  footer { text-align: center; color: var(--muted); font-size: 12.5px; padding: 18px 10px 40px; }
+
+  #storybar { position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 30; display: none; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center;
+    width: min(760px, calc(100% - 20px)); background: #0f172a; color: #fff; border-radius: 14px; padding: 10px 14px; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+  body.story #storybar { display: flex; }
+  body.story main { padding-bottom: 110px; }
+  #storybar .where { flex: 1 1 260px; font-size: 14px; }
+  #storybar .where b { display: block; font-size: 15.5px; }
+  #storybar button { font: inherit; font-weight: 800; font-size: 14px; border-radius: 10px; padding: 7px 14px; cursor: pointer; border: 2px solid #fff; background: #0f172a; color: #fff; }
+  #storybar button.next { background: #22c55e; border-color: #22c55e; color: #052e16; }
+  #storybar button:focus-visible { outline: 3px solid #93c5fd; outline-offset: 2px; }
+
+  #overlay { position: fixed; inset: 0; z-index: 50; background: rgba(15,23,42,.6); display: none; align-items: center; justify-content: center; padding: 14px; }
+  #overlay.open { display: flex; }
+  .panel { background: #fff; border-radius: 18px; width: min(860px, 100%); max-height: calc(100vh - 28px); overflow: auto; padding: 18px 20px 16px; box-shadow: 0 20px 50px rgba(0,0,0,.35); }
+  .panel .top { display: flex; align-items: center; gap: 12px; }
+  .panel .sn { font-size: 13px; font-weight: 800; color: #fff; background: #334155; border-radius: 6px; padding: 2px 8px; }
+  .panel h2 { margin: 0; font-size: 20px; flex: 1; }
+  .panel img { display: block; width: 100%; height: auto; max-height: 52vh; object-fit: contain; margin: 12px 0; border: 1px solid var(--line); border-radius: 8px; }
+  .panel .why { margin: 0 0 6px; font-size: 15.5px; }
+  .panel ul { margin: 4px 0 0; padding-left: 20px; font-size: 15px; }
+  .panel li { margin: 3px 0; }
+  .panel .acts { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin-top: 14px; }
+  .panel button { font: inherit; font-weight: 700; font-size: 14px; border-radius: 10px; padding: 8px 14px; cursor: pointer; border: 2px solid var(--ink); background: #fff; }
+  .panel button.x { padding: 4px 10px; }
+
+  @media (max-width: 1180px) {
+    nav { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; }
+    nav a { flex: 0 0 auto; }
+  }
+  @media (max-width: 760px) {
+    .bar { padding: 6px 10px; gap: 6px 8px; }
+    .brand { font-size: 13.5px; }
+    .brand small { display: none; }
+    .controls { gap: 6px; }
+    .ctl { padding: 4px 9px; font-size: 11.5px; }
+    .toggle { font-size: 11.5px; }
+    .mode { min-width: 56px; }
+    nav { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; }
+    nav a { flex: 0 0 auto; font-size: 11.5px; padding: 4px 9px; }
+    main { padding: 10px; }
+    .fig { padding: 10px; border-radius: 12px; }
+    .block { padding: 12px; }
+    .card p { font-size: 17px; }
+    table.vmw { font-size: 14px; }
+    table.vmw th { width: 96px; }
+  }
+  @media (max-width: 520px) {
+    .hm { display: none; }
+    .brand { white-space: normal; max-width: 120px; line-height: 1.15; }
+  }
+  @media print {
+    header, #overlay, #storybar { display: none !important; }
+    .learn { display: block; }
+    .fig { break-inside: avoid; }
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header id="top">
+  <div class="bar">
+    <a class="brand" href="../index.html">Stage 0 &#8212; Visual Learning<small>VM-to-Kubernetes Migration Platform</small></a>
+    <div class="controls">
+      <label class="toggle" title="Show explanations under each visual">
+        <input type="checkbox" id="learn"><span class="switch"></span><span class="mode" id="modeLabel">VISUAL</span>
+      </label>
+      <button type="button" class="ctl vm" id="vmBtn" aria-pressed="false" aria-label="VMware engineer mode" title="Highlight VMware concepts and their rough KubeVirt/KVM equivalents">VMWARE<span class="hm"> ENGINEER</span> MODE</button>
+      <button type="button" class="ctl story" id="storyBtn" aria-label="Follow the story" title="Walk through 16 key diagrams in order"><span class="hm">FOLLOW THE </span>STORY</button>
+    </div>
+    <nav aria-label="Sections">
+      <a href="#fig-01">BIG PICTURE</a>
+      <a href="#fig-02">VMWARE</a>
+      <a href="#fig-04">VIRTUALIZATION</a>
+      <a href="#fig-05">KVM</a>
+      <a href="#fig-07">KUBEVIRT</a>
+      <a href="#fig-10">CRD</a>
+      <a href="#fig-11">RECONCILIATION</a>
+      <a href="#fig-15">STORAGE</a>
+      <a href="#fig-14">CDI</a>
+      <a href="#fig-17">MIGRATION</a>
+      <a href="#fig-18">STATE MACHINE</a>
+      <a href="#fig-19">NETWORK</a>
+      <a href="#fig-21">MODERNIZATION</a>
+      <a href="#fig-22">FEASIBILITY</a>
+      <a href="#fig-23">ADRs</a>
+      <a href="#fig-24">STAGE 0 &#8594; 1</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <div class="hero">
+    <h1>Stage 0 &#8212; Architecture Before Implementation</h1>
+    <p class="subtitle">Understand the VMware &#8594; KubeVirt migration architecture before building it.</p>
+    <div class="status">
+      <span class="tag design big">STAGE 0 COMPLETE / REVIEW</span>
+      <span class="tag future big">NOTHING BUILT IN STAGE 0</span>
+    </div>
+    <p class="motto">Visual first. Technical documentation later.</p>
+    <div class="legend" aria-label="Visual language">
+      <span class="k"><span class="sw done"></span>VALIDATED (solid green)</span>
+      <span class="k"><span class="sw comp"></span>COMPONENT (solid blue)</span>
+      <span class="k"><span class="sw design"></span>DECISION / DESIGN (dashed yellow)</span>
+      <span class="k"><span class="sw risk"></span>RISK (solid red)</span>
+      <span class="k"><span class="sw future"></span>FUTURE / NOT BUILT (dotted gray)</span>
+      <span class="k"><span class="sw concept"></span>CONCEPT (solid purple)</span>
+    </div>
+    <p class="vocab">Status words keep their exact meaning: OBSERVED, INFERRED, DOCUMENTED, NOT TESTED, VALIDATED, UNVALIDATED, DECIDED, DEFERRED, UNKNOWN, BLOCKED. Colors always come with a label and a border style.</p>
+  </div>
+
+  <section class="block" aria-labelledby="lv-h">
+    <h2 id="lv-h">Five levels</h2>
+    <p class="lead">Go as deep as you like. Level 1 alone gives you the big picture.</p>
+    <div class="lvl-grid">
+      <a class="lvl-card" href="#level-1"><span class="lv">LEVEL 1</span><b>Understand the architecture</b><small>01, 02, 03</small></a>
+      <a class="lvl-card" href="#level-2"><span class="lv">LEVEL 2</span><b>Understand the technologies</b><small>04, 05, 06, 07, 08, 09</small></a>
+      <a class="lvl-card" href="#level-3"><span class="lv">LEVEL 3</span><b>Understand Kubernetes control</b><small>10, 11, 12, 13</small></a>
+      <a class="lvl-card" href="#level-4"><span class="lv">LEVEL 4</span><b>Understand migration mechanics</b><small>15, 14, 16, 17, 18, 19, 20</small></a>
+      <a class="lvl-card" href="#level-5"><span class="lv">LEVEL 5</span><b>Understand engineering decisions</b><small>21, 22, 23, 24</small></a>
+    </div>
+  </section>
+
+  <section class="block" id="five-minutes" aria-labelledby="fm-h">
+    <h2 id="fm-h">Stage 0 in 5 minutes</h2>
+    <p class="lead">Twelve ideas. Click a card to jump to its diagram.</p>
+    <div class="minis">
+      <a class="mini" href="#fig-01"><span class="c">VM migration</span><b>Keep the VM</b><span>Move the whole machine onto KubeVirt; the guest OS stays.</span></a>
+      <a class="mini" href="#fig-21"><span class="c">Modernization</span><b>Remove the VM</b><span>Repackage only the application as containers.</span></a>
+      <a class="mini" href="#fig-04"><span class="c">Virtualization stack</span><b>Same layers, new owners</b><span>Only the hypervisor, virtual hardware and manager change.</span></a>
+      <a class="mini" href="#fig-05"><span class="c">KVM</span><b>Runs the vCPUs</b><span>A Linux kernel module using VT-x / AMD-V through /dev/kvm.</span></a>
+      <a class="mini" href="#fig-05"><span class="c">QEMU</span><b>Builds the machine</b><span>One process per VM with firmware and virtual devices.</span></a>
+      <a class="mini" href="#fig-06"><span class="c">VirtIO</span><b>New hardware under the guest</b><span>PVSCSI and VMXNET3 become virtio devices.</span></a>
+      <a class="mini" href="#fig-07"><span class="c">KubeVirt</span><b>VMs as Kubernetes objects</b><span>It adds CRDs, controllers and a node agent.</span></a>
+      <a class="mini" href="#fig-09"><span class="c">VM vs VMI</span><b>Spec vs running instance</b><span>The VM persists; the VMI exists only while it runs.</span></a>
+      <a class="mini" href="#fig-10"><span class="c">CRD + controller</span><b>Type + behavior</b><span>A CRD stores desired state; a controller makes it true.</span></a>
+      <a class="mini" href="#fig-14"><span class="c">CDI</span><b>Fills the disk</b><span>It imports disk data into a PVC and never runs VMs.</span></a>
+      <a class="mini" href="#fig-18"><span class="c">State machine</span><b>Checkpoints, not a script</b><span>Each phase is a state the controller converges to.</span></a>
+      <a class="mini" href="#fig-22"><span class="c">Feasibility</span><b>Decided &#8800; proven</b><span>Only VALIDATED means we saw it work.</span></a>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="cc-h">
+    <h2 id="cc-h">Jump to a concept</h2>
+    <div class="concepts"><a class="cpt" href="#fig-05">KVM</a> <a class="cpt" href="#fig-05">QEMU</a> <a class="cpt" href="#fig-05">libvirt</a> <a class="cpt" href="#fig-06">VirtIO</a> <a class="cpt" href="#fig-07">KubeVirt</a> <a class="cpt" href="#fig-08">virt-handler</a> <a class="cpt" href="#fig-09">VMI</a> <a class="cpt" href="#fig-10">CRD</a> <a class="cpt" href="#fig-10">Controller</a> <a class="cpt" href="#fig-11">Reconciliation</a> <a class="cpt" href="#fig-12">Conditions</a> <a class="cpt" href="#fig-13">virt-launcher</a> <a class="cpt" href="#fig-15">PVC</a> <a class="cpt" href="#fig-15">StorageClass</a> <a class="cpt" href="#fig-14">CDI</a> <a class="cpt" href="#fig-14">DataVolume</a> <a class="cpt" href="#fig-16">VMDK</a> <a class="cpt" href="#fig-18">State machine</a> <a class="cpt" href="#fig-19">Masquerade</a> <a class="cpt" href="#fig-19">Multus</a> <a class="cpt" href="#fig-20">Network mapping</a> <a class="cpt" href="#fig-21">Modernization</a> <a class="cpt" href="#fig-22">Feasibility</a> <a class="cpt" href="#fig-23">ADR</a></div>
+  </section>
+
+  <section class="block" id="vmware-panel" aria-labelledby="vm-h">
+    <h2 id="vm-h">VMware engineer mode <span class="tag analogy">ROUGH ANALOGY</span></h2>
+    <p class="lead">If you know vSphere, start here. These are rough analogies to help orientation, not equivalences. Diagrams with a VMware comparison now have a dashed amber border.</p>
+    <table class="vmw">
+      <thead><tr><th scope="col">VMware</th><td></td><th scope="col">Rough KubeVirt / KVM equivalent</th><th scope="col">See</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">ESXi</th><td>&#8776;</td><td>a Kubernetes node running Linux + KVM, managed by KubeVirt</td><td><a href="#fig-04">diagram 04</a></td></tr>
+        <tr><th scope="row">VMkernel</th><td>&#8776;</td><td>the Linux kernel with the KVM module (/dev/kvm)</td><td><a href="#fig-05">diagram 05</a></td></tr>
+        <tr><th scope="row">VMX process</th><td>&#8776;</td><td>the QEMU process inside the virt-launcher Pod</td><td><a href="#fig-13">diagram 13</a></td></tr>
+        <tr><th scope="row">vSwitch</th><td>&#8776;</td><td>the node CNI dataplane + in-pod plumbing</td><td><a href="#fig-19">diagram 19</a></td></tr>
+        <tr><th scope="row">Port Group</th><td>&#8776;</td><td>a networks[] entry: the pod network or a Multus NAD</td><td><a href="#fig-19">diagram 19</a></td></tr>
+        <tr><th scope="row">vNIC</th><td>&#8776;</td><td>an interfaces[] entry: a virtio NIC with a binding</td><td><a href="#fig-19">diagram 19</a></td></tr>
+        <tr><th scope="row">PVSCSI</th><td>&#8776;</td><td>virtio-blk or virtio-scsi</td><td><a href="#fig-06">diagram 06</a></td></tr>
+        <tr><th scope="row">VMXNET3</th><td>&#8776;</td><td>virtio-net</td><td><a href="#fig-06">diagram 06</a></td></tr>
+        <tr><th scope="row">VMDK</th><td>&#8776;</td><td>a PVC, filled by CDI and stored raw</td><td><a href="#fig-15">diagram 15</a></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <div class="level" id="level-1"><span class="lv">LEVEL 1</span><h2>Understand the architecture</h2><span class="hint">Stop here and you already know what Stage 0 is about.</span></div>
+  <section class="fig" id="fig-01" data-num="01" aria-labelledby="h-01">
+    <div class="fig-head"><span class="num">01</span><h3 id="h-01">Big picture: one VM, two possible futures</h3>
+      <span class="tags"><span class="tag design">STAGE 0 DESIGN</span><span class="tag concept">CONCEPT</span></span></div>
+    <button type="button" class="img" data-open="01" aria-label="Open details for diagram 01: Big picture: one VM, two possible futures"><img src="../diagrams/stage-0-visual/01-stage0-big-picture.svg" width="1200" height="1050" alt="A VMware VM leads to the migration problem, which splits into a KubeVirt migration path (the VM remains a VM) and a modernization path (the VM dependency is removed)."></button>
+    
+    <div class="learn">
+      <p class="expl">Start with one Linux VM running nginx on ESXi. The question is how to move it to Kubernetes. The <b>migration</b> path moves the whole VM onto KubeVirt, where it is still a VM, now managed by Kubernetes. The <b>modernization</b> path repackages only the application as containers, so the VM disappears.</p>
+      <p class="why"><b>Why this matters:</b> Most later decisions depend on which of the two paths you are on.</p>
+      <p class="rem"><b>Remember this:</b> MIGRATION = the VM remains a VM. MODERNIZATION = the VM dependency is removed.</p>
+      <details class="tech"><summary>Technical details</summary><p>Stage 0 overview and the first demonstration, which is designed but not built. Read: <a href="architecture.md">architecture.md</a>, <a href="migration-architecture.md">migration-architecture.md</a>, <a href="modernization-model.md">modernization-model.md</a>.</p></details>
+    </div>
+  </section>
+  <section class="fig has-vmw" id="fig-02" data-num="02" aria-labelledby="h-02">
+    <div class="fig-head"><span class="num">02</span><h3 id="h-02">VMware to KubeVirt: same guest, different stack</h3>
+      <span class="tags"><span class="tag comp">DOCUMENTED</span><span class="tag design">TARGET: STAGE 0 DESIGN</span></span></div>
+    <button type="button" class="img" data-open="02" aria-label="Open details for diagram 02: VMware to KubeVirt: same guest, different stack"><img src="../diagrams/stage-0-visual/02-vmware-to-kubevirt.svg" width="1200" height="1010" alt="VMware stack (ESXi, VMware VM with PVSCSI and VMXNET3) beside the Kubernetes stack (Kubernetes, KubeVirt, VirtualMachine, VMI, virt-launcher Pod, QEMU, KVM); both end in the same Ubuntu and nginx."></button>
+    <p class="vmw-note"><span class="tag analogy">ROUGH ANALOGY</span> <b>VMware lens:</b> ESXi + hostd become Kubernetes + KubeVirt. The VMX process becomes QEMU inside a Pod.</p>
+    <div class="learn">
+      <p class="expl">On the left, ESXi runs a VM with VMware virtual hardware. On the right, Kubernetes and KubeVirt manage a VirtualMachine object, and a virt-launcher Pod runs QEMU on KVM. Both stacks end with the <b>same Ubuntu and nginx</b>.</p>
+      <p class="why"><b>Why this matters:</b> It shows what a migration must replace and what it must leave alone.</p>
+      <p class="rem"><b>Remember this:</b> Same guest OS. Different management and virtualization stack.</p>
+      <details class="tech"><summary>Technical details</summary><p>How the two stacks are layered, and what KubeVirt adds to Kubernetes. Read: <a href="virtualization-fundamentals.md">virtualization-fundamentals.md</a>, <a href="kubevirt-architecture.md">kubevirt-architecture.md</a>.</p></details>
+    </div>
+  </section>
+  <section class="fig" id="fig-03" data-num="03" aria-labelledby="h-03">
+    <div class="fig-head"><span class="num">03</span><h3 id="h-03">Three compute worlds</h3>
+      <span class="tags"><span class="tag concept">CONCEPT</span></span></div>
+    <button type="button" class="img" data-open="03" aria-label="Open details for diagram 03: Three compute worlds"><img src="../diagrams/stage-0-visual/03-three-compute-worlds.svg" width="1200" height="1000" alt="World A traditional VM on ESXi, World B KubeVirt VM on Kubernetes, World C native container with no guest OS. Migration is A to B; modernization is A or B to C."></button>
+    
+    <div class="learn">
+      <p class="expl"><b>World A</b> is a traditional VM on ESXi. <b>World B</b> is the same VM run by KubeVirt. <b>World C</b> is the application as a container, with no guest OS. Migration moves A to B; modernization moves A or B to C.</p>
+      <p class="why"><b>Why this matters:</b> Without this split, "moving to Kubernetes" can mean two different projects at once.</p>
+      <p class="rem"><b>Remember this:</b> Migration = A &#8594; B. Modernization = A/B &#8594; C.</p>
+      <details class="tech"><summary>Technical details</summary><p>The comparison table and the worked nginx example. Read: <a href="modernization-model.md">modernization-model.md</a>.</p></details>
+    </div>
+  </section>
+  <div class="level" id="level-2"><span class="lv">LEVEL 2</span><h2>Understand the technologies</h2><span class="hint">KVM, QEMU, VirtIO and KubeVirt: what each one does.</span></div>
+  <section class="fig has-vmw" id="fig-04" data-num="04" aria-labelledby="h-04">
+    <div class="fig-head"><span class="num">04</span><h3 id="h-04">The virtualization stack</h3>
+      <span class="tags"><span class="tag comp">DOCUMENTED</span></span></div>
+    <button type="button" class="img" data-open="04" aria-label="Open details for diagram 04: The virtualization stack"><img src="../diagrams/stage-0-visual/04-virtualization-stack.svg" width="1200" height="880" alt="Six layers (physical hardware, hypervisor, virtual hardware, guest OS, application, managed through) across VMware, KVM and KubeVirt-managed KVM, marked SAME or CHANGES."></button>
+    <p class="vmw-note"><span class="tag analogy">ROUGH ANALOGY</span> <b>VMware lens:</b> ESXi VMkernel &#8776; Linux + KVM. VMX process &#8776; QEMU. hostd / vCenter &#8776; Kubernetes API + KubeVirt.</p>
+    <div class="learn">
+      <p class="expl">Every VM platform has the same layers: hardware, hypervisor, virtual hardware, guest OS, application and a manager. VMware, plain KVM and KubeVirt-managed KVM differ only in the <b>hypervisor</b>, <b>virtual hardware</b> and <b>manager</b> rows.</p>
+      <p class="why"><b>Why this matters:</b> It tells you which layer each migration problem lives in.</p>
+      <p class="rem"><b>Remember this:</b> Migration changes the lower machinery and the manager, not the guest.</p>
+      <details class="tech"><summary>Technical details</summary><p>Hypervisor types, and how ESXi and KVM compare layer by layer. Read: <a href="virtualization-fundamentals.md">virtualization-fundamentals.md</a>.</p></details>
+    </div>
+  </section>
+  <section class="fig key has-vmw" id="fig-05" data-num="05" aria-labelledby="h-05">
+    <div class="fig-head"><span class="num">05</span><h3 id="h-05">KVM, QEMU and libvirt: three jobs, one VM</h3>
+      <span class="tags"><span class="tag comp">DOCUMENTED</span><span class="tag design">MOST IMPORTANT</span></span></div>
+    <button type="button" class="img" data-open="05" aria-label="Open details for diagram 05: KVM, QEMU and libvirt: three jobs, one VM"><img src="../diagrams/stage-0-visual/05-kvm-qemu-libvirt.svg" width="1200" height="960" alt="libvirt (management API) over QEMU (VM process and devices) over KVM (kernel module) over the physical CPU, beside a rough VMware analogy: hostd, VMX process, VMkernel."></button>
+    <p class="vmw-note"><span class="tag analogy">ROUGH ANALOGY</span> <b>VMware lens:</b> VMkernel's VMM &#8776; KVM. VMX process &#8776; QEMU. hostd &#8776; libvirt. ESXi does all three as one product.</p>
+    <div class="learn">
+      <p class="expl"><b>KVM</b> is a Linux kernel module that runs guest code on the real CPU using VT-x or AMD-V. <b>QEMU</b> is one user-space process per VM that builds the machine: firmware, chipset and devices. <b>libvirt</b> describes the VM as domain XML and starts QEMU.</p>
+      <p class="why"><b>Why this matters:</b> Every KubeVirt VM is this exact stack inside a Pod. Debugging starts with knowing which layer failed.</p>
+      <p class="rem"><b>Remember this:</b> KVM runs the VM; QEMU provides the machine; libvirt manages it.</p>
+      <details class="tech"><summary>Technical details</summary><p>KVM, QEMU and libvirt in detail, and how KubeVirt uses them. Read: <a href="virtualization-fundamentals.md">virtualization-fundamentals.md</a>, <a href="kubevirt-architecture.md">kubevirt-architecture.md</a>.</p></details>
+    </div>
+  </section>
+  <section class="fig has-vmw" id="fig-06" data-num="06" aria-labelledby="h-06">
+    <div class="fig-head"><span class="num">06</span><h3 id="h-06">VirtIO: the hardware changes under the guest</h3>
+      <span class="tags"><span class="tag comp">DOCUMENTED</span><span class="tag risk">RISK: DRIVERS</span></span></div>
+    <button type="button" class="img" data-open="06" aria-label="Open details for diagram 06: VirtIO: the hardware changes under the guest"><img src="../diagrams/stage-0-visual/06-virtio-hardware-model.svg" width="1200" height="830" alt="PVSCSI becomes virtio-blk or virtio-scsi and VMXNET3 becomes virtio-net during migration; the Linux guest needs virtio drivers in the initramfs; qemu-img versus virt-v2v."></button>
+    <p class="vmw-note"><span class="tag analogy">ROUGH ANALOGY</span> <b>VMware lens:</b> PVSCSI &#8594; virtio-blk / virtio-scsi. VMXNET3 &#8594; virtio-net.</p>
+    <div class="learn">
+      <p class="expl">VMware guests use <b>PVSCSI</b> disks and <b>VMXNET3</b> NICs. Under KVM the guest sees <b>virtio-blk/scsi</b> and <b>virtio-net</b>. The drivers must be in the initramfs for the guest to boot. qemu-img changes only the disk format; virt-v2v also adapts the guest.</p>
+      <p class="why"><b>Why this matters:</b> New hardware under an unchanged guest is the usual reason a converted VM fails to boot or has no network.</p>
+      <p class="rem"><b>Remember this:</b> The disk bytes move; the hardware under them changes.</p>
+      <details class="tech"><summary>Technical details</summary><p>Device models, and where guest conversion fits in the flow. Read: <a href="virtualization-fundamentals.md">virtualization-fundamentals.md</a>, <a href="migration-architecture.md">migration-architecture.md</a>.</p></details>
+    </div>
+  </section>
+  <section class="fig" id="fig-07" data-num="07" aria-labelledby="h-07">
+    <div class="fig-head"><span class="num">07</span><h3 id="h-07">What is KubeVirt?</h3>
+      <span class="tags"><span class="tag comp">DOCUMENTED</span></span></div>
+    <button type="button" class="img" data-open="07" aria-label="Open details for diagram 07: What is KubeVirt?"><img src="../diagrams/stage-0-visual/07-what-is-kubevirt.svg" width="1200" height="860" alt="Kubernetes with built-in Pod, Deployment and Service plus a new VirtualMachine type; the big statement: KubeVirt makes VMs manageable through Kubernetes."></button>
+    
+    <div class="learn">
+      <p class="expl">KubeVirt is a Kubernetes add-on. It adds new object types such as VirtualMachine, controllers that act on them, and a node agent. A VM becomes something you <code>kubectl apply</code>, protect with RBAC and schedule like a Pod. It does not replace KVM; it drives QEMU and KVM from inside Pods.</p>
+      <p class="why"><b>Why this matters:</b> Everything else in Stage 0 builds on this one idea.</p>
+      <p class="rem"><b>Remember this:</b> KubeVirt makes VMs manageable through Kubernetes.</p>
+      <details class="tech"><summary>Technical details</summary><p>KubeVirt components, objects and what the nodes need. Read: <a href="kubevirt-architecture.md">kubevirt-architecture.md</a>.</p></details>
+    </div>
+  </section>
+  <section class="fig" id="fig-08" data-num="08" aria-labelledby="h-08">
+    <div class="fig-head"><span class="num">08</span><h3 id="h-08">KubeVirt component map</h3>
+      <span class="tags"><span class="tag comp">DOCUMENTED</span></span></div>
+    <button type="button" class="img" data-open="08" aria-label="Open details for diagram 08: KubeVirt component map"><img src="../diagrams/stage-0-visual/08-kubevirt-component-map.svg" width="1200" height="1010" alt="Cluster level: Kubernetes API, virt-api webhooks, virt-operator, virt-controller, VirtualMachine and VMI. VM node: virt-handler and a virt-launcher Pod containing libvirt and QEMU on KVM."></button>
+    
+    <div class="learn">
+      <p class="expl"><b>virt-operator</b> installs and upgrades KubeVirt. <b>virt-api</b> provides admission webhooks and subresources such as start, stop and console. <b>virt-controller</b> turns VMs into VMIs and virt-launcher Pods. <b>virt-handler</b> runs on every VM node and tells virt-launcher to define and start the libvirt domain.</p>
+      <p class="why"><b>Why this matters:</b> When a VM will not start, the failing component tells you where to look.</p>
+      <p class="rem"><b>Remember this:</b> Cluster brain: virt-controller. Node hands: virt-handler.</p>
+      <details class="tech"><summary>Technical details</summary><p>The component table and the full lifecycle of starting a VM. Read: <a href="kubevirt-architecture.md">kubevirt-architecture.md</a>.</p></details>
+    </div>
+  </section>
+  <section class="fig" id="fig-09" data-num="09" aria-labelledby="h-09">
+    <div class="fig-head"><span class="num">09</span><h3 id="h-09">VM vs VMI</h3>
+      <span class="tags"><span class="tag concept">CONCEPT</span><span class="tag comp">DOCUMENTED</span></span></div>
+    <button type="button" class="img" data-open="09" aria-label="Open details for diagram 09: VM vs VMI"><img src="../diagrams/stage-0-visual/09-vm-vs-vmi.svg" width="1200" height="930" alt="VirtualMachine (persistent specification) versus VirtualMachineInstance (running instance), with a timeline: the VM exists the whole time, the VMI and running guest only between start and stop."></button>
+    
+    <div class="learn">
+      <p class="expl">The <b>VirtualMachine</b> is the persistent definition: it exists while the VM is stopped and holds <code>runStrategy</code>. The <b>VirtualMachineInstance</b> is one running instance. virt-controller creates it when the VM should run and deletes it when it stops.</p>
+      <p class="why"><b>Why this matters:</b> Lifecycle questions, such as what survives a stop or what restarts a crash, depend on this split.</p>
+      <p class="rem"><b>Remember this:</b> VM = specification. VMI = running instance.</p>
+      <details class="tech"><summary>Technical details</summary><p>VM, VMI and runStrategy. Read: <a href="kubevirt-architecture.md">kubevirt-architecture.md</a>.</p></details>
+    </div>
+  </section>
+  <div class="level" id="level-3"><span class="lv">LEVEL 3</span><h2>Understand Kubernetes control</h2><span class="hint">CRDs, controllers, reconciliation and status.</span></div>
+  <section class="fig key" id="fig-10" data-num="10" aria-labelledby="h-10">
+    <div class="fig-head"><span class="num">10</span><h3 id="h-10">CRD &#8594; controller &#8594; VM</h3>
+      <span class="tags"><span class="tag concept">CONCEPT</span><span class="tag design">KEY IDEA</span></span></div>
+    <button type="button" class="img" data-open="10" aria-label="Open details for diagram 10: CRD &#8594; controller &#8594; VM"><img src="../diagrams/stage-0-visual/10-crd-controller-api-flow.svg" width="1200" height="1060" alt="User applies YAML to the API server, which stores a VirtualMachine custom resource whose type a CRD defines; a controller watches, compares and reconciles, creating VMI, virt-launcher Pod and QEMU; status flows back."></button>
+    
+    <div class="learn">
+      <p class="expl">A <b>CRD</b> teaches the API server a new object type, such as VirtualMachine. Creating an object of that type only stores data. A <b>controller</b> watches those objects, compares desired with actual state, and creates or updates resources until they match. Status flows back to the object.</p>
+      <p class="why"><b>Why this matters:</b> The planned migration platform is exactly this pattern: a new CRD plus our own controller.</p>
+      <p class="rem"><b>Remember this:</b> CRD = defines a new API type. Controller = implements the behavior.</p>
+      <details class="tech"><summary>Technical details</summary><p>CRDs, controllers, informers and work queues. Read: <a href="crd-controller-fundamentals.md">crd-controller-fundamentals.md</a>.</p></details>
+    </div>
+  </section>
+  <section class="fig" id="fig-11" data-num="11" aria-labelledby="h-11">
+    <div class="fig-head"><span class="num">11</span><h3 id="h-11">The reconciliation loop</h3>
+      <span class="tags"><span class="tag concept">CONCEPT</span><span class="tag comp">DOCUMENTED EXAMPLE</span></span></div>
+    <button type="button" class="img" data-open="11" aria-label="Open details for diagram 11: The reconciliation loop"><img src="../diagrams/stage-0-visual/11-reconciliation-loop.svg" width="1200" height="900" alt="Loop: desired state, observe actual, compare, difference?, act, observe again, desired equals actual, wait and watch. Example: VM crashes, virt-controller creates a new VMI. Controller = state convergence."></button>
+    
+    <div class="learn">
+      <p class="expl">A controller does not run a script once. It observes, compares, takes one idempotent step, then observes again. Example: with <code>runStrategy: Always</code>, if the VM crashes, virt-controller creates a new VMI. That is documented KubeVirt behavior; Stage 0 did not test it.</p>
+      <p class="why"><b>Why this matters:</b> Idempotent, restart-safe steps are what make a long migration survivable.</p>
+      <p class="rem"><b>Remember this:</b> Controller = state convergence.</p>
+      <details class="tech"><summary>Technical details</summary><p>The reconcile loop, idempotency and requeueing. Read: <a href="crd-controller-fundamentals.md">crd-controller-fundamentals.md</a>.</p></details>
+    </div>
+  </section>
+  <section class="fig" id="fig-12" data-num="12" aria-labelledby="h-12">
+    <div class="fig-head"><span class="num">12</span><h3 id="h-12">Spec, status and conditions</h3>
+      <span class="tags"><span class="tag concept">CONCEPT</span><span class="tag design">STAGE 0 DESIGN</span></span></div>
+    <button type="button" class="img" data-open="12" aria-label="Open details for diagram 12: Spec, status and conditions"><img src="../diagrams/stage-0-visual/12-controller-status-conditions.svg" width="1200" height="900" alt="Spec (what I want, written by the user) goes to the controller, which writes status (what actually happened). The migration CR conditions: SourceDiscovered, Validated, DiskConverted, DiskImported, VMCreated, VMStarted, GuestReady, Ready, with an example status block."></button>
+    
+    <div class="learn">
+      <p class="expl"><b>spec</b> is what you want; only you write it. <b>status</b> is what actually happened; only the controller writes it. The designed migration CR reports independent <b>conditions</b> such as SourceDiscovered, DiskImported and Ready, each with a reason, a message and <code>observedGeneration</code>.</p>
+      <p class="why"><b>Why this matters:</b> You debug a controller by reading status, so status must be honest and specific.</p>
+      <p class="rem"><b>Remember this:</b> The controller reports what it knows.</p>
+      <details class="tech"><summary>Technical details</summary><p>status.phase, conditions and observedGeneration, as designed. Read: <a href="crd-controller-fundamentals.md">crd-controller-fundamentals.md</a>, <a href="migration-architecture.md">migration-architecture.md</a>.</p></details>
+    </div>
+  </section>
+  <section class="fig has-vmw" id="fig-13" data-num="13" aria-labelledby="h-13">
+    <div class="fig-head"><span class="num">13</span><h3 id="h-13">The KubeVirt resource chain: who owns this?</h3>
+      <span class="tags"><span class="tag comp">DOCUMENTED</span><span class="tag analogy">ROUGH ANALOGY</span></span></div>
+    <button type="button" class="img" data-open="13" aria-label="Open details for diagram 13: The KubeVirt resource chain: who owns this?"><img src="../diagrams/stage-0-visual/13-kubevirt-resource-chain.svg" width="1200" height="1000" alt="VirtualMachine, VMI, virt-launcher Pod, libvirt domain, QEMU, KVM, guest OS, each with its owner and a rough ESXi analogy; status flows back up."></button>
+    <p class="vmw-note"><span class="tag analogy">ROUGH ANALOGY</span> <b>VMware lens:</b> VM in inventory &#8776; VirtualMachine. VMX process &#8776; QEMU in virt-launcher. VMkernel's VMM &#8776; KVM.</p>
+    <div class="learn">
+      <p class="expl">Seven layers, each with a different owner. You (or the migration controller) own the VirtualMachine. virt-controller owns the VMI and creates the virt-launcher Pod. virt-handler has the libvirt domain defined. libvirt runs QEMU, the node kernel provides KVM, and the application team owns the guest.</p>
+      <p class="why"><b>Why this matters:</b> "Who owns this layer?" is the fastest way to find the right logs.</p>
+      <p class="rem"><b>Remember this:</b> VM &#8594; VMI &#8594; virt-launcher Pod &#8594; libvirt &#8594; QEMU &#8594; KVM &#8594; guest.</p>
+      <details class="tech"><summary>Technical details</summary><p>The start-up sequence, step by step. Read: <a href="kubevirt-architecture.md">kubevirt-architecture.md</a>.</p></details>
+    </div>
+  </section>
+  <div class="level" id="level-4"><span class="lv">LEVEL 4</span><h2>Understand migration mechanics</h2><span class="hint">Storage, CDI, the source model, the flow, the state machine and networking.</span></div>
+  <section class="fig has-vmw" id="fig-15" data-num="15" aria-labelledby="h-15">
+    <div class="fig-head"><span class="num">15</span><h3 id="h-15">Storage object stack</h3>
+      <span class="tags"><span class="tag comp">DOCUMENTED</span><span class="tag design">AWS: STAGE 0 DESIGN</span></span></div>
+    <button type="button" class="img" data-open="15" aria-label="Open details for diagram 15: Storage object stack"><img src="../diagrams/stage-0-visual/15-storage-object-stack.svg" width="1200" height="900" alt="VM disk, DataVolume, PVC, StorageClass, CSI provisioner, storage backend, with meanings and rough VMware analogies; EBS gp3 is ReadWriteOnce and bound to one Availability Zone."></button>
+    <p class="vmw-note"><span class="tag analogy">ROUGH ANALOGY</span> <b>VMware lens:</b> VMDK &#8776; PVC. Datastore + storage policy &#8776; StorageClass. Datastore upload &#8776; DataVolume import.</p>
+    <div class="learn">
+      <p class="expl">The guest sees a virtio disk. It comes from a <b>PVC</b>, which a <b>DataVolume</b> filled. A <b>StorageClass</b> is a policy that tells a <b>CSI</b> driver to create one real volume per claim, for example an EBS gp3 volume on AWS.</p>
+      <p class="why"><b>Why this matters:</b> Storage settings such as access mode and zone decide what the VM can and cannot do later.</p>
+      <p class="rem"><b>Remember this:</b> One disk = one PVC. A StorageClass is a policy, not a pool you browse.</p>
+      <details class="tech"><summary>Technical details</summary><p>PVCs, StorageClasses, CSI and the planned AWS storage. Read: <a href="cdi-storage-model.md">cdi-storage-model.md</a>.</p></details>
+    </div>
+  </section>
+  <section class="fig" id="fig-14" data-num="14" aria-labelledby="h-14">
+    <div class="fig-head"><span class="num">14</span><h3 id="h-14">CDI data path</h3>
+      <span class="tags"><span class="tag comp">DOCUMENTED</span><span class="tag design">STAGE 0 DESIGN</span></span></div>
+    <button type="button" class="img" data-open="14" aria-label="Open details for diagram 14: CDI data path"><img src="../diagrams/stage-0-visual/14-cdi-data-path.svg" width="1200" height="900" alt="Disk image, CDI, DataVolume, PVC and storage backend inside the CDI zone; a seam where the DataVolume is Succeeded; a KubeVirt VM below that references the PVC."></button>
+    
+    <div class="learn">
+      <p class="expl"><b>CDI</b> takes a disk image (qcow2, VMDK or raw), imports or receives it, converts it to raw and writes it into a <b>PVC</b>, reporting progress on a <b>DataVolume</b>. CDI ends when the DataVolume is <code>Succeeded</code>. KubeVirt begins when a VM references the PVC.</p>
+      <p class="why"><b>Why this matters:</b> A clear boundary tells you which system to debug when a migrated VM has a disk problem.</p>
+      <p class="rem"><b>Remember this:</b> CDI imports / prepares disk into Kubernetes storage. CDI does not run VMs.</p>
+      <details class="tech"><summary>Technical details</summary><p>CDI sources, DataVolume phases and scratch space. Read: <a href="cdi-storage-model.md">cdi-storage-model.md</a>.</p></details>
+    </div>
+  </section>
+  <section class="fig has-vmw" id="fig-16" data-num="16" aria-labelledby="h-16">
+    <div class="fig-head"><span class="num">16</span><h3 id="h-16">The VMware source model</h3>
+      <span class="tags"><span class="tag comp">DOCUMENTED</span></span></div>
+    <button type="button" class="img" data-open="16" aria-label="Open details for diagram 16: The VMware source model"><img src="../diagrams/stage-0-visual/16-vmware-source-model.svg" width="1200" height="900" alt="ESXi host tree: VM inventory, configuration (.vmx), firmware (.nvram), network (vNIC and port group) classified as METADATA; disk (VMDK) as DISK DATA; runtime state (power, guest IP, VMware Tools) as RUNTIME STATE."></button>
+    <p class="vmw-note"><span class="tag analogy">ROUGH ANALOGY</span> <b>VMware lens:</b> These are the objects you know from the Host Client: inventory, .vmx, .nvram, VMDK, vNIC, port group.</p>
+    <div class="learn">
+      <p class="expl">A VMware VM is three kinds of information. <b>Metadata</b> (inventory, .vmx, firmware, NICs) is small and is translated into a VM spec. <b>Disk data</b> (the VMDK) is large and is copied and converted after power-off. <b>Runtime state</b> (power, IP lease, VMware Tools) is only observed.</p>
+      <p class="why"><b>Why this matters:</b> Each kind is handled at a different time, by a different step.</p>
+      <p class="rem"><b>Remember this:</b> Metadata is translated, disk data is copied, runtime state is only observed.</p>
+      <details class="tech"><summary>Technical details</summary><p>The source model and what a free ESXi host exposes. Read: <a href="vmware-source-model.md">vmware-source-model.md</a>.</p></details>
+    </div>
+  </section>
+  <section class="fig" id="fig-17" data-num="17" aria-labelledby="h-17">
+    <div class="fig-head"><span class="num">17</span><h3 id="h-17">Migration architecture</h3>
+      <span class="tags"><span class="tag design">STAGE 0 DESIGN</span><span class="tag future">CONTROLLER: NOT BUILT</span></span></div>
+    <button type="button" class="img" data-open="17" aria-label="Open details for diagram 17: Migration architecture"><img src="../diagrams/stage-0-visual/17-migration-architecture.svg" width="1200" height="990" alt="Three rows: source side (VMware source, discovery, inventory and assessment, disk acquisition), conversion (conversion, staging), Kubernetes target (CDI, DataVolume, PVC, KubeVirt VM, validation), under a future VirtualMachineMigration controller layer."></button>
+    
+    <div class="learn">
+      <p class="expl">The designed cold-migration road has three rows. On the source side the VM is discovered, assessed and powered off, and its disk is copied. The disk is then converted and staged. On the Kubernetes target, CDI imports it and a KubeVirt VM is created and validated. A future controller sits on top.</p>
+      <p class="why"><b>Why this matters:</b> This is the whole project on one page. Each box later becomes a controller phase.</p>
+      <p class="rem"><b>Remember this:</b> Stage 0 designed the whole road; nothing on it was built in Stage 0.</p>
+      <details class="tech"><summary>Technical details</summary><p>The flow table, cold vs warm, MTV as reference and the CRD sketch. Read: <a href="migration-architecture.md">migration-architecture.md</a>, <a href="../adr/003-cold-before-warm.md">ADR 003</a>, <a href="../adr/005-custom-controller-vs-scripts.md">ADR 005</a>.</p></details>
+    </div>
+  </section>
+  <section class="fig key" id="fig-18" data-num="18" aria-labelledby="h-18">
+    <div class="fig-head"><span class="num">18</span><h3 id="h-18">Migration state machine</h3>
+      <span class="tags"><span class="tag design">STAGE 0 DESIGN</span><span class="tag concept">KEY IDEA</span></span></div>
+    <button type="button" class="img" data-open="18" aria-label="Open details for diagram 18: Migration state machine"><img src="../diagrams/stage-0-visual/18-migration-state-machine.svg" width="1200" height="960" alt="Phases Pending, Discovering, Validated, Preparing, Converting, Importing, CreatingVM, Starting, Validating, Completed; failure states Retryable, ManualInterventionRequired, Failed; rollback is not a phase."></button>
+    
+    <div class="learn">
+      <p class="expl">The designed <code>status.phase</code> goes from <b>Pending</b> through Discovering, Validated, Preparing, Converting, Importing, CreatingVM, Starting and Validating to <b>Completed</b>. Transient errors go to <b>Retryable</b> and resume the same phase. A human decision goes to <b>ManualInterventionRequired</b>. Permanent errors go to <b>Failed</b>.</p>
+      <p class="why"><b>Why this matters:</b> Checkpoints make a half-finished migration resumable instead of a mystery.</p>
+      <p class="rem"><b>Remember this:</b> State machine = reconciliation checkpoints.</p>
+      <details class="tech"><summary>Technical details</summary><p>Per-phase desired and observed state, transition types and idempotency rules. Read: <a href="migration-state-machine.md">migration-state-machine.md</a>.</p></details>
+    </div>
+  </section>
+  <section class="fig has-vmw" id="fig-19" data-num="19" aria-labelledby="h-19">
+    <div class="fig-head"><span class="num">19</span><h3 id="h-19">Networking model</h3>
+      <span class="tags"><span class="tag comp">DOCUMENTED</span><span class="tag design">STAGE 0 PLAN: MASQUERADE</span><span class="tag future">MULTUS: DEFERRED</span></span></div>
+    <button type="button" class="img" data-open="19" aria-label="Open details for diagram 19: Networking model"><img src="../diagrams/stage-0-visual/19-networking-model.svg" width="1200" height="1010" alt="VMware guest, vNIC, port group, vSwitch, uplink beside KubeVirt guest, virtio NIC, masquerade binding (Stage 0 plan) on the pod network, smaller bridge binding and deferred Multus secondary network, node CNI dataplane."></button>
+    <p class="vmw-note"><span class="tag analogy">ROUGH ANALOGY</span> <b>VMware lens:</b> vNIC &#8776; virtio NIC in interfaces[]. Port group &#8776; networks[] entry. vSwitch &#8776; CNI dataplane + in-pod plumbing.</p>
+    <div class="learn">
+      <p class="expl">In KubeVirt, <code>networks[]</code> says <b>where</b> a NIC connects (the pod network or a Multus network), and <code>interfaces[]</code> says <b>how</b> (the binding). The Stage 0 plan is one NIC on the pod network with <b>masquerade</b>, reached through a Service. Bridge and Multus are optional and deferred.</p>
+      <p class="why"><b>Why this matters:</b> Networking changes more in a migration than anything else, including the VM's IP address.</p>
+      <p class="rem"><b>Remember this:</b> networks[] = where. interfaces[] = how.</p>
+      <details class="tech"><summary>Technical details</summary><p>Bindings, Multus, NADs and the ESXi comparison. Read: <a href="networking-model.md">networking-model.md</a>.</p></details>
+    </div>
+  </section>
+  <section class="fig has-vmw" id="fig-20" data-num="20" aria-labelledby="h-20">
+    <div class="fig-head"><span class="num">20</span><h3 id="h-20">Network mapping</h3>
+      <span class="tags"><span class="tag design">STAGE 0 DESIGN</span><span class="tag risk">RISK: GUEST CONFIG</span></span></div>
+    <button type="button" class="img" data-open="20" aria-label="Open details for diagram 20: Network mapping"><img src="../diagrams/stage-0-visual/20-network-mapping.svg" width="1200" height="960" alt="A VMware NIC (port group, VLAN, VMXNET3, MAC, static IP) goes through five mapping decisions to option A, the pod network with masquerade (Stage 0 plan), or option B, Multus with bridge (deferred); guest-side netplan risk."></button>
+    <p class="vmw-note"><span class="tag analogy">ROUGH ANALOGY</span> <b>VMware lens:</b> Port group + VLAN + vNIC settings are the source of the mapping.</p>
+    <div class="learn">
+      <p class="expl">Every NIC needs five answers: destination network, binding, IP addressing, MAC address and guest OS configuration. With masquerade, the guest must use <b>DHCP</b>, so a static VMware IP will not work as-is. The interface name can change (ens192 to enp1s0), which can break netplan.</p>
+      <p class="why"><b>Why this matters:</b> A VM that boots but has no network is still a failed migration.</p>
+      <p class="rem"><b>Remember this:</b> Network migration is a mapping problem, not simply a NIC swap.</p>
+      <details class="tech"><summary>Technical details</summary><p>The mapping rules and the demo plan. Read: <a href="networking-model.md">networking-model.md</a>.</p></details>
+    </div>
+  </section>
+  <div class="level" id="level-5"><span class="lv">LEVEL 5</span><h2>Understand engineering decisions</h2><span class="hint">What is decided, what is proven, and what comes next.</span></div>
+  <section class="fig" id="fig-21" data-num="21" aria-labelledby="h-21">
+    <div class="fig-head"><span class="num">21</span><h3 id="h-21">Migration vs modernization</h3>
+      <span class="tags"><span class="tag concept">CONCEPT</span><span class="tag design">EXAMPLE: DESIGN</span></span></div>
+    <button type="button" class="img" data-open="21" aria-label="Open details for diagram 21: Migration vs modernization"><img src="../diagrams/stage-0-visual/21-migration-vs-modernization.svg" width="1200" height="870" alt="Migration (rehost, unit VirtualMachine) versus modernization (replatform, unit Deployment) compared on what moves, guest OS, app change, scaling, updates, speed and risk, and when to choose."></button>
+    
+    <div class="learn">
+      <p class="expl"><b>Migration</b> moves the whole machine and ends as a KubeVirt VirtualMachine; the guest OS is kept and still patched like a VM. <b>Modernization</b> moves only the application into a container image run by a Deployment, and the guest OS goes away.</p>
+      <p class="why"><b>Why this matters:</b> Treating a migrated VM as modernized hides the guest OS you still have to operate.</p>
+      <p class="rem"><b>Remember this:</b> Migration keeps the VM; modernization removes it.</p>
+      <details class="tech"><summary>Technical details</summary><p>The comparison table and the nginx worked example. Read: <a href="modernization-model.md">modernization-model.md</a>.</p></details>
+    </div>
+  </section>
+  <section class="fig" id="fig-22" data-num="22" aria-labelledby="h-22">
+    <div class="fig-head"><span class="num">22</span><h3 id="h-22">Feasibility decision map</h3>
+      <span class="tags"><span class="tag done">VALIDATED</span><span class="tag comp">DOCUMENTED</span><span class="tag design">UNVALIDATED</span><span class="tag risk">BLOCKED</span><span class="tag future">DEFERRED</span></span></div>
+    <button type="button" class="img" data-open="22" aria-label="Open details for diagram 22: Feasibility decision map"><img src="../diagrams/stage-0-visual/22-feasibility-decision-map.svg" width="1200" height="820" alt="Stage 0 findings in five columns: validated, documented, unvalidated, blocked by lab mode, deferred decision, with feasibility IDs."></button>
+    
+    <div class="learn">
+      <p class="expl">Stage 0 sorted every finding into five categories. <b>Validated</b> means we saw it work. <b>Documented</b> means official docs say so, but we did not run it. <b>Unvalidated</b> means unknown. <b>Blocked</b> means impossible in the current lab mode. <b>Deferred</b> means intentionally not decided yet.</p>
+      <p class="why"><b>Why this matters:</b> It stops paper decisions from being mistaken for proven facts.</p>
+      <p class="rem"><b>Remember this:</b> Architecture decisions are different from proven runtime facts.</p>
+      <details class="tech"><summary>Technical details</summary><p>The full feasibility table, compatibility tuple and host requirements. Read: <a href="feasibility.md">feasibility.md</a>, <a href="evidence-index.md">evidence-index.md</a>.</p></details>
+    </div>
+  </section>
+  <section class="fig" id="fig-23" data-num="23" aria-labelledby="h-23">
+    <div class="fig-head"><span class="num">23</span><h3 id="h-23">Stage 0 decisions: ADR 001 to 005</h3>
+      <span class="tags"><span class="tag design">DECIDED (ACCEPTED)</span></span></div>
+    <button type="button" class="img" data-open="23" aria-label="Open details for diagram 23: Stage 0 decisions: ADR 001 to 005"><img src="../diagrams/stage-0-visual/23-stage0-decisions-and-adr.svg" width="1200" height="960" alt="Five accepted ADRs around Stage 0 architecture: 001 local nested ESXi source, 002 disposable AWS target, 003 cold before warm, 004 KubeVirt + CDI destination, 005 custom controller; later Stage 1 ADRs 006 to 010 shown separately."></button>
+    
+    <div class="learn">
+      <p class="expl">Five accepted decisions answer the big questions. <b>001</b>: the source is a local nested ESXi. <b>002</b>: the target is AWS, Terraform-only and disposable. <b>003</b>: cold before warm. <b>004</b>: upstream KubeVirt + CDI. <b>005</b>: a custom controller owns the workflow, with scripts only as building blocks.</p>
+      <p class="why"><b>Why this matters:</b> ADRs record why, so later stages do not quietly re-decide.</p>
+      <p class="rem"><b>Remember this:</b> Where from, where to, how, onto what, who orchestrates.</p>
+      <details class="tech"><summary>Technical details</summary><p>Read each decision record. Read: <a href="../adr/001-local-esxi-migration-source.md">ADR 001</a>, <a href="../adr/002-aws-disposable-target.md">ADR 002</a>, <a href="../adr/003-cold-before-warm.md">ADR 003</a>, <a href="../adr/004-kubevirt-vm-destination.md">ADR 004</a>, <a href="../adr/005-custom-controller-vs-scripts.md">ADR 005</a>, <a href="../adr/README.md">ADR index</a>.</p></details>
+    </div>
+  </section>
+  <section class="fig" id="fig-24" data-num="24" aria-labelledby="h-24">
+    <div class="fig-head"><span class="num">24</span><h3 id="h-24">From Stage 0 to Stage 1</h3>
+      <span class="tags"><span class="tag design">STAGE 0: COMPLETE</span><span class="tag done">STAGE 1: 1A-1H DONE</span></span></div>
+    <button type="button" class="img" data-open="24" aria-label="Open details for diagram 24: From Stage 0 to Stage 1"><img src="../diagrams/stage-0-visual/24-stage0-to-stage1.svg" width="1200" height="900" alt="Stage 0 asks what should we build and lists its design outputs; Stage 1 asks whether the important parts can be made to work and lists sub-stages 1A to 1H; Stage 1I not started."></button>
+    
+    <div class="learn">
+      <p class="expl">Stage 0 produced concepts, designs, a feasibility table and five ADRs, and built nothing. Stage 1 then built selected parts in the lab: a stable ESXi host, a source VM, a cold disk copy, a conversion host, and a converted guest booting on QEMU/KVM. 1H designed the KubeVirt target; nothing is provisioned.</p>
+      <p class="why"><b>Why this matters:</b> It shows where design ends and evidence begins.</p>
+      <p class="rem"><b>Remember this:</b> Stage 0 asks: What should we build? Stage 1 asks: Can we actually make the important parts work?</p>
+      <details class="tech"><summary>Technical details</summary><p>Stage 0 exit criteria and the Stage 1 record. Read: <a href="README.md">Stage 0 README</a>, <a href="../stage-1/README.md">Stage 1 README</a>, <a href="../stage-1/stage-1-visual-learning.html">Stage 1 Visual Learning</a>.</p></details>
+    </div>
+  </section>
+
+  <div class="level" id="not-built"><span class="lv">STATUS</span><h2>What is not built yet?</h2><span class="hint">Design, proof and future work are three different things.</span></div>
+  <section class="block" aria-label="Stage 0 design, Stage 1 proven, future">
+    <div class="cols">
+      <div class="col design"><h3><span class="tag design">STAGE 0 DESIGN</span></h3><p class="sub">on paper only</p><ul><li>VirtualMachineMigration CRD + controller</li><li>Migration state machine and conditions</li><li>Network mapping rules (pod network + masquerade)</li><li>CDI import flow and storage mapping</li><li>Disposable AWS target (ADR 002)</li></ul></div>
+      <div class="col done"><h3><span class="tag done">STAGE 1 PROVEN</span></h3><p class="sub">observed in the lab</p><ul><li>ESXi survives a controlled reboot (1A)</li><li>Nested KVM learning VM (1B)</li><li>VMware source VM with nginx (1C)</li><li>Cold disk acquisition, sha256 verified (1E)</li><li>qemu-img + virt-v2v conversion, QEMU/KVM boot with UEFI + virtio (1G)</li><li>Guest network fix on a disposable copy (1G)</li></ul></div>
+      <div class="col future"><h3><span class="tag future">FUTURE</span></h3><p class="sub">not built</p><ul><li>AWS cluster (1H designed it; nothing provisioned)</li><li>KubeVirt + CDI installed and running</li><li>The migrated VM running on KubeVirt</li><li>The migration controller</li><li>Application modernization (container path)</li></ul></div>
+    </div>
+  </section>
+
+  <div class="level" id="interview"><span class="lv">INTERVIEW</span><h2>Stage 0 interview visuals</h2><span class="hint">From interview-notes.md. Click a question.</span></div>
+  <section class="block" aria-label="Interview questions">
+      <details class="q"><summary><span class="qn">Q1</span> How would you migrate a VMware VM to Kubernetes?</summary><p>Rehost it as a KubeVirt VM: discover and assess, power off (cold), convert the disk and guest drivers, import the disk into a PVC with CDI, create a VirtualMachine with storage and network mappings, boot it and validate the app.</p><p><a href="#fig-17">See diagram 17 &#8594;</a></p></details>
+      <details class="q"><summary><span class="qn">Q2</span> What is KubeVirt?</summary><p>A Kubernetes add-on that runs and manages VMs as Kubernetes objects, next to containers, using the Kubernetes API, scheduler, networking and storage.</p><p><a href="#fig-07">See diagram 07 &#8594;</a></p></details>
+      <details class="q"><summary><span class="qn">Q3</span> What is the difference between a VM and a VMI?</summary><p>The VirtualMachine is the persistent definition and desired run state; the VMI is one running instance of it. Like a StatefulSet with one replica versus its Pod.</p><p><a href="#fig-09">See diagram 09 &#8594;</a></p></details>
+      <details class="q"><summary><span class="qn">Q4</span> How does KubeVirt run a VM?</summary><p>VirtualMachine, then virt-controller creates a VMI and a virt-launcher Pod, the scheduler places it, virt-handler has libvirt start the domain, and QEMU runs the VM on /dev/kvm.</p><p><a href="#fig-13">See diagram 13 &#8594;</a></p></details>
+      <details class="q"><summary><span class="qn">Q5</span> Where does QEMU run?</summary><p>In user space, inside the compute container of the VM&#x27;s virt-launcher Pod, on the node where that Pod was scheduled. One QEMU process per VM.</p><p><a href="#fig-13">See diagram 13 &#8594;</a></p></details>
+      <details class="q"><summary><span class="qn">Q6</span> What is KVM?</summary><p>A Linux kernel module that turns Linux into a hypervisor using VT-x / AMD-V. It exposes /dev/kvm, which QEMU uses to create VMs and run vCPUs.</p><p><a href="#fig-05">See diagram 05 &#8594;</a></p></details>
+      <details class="q"><summary><span class="qn">Q7</span> What does CDI do?</summary><p>It fills PVCs with VM disk data: import, upload, clone or blank. It converts images to raw and reports progress on a DataVolume. It knows nothing about CPUs or NICs.</p><p><a href="#fig-14">See diagram 14 &#8594;</a></p></details>
+      <details class="q"><summary><span class="qn">Q8</span> How would you design a migration CRD?</summary><p>One namespaced CR per VM migration: a declarative spec (source, destination, strategy, storage and network mapping, validation) and a controller-owned status (phase, conditions, progress, inventory, errors).</p><p><a href="#fig-12">See diagram 12 &#8594;</a></p></details>
+      <details class="q"><summary><span class="qn">Q9</span> What happens when migration fails halfway?</summary><p>The CR keeps the phase and records the error. Transient errors retry in the same phase; permanent ones go to Failed or ManualInterventionRequired. The source disk is intact, so the source can be powered back on.</p><p><a href="#fig-18">See diagram 18 &#8594;</a></p></details>
+      <details class="q"><summary><span class="qn">Q10</span> What is the difference between VM migration and application modernization?</summary><p>Migration moves the whole VM, guest OS included, without changing the app. Modernization repackages the app, for example as a container in a Deployment, which removes the VM and guest OS.</p><p><a href="#fig-21">See diagram 21 &#8594;</a></p></details>
+    <p><a href="interview-notes.md">All interview notes, with details &#8594;</a></p>
+  </section>
+
+  <div class="level" id="final-map"><span class="lv">60 SECONDS</span><h2>The whole map</h2></div>
+  <section class="block fmap" aria-label="Final 60-second map">
+    <p class="over">Stage 0 gives us the map.</p>
+    <div class="flow"><a class="step" href="#fig-02">VMware</a><span class="arr" aria-hidden="true">&#8594;</span><a class="step" href="#fig-16">Source VM</a><span class="arr" aria-hidden="true">&#8594;</span><a class="step" href="#fig-17">Discovery</a><span class="arr" aria-hidden="true">&#8594;</span><a class="step" href="#fig-16">Disk</a><span class="arr" aria-hidden="true">&#8594;</span><a class="step" href="#fig-06">Conversion</a><span class="arr" aria-hidden="true">&#8594;</span><a class="step" href="#fig-14">CDI</a><span class="arr" aria-hidden="true">&#8594;</span><a class="step" href="#fig-15">PVC</a><span class="arr" aria-hidden="true">&#8594;</span><a class="step" href="#fig-07">KubeVirt</a><span class="arr" aria-hidden="true">&#8594;</span><a class="step" href="#fig-09">VM</a><span class="arr" aria-hidden="true">&#8594;</span><a class="step" href="#fig-10">Kubernetes management</a><span class="arr" aria-hidden="true">&#8594;</span><a class="step fut" href="#fig-21">Future modernization</a></div>
+    <p class="under">Stage 1 proves selected roads on the map.</p>
+  </section>
+
+  <div class="level" id="remember"><span class="lv">REMEMBER</span><h2>5 things to remember</h2></div>
+  <div class="five">
+      <div class="card"><div class="n">1</div><p>KubeVirt manages VMs through Kubernetes.</p></div>
+      <div class="card"><div class="n">2</div><p>KVM runs the VM; QEMU provides the machine.</p></div>
+      <div class="card"><div class="n">3</div><p>CRDs describe desired state; controllers reconcile it.</p></div>
+      <div class="card"><div class="n">4</div><p>CDI puts disk content into Kubernetes storage.</p></div>
+      <div class="card"><div class="n">5</div><p>Migration keeps the VM; modernization removes it.</p></div>
+  </div>
+
+  <div class="srcs">
+    <b>Source of truth.</b> This page adds no facts; the Stage 0 records win.
+    <ul>
+      <li><a href="README.md">Stage 0 README</a></li>
+      <li><a href="architecture.md">architecture.md</a></li>
+      <li><a href="virtualization-fundamentals.md">virtualization-fundamentals.md</a></li>
+      <li><a href="kubevirt-architecture.md">kubevirt-architecture.md</a></li>
+      <li><a href="crd-controller-fundamentals.md">crd-controller-fundamentals.md</a></li>
+      <li><a href="cdi-storage-model.md">cdi-storage-model.md</a></li>
+      <li><a href="vmware-source-model.md">vmware-source-model.md</a></li>
+      <li><a href="migration-architecture.md">migration-architecture.md</a></li>
+      <li><a href="migration-state-machine.md">migration-state-machine.md</a></li>
+      <li><a href="networking-model.md">networking-model.md</a></li>
+      <li><a href="modernization-model.md">modernization-model.md</a></li>
+      <li><a href="feasibility.md">feasibility.md</a></li>
+      <li><a href="evidence-index.md">evidence-index.md</a></li>
+      <li><a href="interview-notes.md">interview-notes.md</a></li>
+      <li><a href="glossary.md">glossary.md</a></li>
+      <li><a href="../adr/README.md">ADRs 001 to 005</a></li>
+    </ul>
+    <p><a href="../index.html">Learning portal home</a> &#183; <a href="../stage-1/stage-1-visual-learning.html">Stage 1 Visual Learning</a></p>
+  </div>
+</main>
+<footer>Self-contained page: no external scripts, styles, fonts or images. Diagrams: <code>docs/diagrams/stage-0-visual/</code>.</footer>
+
+<div id="storybar" role="region" aria-label="Follow the story">
+  <div class="where" id="storyWhere" aria-live="polite"></div>
+  <button type="button" id="storyPrev">&#8592; BACK</button>
+  <button type="button" class="next" id="storyNext">NEXT &#8594;</button>
+  <button type="button" id="storyExit" aria-label="Exit the story">EXIT</button>
+</div>
+
+<div id="overlay" role="dialog" aria-modal="true" aria-labelledby="ovTitle" aria-describedby="ovWhy" hidden>
+  <div class="panel" id="panel">
+    <div class="top"><span class="sn" id="ovNum"></span><h2 id="ovTitle"></h2><button type="button" class="x" id="ovX" aria-label="Close">&#10005;</button></div>
+    <img id="ovImg" src="data:," alt="">
+    <p class="why" id="ovWhy"></p>
+    <ul id="ovTake"></ul>
+    <div class="acts"><a id="ovFull" href="#" target="_blank" rel="noopener">Open full-size SVG</a><button type="button" id="ovClose">Close</button></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var DATA = {"modal": {"01": {"t": "Big picture: one VM, two possible futures", "src": "../diagrams/stage-0-visual/01-stage0-big-picture.svg", "alt": "A VMware VM leads to the migration problem, which splits into a KubeVirt migration path (the VM remains a VM) and a modernization path (the VM dependency is removed).", "why": "Most later decisions depend on which of the two paths you are on.", "take": ["The starting point is one Linux VM running nginx on ESXi.", "Migration keeps the guest OS and changes only the platform under it.", "Modernization removes the guest OS; only the application moves."]}, "02": {"t": "VMware to KubeVirt: same guest, different stack", "src": "../diagrams/stage-0-visual/02-vmware-to-kubevirt.svg", "alt": "VMware stack (ESXi, VMware VM with PVSCSI and VMXNET3) beside the Kubernetes stack (Kubernetes, KubeVirt, VirtualMachine, VMI, virt-launcher Pod, QEMU, KVM); both end in the same Ubuntu and nginx.", "why": "It shows what a migration must replace and what it must leave alone.", "take": ["ESXi is one integrated product; the KVM stack is assembled from parts.", "KubeVirt turns the VM into Kubernetes objects.", "The guest's virtual hardware changes from VMware devices to virtio."]}, "03": {"t": "Three compute worlds", "src": "../diagrams/stage-0-visual/03-three-compute-worlds.svg", "alt": "World A traditional VM on ESXi, World B KubeVirt VM on Kubernetes, World C native container with no guest OS. Migration is A to B; modernization is A or B to C.", "why": "Without this split, \"moving to Kubernetes\" can mean two different projects at once.", "take": ["Worlds A and B both keep their own guest kernel.", "World C shares the node kernel; there is no guest OS.", "KubeVirt lets B and C run on the same cluster."]}, "04": {"t": "The virtualization stack", "src": "../diagrams/stage-0-visual/04-virtualization-stack.svg", "alt": "Six layers (physical hardware, hypervisor, virtual hardware, guest OS, application, managed through) across VMware, KVM and KubeVirt-managed KVM, marked SAME or CHANGES.", "why": "It tells you which layer each migration problem lives in.", "take": ["The hardware and the guest are the same in every column.", "The hypervisor changes from the ESXi VMkernel to Linux + KVM.", "The manager changes from hostd/vCenter to the Kubernetes API + KubeVirt."]}, "05": {"t": "KVM, QEMU and libvirt: three jobs, one VM", "src": "../diagrams/stage-0-visual/05-kvm-qemu-libvirt.svg", "alt": "libvirt (management API) over QEMU (VM process and devices) over KVM (kernel module) over the physical CPU, beside a rough VMware analogy: hostd, VMX process, VMkernel.", "why": "Every KubeVirt VM is this exact stack inside a Pod. Debugging starts with knowing which layer failed.", "take": ["KVM exposes /dev/kvm; without it there is no acceleration.", "QEMU is a normal process: one per VM, with the vCPUs as threads.", "The VMware column is a rough analogy, not an equivalence."]}, "06": {"t": "VirtIO: the hardware changes under the guest", "src": "../diagrams/stage-0-visual/06-virtio-hardware-model.svg", "alt": "PVSCSI becomes virtio-blk or virtio-scsi and VMXNET3 becomes virtio-net during migration; the Linux guest needs virtio drivers in the initramfs; qemu-img versus virt-v2v.", "why": "New hardware under an unchanged guest is the usual reason a converted VM fails to boot or has no network.", "take": ["VirtIO is paravirtual: the guest knows it is virtual.", "Mainline Linux has virtio drivers; Windows needs virtio-win.", "Converting the disk format does not fix guest drivers."]}, "07": {"t": "What is KubeVirt?", "src": "../diagrams/stage-0-visual/07-what-is-kubevirt.svg", "alt": "Kubernetes with built-in Pod, Deployment and Service plus a new VirtualMachine type; the big statement: KubeVirt makes VMs manageable through Kubernetes.", "why": "Everything else in Stage 0 builds on this one idea.", "take": ["A VM is a Kubernetes object next to Pods and Services.", "The VM still runs on QEMU + KVM, inside a virt-launcher Pod.", "KubeVirt adds CRDs, controllers and a node daemon."]}, "08": {"t": "KubeVirt component map", "src": "../diagrams/stage-0-visual/08-kubevirt-component-map.svg", "alt": "Cluster level: Kubernetes API, virt-api webhooks, virt-operator, virt-controller, VirtualMachine and VMI. VM node: virt-handler and a virt-launcher Pod containing libvirt and QEMU on KVM.", "why": "When a VM will not start, the failing component tells you where to look.", "take": ["virt-controller works cluster-wide; virt-handler works per node.", "Each running VM has its own private libvirt inside its Pod.", "virt-handler also advertises /dev/kvm as a node resource."]}, "09": {"t": "VM vs VMI", "src": "../diagrams/stage-0-visual/09-vm-vs-vmi.svg", "alt": "VirtualMachine (persistent specification) versus VirtualMachineInstance (running instance), with a timeline: the VM exists the whole time, the VMI and running guest only between start and stop.", "why": "Lifecycle questions, such as what survives a stop or what restarts a crash, depend on this split.", "take": ["Like a StatefulSet with one replica versus its Pod.", "A bare VMI can be created, but nothing restarts it.", "A migration always creates a VirtualMachine."]}, "10": {"t": "CRD \u2192 controller \u2192 VM", "src": "../diagrams/stage-0-visual/10-crd-controller-api-flow.svg", "alt": "User applies YAML to the API server, which stores a VirtualMachine custom resource whose type a CRD defines; a controller watches, compares and reconciles, creating VMI, virt-launcher Pod and QEMU; status flows back.", "why": "The planned migration platform is exactly this pattern: a new CRD plus our own controller.", "take": ["A CRD alone only stores data; without a controller nothing happens.", "KubeVirt ships CRDs and the controllers that give them meaning.", "Status is written back by the controller, not by the user."]}, "11": {"t": "The reconciliation loop", "src": "../diagrams/stage-0-visual/11-reconciliation-loop.svg", "alt": "Loop: desired state, observe actual, compare, difference?, act, observe again, desired equals actual, wait and watch. Example: VM crashes, virt-controller creates a new VMI. Controller = state convergence.", "why": "Idempotent, restart-safe steps are what make a long migration survivable.", "take": ["The loop never assumes a step worked; it looks again.", "No gap means nothing to do: the controller just waits.", "The migration controller uses the same loop for every phase."]}, "12": {"t": "Spec, status and conditions", "src": "../diagrams/stage-0-visual/12-controller-status-conditions.svg", "alt": "Spec (what I want, written by the user) goes to the controller, which writes status (what actually happened). The migration CR conditions: SourceDiscovered, Validated, DiskConverted, DiskImported, VMCreated, VMStarted, GuestReady, Ready, with an example status block.", "why": "You debug a controller by reading status, so status must be honest and specific.", "take": ["spec \u2260 status: desired and observed state are kept apart.", "status.phase is the current checkpoint, not a history log.", "The example status block is from the design, not from a real run."]}, "13": {"t": "The KubeVirt resource chain: who owns this?", "src": "../diagrams/stage-0-visual/13-kubevirt-resource-chain.svg", "alt": "VirtualMachine, VMI, virt-launcher Pod, libvirt domain, QEMU, KVM, guest OS, each with its owner and a rough ESXi analogy; status flows back up.", "why": "\"Who owns this layer?\" is the fastest way to find the right logs.", "take": ["Status flows back up: domain, VMI phase, VM printableStatus.", "If the Pod dies the VM dies; the VM object restarts it.", "The ESXi column is only a rough analogy."]}, "15": {"t": "Storage object stack", "src": "../diagrams/stage-0-visual/15-storage-object-stack.svg", "alt": "VM disk, DataVolume, PVC, StorageClass, CSI provisioner, storage backend, with meanings and rough VMware analogies; EBS gp3 is ReadWriteOnce and bound to one Availability Zone.", "why": "Storage settings such as access mode and zone decide what the VM can and cannot do later.", "take": ["CDI's DataVolume fills a PVC from a source.", "EBS gp3 is ReadWriteOnce and lives in one Availability Zone.", "The VMware column is a rough analogy."]}, "14": {"t": "CDI data path", "src": "../diagrams/stage-0-visual/14-cdi-data-path.svg", "alt": "Disk image, CDI, DataVolume, PVC and storage backend inside the CDI zone; a seam where the DataVolume is Succeeded; a KubeVirt VM below that references the PVC.", "why": "A clear boundary tells you which system to debug when a migrated VM has a disk problem.", "take": ["CDI never creates or starts VMs.", "KubeVirt never imports disks.", "Stage 0 design: create the DataVolume first, then the VM."]}, "16": {"t": "The VMware source model", "src": "../diagrams/stage-0-visual/16-vmware-source-model.svg", "alt": "ESXi host tree: VM inventory, configuration (.vmx), firmware (.nvram), network (vNIC and port group) classified as METADATA; disk (VMDK) as DISK DATA; runtime state (power, guest IP, VMware Tools) as RUNTIME STATE.", "why": "Each kind is handled at a different time, by a different step.", "take": ["Metadata is frozen into status at discovery.", "Disk data is read only after the VM is confirmed off.", "Runtime state is re-checked before every irreversible step."]}, "17": {"t": "Migration architecture", "src": "../diagrams/stage-0-visual/17-migration-architecture.svg", "alt": "Three rows: source side (VMware source, discovery, inventory and assessment, disk acquisition), conversion (conversion, staging), Kubernetes target (CDI, DataVolume, PVC, KubeVirt VM, validation), under a future VirtualMachineMigration controller layer.", "why": "This is the whole project on one page. Each box later becomes a controller phase.", "take": ["The controller layer is future work (ADR 005).", "Staging was S3 or the CDI upload proxy; Stage 1 later chose CDI upload.", "Stage 1 walked the source and conversion rows by hand."]}, "18": {"t": "Migration state machine", "src": "../diagrams/stage-0-visual/18-migration-state-machine.svg", "alt": "Phases Pending, Discovering, Validated, Preparing, Converting, Importing, CreatingVM, Starting, Validating, Completed; failure states Retryable, ManualInterventionRequired, Failed; rollback is not a phase.", "why": "Checkpoints make a half-finished migration resumable instead of a mystery.", "take": ["A phase advances only on observed success.", "Rollback is not a phase: power the source back on; its disk is never modified.", "Source power-off is the one irreversible step, and it is guarded."]}, "19": {"t": "Networking model", "src": "../diagrams/stage-0-visual/19-networking-model.svg", "alt": "VMware guest, vNIC, port group, vSwitch, uplink beside KubeVirt guest, virtio NIC, masquerade binding (Stage 0 plan) on the pod network, smaller bridge binding and deferred Multus secondary network, node CNI dataplane.", "why": "Networking changes more in a migration than anything else, including the VM's IP address.", "take": ["Masquerade: the guest gets a private DHCP address behind the pod IP.", "Bridge and Multus can keep L2 identity, but need extra setup.", "No Multus networking is built in Stage 0."]}, "20": {"t": "Network mapping", "src": "../diagrams/stage-0-visual/20-network-mapping.svg", "alt": "A VMware NIC (port group, VLAN, VMXNET3, MAC, static IP) goes through five mapping decisions to option A, the pod network with masquerade (Stage 0 plan), or option B, Multus with bridge (deferred); guest-side netplan risk.", "why": "A VM that boots but has no network is still a failed migration.", "take": ["The mapping must cover every NIC before migration starts.", "Keeping a static IP needs a secondary network (deferred).", "Stage 1 later hit the netplan problem and fixed it (ADR 010)."]}, "21": {"t": "Migration vs modernization", "src": "../diagrams/stage-0-visual/21-migration-vs-modernization.svg", "alt": "Migration (rehost, unit VirtualMachine) versus modernization (replatform, unit Deployment) compared on what moves, guest OS, app change, scaling, updates, speed and risk, and when to choose.", "why": "Treating a migrated VM as modernized hides the guest OS you still have to operate.", "take": ["Migration is fast and low risk; modernization needs app knowledge.", "KubeVirt lets both run on one platform.", "Migrate first, then modernize the workloads that justify it."]}, "22": {"t": "Feasibility decision map", "src": "../diagrams/stage-0-visual/22-feasibility-decision-map.svg", "alt": "Stage 0 findings in five columns: validated, documented, unvalidated, blocked by lab mode, deferred decision, with feasibility IDs.", "why": "It stops paper decisions from being mistaken for proven facts.", "take": ["These statuses are as recorded at the end of Stage 0.", "Documented is never the same as validated.", "Stage 1 later proved several unvalidated rows."]}, "23": {"t": "Stage 0 decisions: ADR 001 to 005", "src": "../diagrams/stage-0-visual/23-stage0-decisions-and-adr.svg", "alt": "Five accepted ADRs around Stage 0 architecture: 001 local nested ESXi source, 002 disposable AWS target, 003 cold before warm, 004 KubeVirt + CDI destination, 005 custom controller; later Stage 1 ADRs 006 to 010 shown separately.", "why": "ADRs record why, so later stages do not quietly re-decide.", "take": ["ADR 005 is accepted as a direction; implementation is deferred.", "The free ESXi source is why the first migration is cold.", "ADRs 006 to 010 came later, in Stage 1."]}, "24": {"t": "From Stage 0 to Stage 1", "src": "../diagrams/stage-0-visual/24-stage0-to-stage1.svg", "alt": "Stage 0 asks what should we build and lists its design outputs; Stage 1 asks whether the important parts can be made to work and lists sub-stages 1A to 1H; Stage 1I not started.", "why": "It shows where design ends and evidence begins.", "take": ["Stage 1 turned several UNVALIDATED rows into evidence.", "1H is design only; nothing is provisioned.", "Stage 1I is not started."]}}, "story": [{"n": "01", "t": "Big picture: one VM, two possible futures"}, {"n": "03", "t": "Three compute worlds"}, {"n": "04", "t": "The virtualization stack"}, {"n": "05", "t": "KVM, QEMU and libvirt: three jobs, one VM"}, {"n": "07", "t": "What is KubeVirt?"}, {"n": "10", "t": "CRD \u2192 controller \u2192 VM"}, {"n": "11", "t": "The reconciliation loop"}, {"n": "13", "t": "The KubeVirt resource chain: who owns this?"}, {"n": "14", "t": "CDI data path"}, {"n": "16", "t": "The VMware source model"}, {"n": "17", "t": "Migration architecture"}, {"n": "18", "t": "Migration state machine"}, {"n": "19", "t": "Networking model"}, {"n": "21", "t": "Migration vs modernization"}, {"n": "23", "t": "Stage 0 decisions: ADR 001 to 005"}, {"n": "24", "t": "From Stage 0 to Stage 1"}], "navFor": {"fig-01": "fig-01", "fig-02": "fig-02", "fig-03": "fig-02", "fig-04": "fig-04", "fig-05": "fig-05", "fig-06": "fig-05", "fig-07": "fig-07", "fig-08": "fig-07", "fig-09": "fig-07", "fig-10": "fig-10", "fig-11": "fig-11", "fig-12": "fig-11", "fig-13": "fig-11", "fig-15": "fig-15", "fig-14": "fig-14", "fig-16": "fig-14", "fig-17": "fig-17", "fig-18": "fig-18", "fig-19": "fig-19", "fig-20": "fig-19", "fig-21": "fig-21", "fig-22": "fig-22", "fig-23": "fig-23", "fig-24": "fig-24"}};
+  var body = document.body;
+
+  function store(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function load(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+
+  var header = document.getElementById('top');
+  function pad() { document.documentElement.style.scrollPaddingTop = (header.offsetHeight + 12) + 'px'; }
+  window.addEventListener('resize', pad); pad();
+
+  function goTo(id, flash) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (flash) { el.classList.add('flash'); setTimeout(function () { el.classList.remove('flash'); }, 1600); }
+  }
+
+  var learn = document.getElementById('learn'), label = document.getElementById('modeLabel');
+  function setLearn(on) {
+    body.classList.toggle('learning', on);
+    label.textContent = on ? 'LEARNING' : 'VISUAL';
+    learn.checked = on;
+    store('stage0-learning-mode', on ? '1' : '0');
+  }
+  setLearn(load('stage0-learning-mode') === '1');
+  learn.addEventListener('change', function () { setLearn(learn.checked); });
+
+  var vmBtn = document.getElementById('vmBtn');
+  function setVm(on, jump) {
+    body.classList.toggle('vmware', on);
+    vmBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    store('stage0-vmware-mode', on ? '1' : '0');
+    if (on && jump) goTo('vmware-panel', false);
+  }
+  setVm(load('stage0-vmware-mode') === '1', false);
+  vmBtn.addEventListener('click', function () { setVm(!body.classList.contains('vmware'), true); });
+
+  var links = document.querySelectorAll('a[href^="#fig-"]');
+  for (var i = 0; i < links.length; i++) {
+    links[i].addEventListener('click', function (e) {
+      e.preventDefault();
+      var id = this.getAttribute('href').slice(1);
+      goTo(id, true);
+      if (history.replaceState) history.replaceState(null, '', '#' + id);
+    });
+  }
+
+  var ov = document.getElementById('overlay'), panel = document.getElementById('panel'), lastFocus = null;
+  function focusables() { return panel.querySelectorAll('a[href], button'); }
+  function openModal(n) {
+    var d = DATA.modal[n]; if (!d) return;
+    lastFocus = document.activeElement;
+    document.getElementById('ovNum').textContent = n;
+    document.getElementById('ovTitle').textContent = d.t;
+    var img = document.getElementById('ovImg'); img.src = d.src; img.alt = d.alt;
+    document.getElementById('ovWhy').textContent = 'Why it matters: ' + d.why;
+    var ul = document.getElementById('ovTake'); ul.innerHTML = '';
+    for (var j = 0; j < d.take.length; j++) { var li = document.createElement('li'); li.textContent = d.take[j]; ul.appendChild(li); }
+    document.getElementById('ovFull').href = d.src;
+    ov.hidden = false; ov.classList.add('open');
+    document.getElementById('ovClose').focus();
+  }
+  function closeModal() {
+    if (!ov.classList.contains('open')) return;
+    ov.classList.remove('open'); ov.hidden = true;
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  var opens = document.querySelectorAll('[data-open]');
+  for (var k = 0; k < opens.length; k++) {
+    opens[k].addEventListener('click', function () { openModal(this.getAttribute('data-open')); });
+  }
+  document.getElementById('ovClose').addEventListener('click', closeModal);
+  document.getElementById('ovX').addEventListener('click', closeModal);
+  ov.addEventListener('click', function (e) { if (e.target === ov) closeModal(); });
+  document.addEventListener('keydown', function (e) {
+    if (ov.classList.contains('open')) {
+      if (e.key === 'Escape') { e.preventDefault(); closeModal(); return; }
+      if (e.key === 'Tab') {
+        var f = focusables(), first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    } else if (e.key === 'Escape' && body.classList.contains('story')) {
+      stopStory();
+    }
+  });
+
+  var storyIdx = -1, story = DATA.story;
+  var where = document.getElementById('storyWhere'), nextBtn = document.getElementById('storyNext'), prevBtn = document.getElementById('storyPrev');
+  function showStep() {
+    var figs = document.querySelectorAll('.fig.story-on');
+    for (var j = 0; j < figs.length; j++) figs[j].classList.remove('story-on');
+    if (storyIdx >= story.length) {
+      where.innerHTML = '<b>You now have the Stage 0 mental model.</b>Next: the five things to remember.';
+      nextBtn.textContent = 'FINISH';
+      goTo('remember', false);
+      return;
+    }
+    var s = story[storyIdx];
+    var el = document.getElementById('fig-' + s.n);
+    if (el) el.classList.add('story-on');
+    where.innerHTML = '';
+    var b = document.createElement('b'); b.textContent = s.n + ' \u00b7 ' + s.t; where.appendChild(b);
+    where.appendChild(document.createTextNode('Story ' + (storyIdx + 1) + ' of ' + story.length));
+    nextBtn.innerHTML = 'NEXT &#8594;';
+    prevBtn.disabled = storyIdx === 0;
+    goTo('fig-' + s.n, false);
+  }
+  function startStory() { body.classList.add('story'); storyIdx = 0; showStep(); nextBtn.focus(); }
+  function stopStory() {
+    body.classList.remove('story'); storyIdx = -1;
+    var figs = document.querySelectorAll('.fig.story-on');
+    for (var j = 0; j < figs.length; j++) figs[j].classList.remove('story-on');
+    document.getElementById('storyBtn').focus();
+  }
+  document.getElementById('storyBtn').addEventListener('click', startStory);
+  document.getElementById('storyExit').addEventListener('click', stopStory);
+  nextBtn.addEventListener('click', function () { if (storyIdx >= story.length) { stopStory(); return; } storyIdx++; showStep(); });
+  prevBtn.addEventListener('click', function () { if (storyIdx > 0) { storyIdx = Math.min(storyIdx, story.length) - 1; showStep(); } });
+
+  var navLinks = document.querySelectorAll('nav a');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        var target = DATA.navFor[en.target.id] || '';
+        for (var j = 0; j < navLinks.length; j++) {
+          var on = navLinks[j].getAttribute('href') === '#' + target;
+          navLinks[j].classList.toggle('active', on);
+          if (on && window.innerWidth <= 1180) {
+            var nav = navLinks[j].parentNode;
+            nav.scrollLeft = navLinks[j].offsetLeft - nav.clientWidth / 2 + navLinks[j].offsetWidth / 2;
+          }
+        }
+      });
+    }, { rootMargin: '-40% 0px -55% 0px' });
+    var all = document.querySelectorAll('section.fig');
+    for (var m = 0; m < all.length; m++) io.observe(all[m]);
+    window.addEventListener('scroll', function () {
+      if (all.length && all[0].getBoundingClientRect().top > window.innerHeight * 0.45) {
+        for (var j = 0; j < navLinks.length; j++) navLinks[j].classList.remove('active');
+      }
+    }, { passive: true });
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">CDI data path: from disk image to a KubeVirt VM disk</title>
+  <desc id="desc">A disk image goes to CDI, which creates a DataVolume and a PVC on a storage backend. That is the end of CDI. KubeVirt then runs a VM that references the PVC. CDI imports and prepares disk data into Kubernetes storage; it does not create or run VMs. KubeVirt runs the VM; it does not import disks.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker></defs>
+  <rect width="1200" height="900" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">CDI data path</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">CDI fills the disk. KubeVirt runs the VM. The PVC is the seam.</text>
+  <rect x="90" y="96" width="480" height="600" rx="14" fill="#eff6ff" stroke="#1d4ed8" stroke-width="1.5"/>
+  <text x="106" y="122" class="lab" text-anchor="start">CDI ZONE</text>
+  <text x="106" y="142" class="xs" text-anchor="start">Containerized Data Importer</text>
+  <rect x="150" y="164" width="360" height="66" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="330.0" y="192.55" class="t" text-anchor="middle" style="font-size:15px">Disk image</text>
+  <text x="330.0" y="211.5" class="s" text-anchor="middle" style="font-size:12.5px">qcow2, VMDK or raw (e.g. from S3, or uploaded)</text>
+  <rect x="150" y="260" width="360" height="66" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="330.0" y="288.55" class="t" text-anchor="middle" style="font-size:15px">CDI</text>
+  <text x="330.0" y="307.5" class="s" text-anchor="middle" style="font-size:12.5px">importer or upload Pod; qemu-img converts to raw</text>
+  <path d="M330.0,232 L330.0,257" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="150" y="356" width="360" height="66" rx="10" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.8"/>
+  <text x="330.0" y="384.55" class="t" text-anchor="middle" style="font-size:15px">DataVolume</text>
+  <text x="330.0" y="403.5" class="s" text-anchor="middle" style="font-size:12.5px">CR: source, size, StorageClass; phase + progress</text>
+  <path d="M330.0,328 L330.0,353" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="150" y="452" width="360" height="66" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="330.0" y="480.55" class="t" text-anchor="middle" style="font-size:15px">PVC</text>
+  <text x="330.0" y="499.5" class="s" text-anchor="middle" style="font-size:12.5px">now holds a raw, bootable disk</text>
+  <path d="M330.0,424 L330.0,449" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="150" y="548" width="360" height="66" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="330.0" y="576.55" class="t" text-anchor="middle" style="font-size:15px">Storage backend</text>
+  <text x="330.0" y="595.5" class="s" text-anchor="middle" style="font-size:12.5px">PV from a CSI driver (e.g. EBS gp3)</text>
+  <path d="M330.0,520 L330.0,545" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M60,724 L1140,724" stroke="#0f172a" stroke-width="4" stroke-dasharray="14 8"/>
+  <rect x="400" y="708" width="540" height="32" rx="16" fill="#0f172a" stroke="#0f172a" stroke-width="1.6"/>
+  <text x="670" y="730" class="pill" text-anchor="middle" style="font-size:13px">THE SEAM: CDI ENDS WHEN THE DATAVOLUME IS Succeeded</text>
+  <rect x="90" y="752" width="480" height="120" rx="14" fill="#f5f3ff" stroke="#6d28d9" stroke-width="1.5"/>
+  <text x="106" y="778" class="lab" text-anchor="start">KUBEVIRT ZONE</text>
+  <rect x="150" y="784" width="360" height="70" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="330.0" y="814.55" class="t" text-anchor="middle" style="font-size:15px">KubeVirt VM</text>
+  <text x="330.0" y="833.5" class="s" text-anchor="middle" style="font-size:12.5px">VM spec references the PVC; QEMU shows a virtio disk</text>
+  <path d="M330,604 L330,690 L330,781" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="342" y="688" class="xs halo" text-anchor="start" style="font-weight:600">VM references the PVC</text>
+  <text x="640" y="200" class="t" text-anchor="start" style="font-size:40px;fill:#1d4ed8">CDI</text>
+  <text x="640" y="238" class="s" text-anchor="start" style="font-size:20px;fill:#334155;font-weight:700">= imports / prepares the disk</text>
+  <text x="640" y="264" class="s" text-anchor="start" style="font-size:20px;fill:#334155;font-weight:700">   into Kubernetes storage</text>
+  <path d="M651,325 L673,347 M673,325 L651,347" stroke="#b91c1c" stroke-width="5" stroke-linecap="round"/>
+  <text x="690" y="342" class="s" text-anchor="start" style="font-size:15px;fill:#334155">does NOT create or start VMs</text>
+  <text x="690" y="363" class="s" text-anchor="start" style="font-size:15px;fill:#334155">knows nothing about CPUs, NICs or boot</text>
+  <text x="640" y="452" class="s" text-anchor="start" style="font-size:14px;fill:#334155">Operations: import (http, s3, registry, vddk),</text>
+  <text x="640" y="472" class="s" text-anchor="start" style="font-size:14px;fill:#334155">upload (virtctl image-upload), clone, blank.</text>
+  <text x="640" y="492" class="s" text-anchor="start" style="font-size:14px;fill:#334155">Every input format is stored as raw.</text>
+  <text x="640" y="560" class="s" text-anchor="start" style="font-size:14px;fill:#a16207;font-weight:600">Stage 0 design: create the DataVolume first, so</text>
+  <text x="640" y="580" class="s" text-anchor="start" style="font-size:14px;fill:#a16207;font-weight:600">a failed import never leaves a half-created VM.</text>
+  <text x="640" y="806" class="t" text-anchor="start" style="font-size:34px;fill:#6d28d9">KubeVirt</text>
+  <text x="640" y="840" class="s" text-anchor="start" style="font-size:17px;fill:#334155;font-weight:700">= runs the VM from the PVC. It does NOT import disks.</text>
+</svg>
