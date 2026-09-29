@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+  <title id="title">Three worlds: VMware, KVM/QEMU and Kubernetes</title>
+  <desc id="desc">Three columns. World 1 VMware: ESXi, VMware VM, then PVSCSI, VMXNET3 and VMDK. World 2 KVM/QEMU: Linux, KVM, QEMU, VirtIO, converted VM (proven in 1G). World 3 Kubernetes: Kubernetes, KubeVirt, VirtualMachine, virt-launcher Pod, QEMU/KVM, VM (design only). At the bottom the same Ubuntu plus nginx guest sits under every world: the manager changes, the guest stays a VM.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker></defs>
+  <rect width="1200" height="800" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">Three worlds: what changes, what stays</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">The manager changes. The guest stays a VM in every world.</text>
+  <rect x="30" y="92" width="360" height="580" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.6"/>
+  <text x="210" y="124" class="h2" text-anchor="middle">WORLD 1 - VMware</text>
+  <rect x="156.0" y="134" width="108" height="20" rx="10.0" fill="#15803d"/>
+  <text x="210.0" y="147.96" class="pill" text-anchor="middle" style="font-size:11px">SOURCE - DONE</text>
+  <rect x="420" y="92" width="360" height="580" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.6"/>
+  <text x="600" y="124" class="h2" text-anchor="middle">WORLD 2 - KVM / QEMU</text>
+  <rect x="549.5" y="134" width="101" height="20" rx="10.0" fill="#15803d"/>
+  <text x="600.0" y="147.96" class="pill" text-anchor="middle" style="font-size:11px">PROVEN IN 1G</text>
+  <rect x="810" y="92" width="360" height="580" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.6"/>
+  <text x="990" y="124" class="h2" text-anchor="middle">WORLD 3 - Kubernetes</text>
+  <rect x="900.5" y="134" width="179" height="20" rx="10.0" fill="#a16207"/>
+  <text x="990.0" y="147.96" class="pill" text-anchor="middle" style="font-size:11px">DESIGN (1H) - NOT BUILT</text>
+  <rect x="60" y="172" width="300" height="50" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="210.0" y="192.8" class="t" text-anchor="middle" style="font-size:15px">ESXi</text>
+  <text x="210.0" y="211.34" class="s" text-anchor="middle" style="font-size:12px">VMkernel + hostd</text>
+  <rect x="60" y="244" width="300" height="50" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="210.0" y="264.8" class="t" text-anchor="middle" style="font-size:15px">VMware VM</text>
+  <text x="210.0" y="283.34" class="s" text-anchor="middle" style="font-size:12px">.vmx - VMX process</text>
+  <path d="M210,224 L210,241" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="450" y="172" width="300" height="50" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="600.0" y="192.8" class="t" text-anchor="middle" style="font-size:15px">Linux</text>
+  <text x="600.0" y="211.34" class="s" text-anchor="middle" style="font-size:12px">conversion-host-01</text>
+  <rect x="450" y="244" width="300" height="50" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="600.0" y="264.8" class="t" text-anchor="middle" style="font-size:15px">KVM</text>
+  <text x="600.0" y="283.34" class="s" text-anchor="middle" style="font-size:12px">kernel module, /dev/kvm</text>
+  <path d="M600,224 L600,241" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="450" y="316" width="300" height="50" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="600.0" y="336.8" class="t" text-anchor="middle" style="font-size:15px">QEMU</text>
+  <text x="600.0" y="355.34" class="s" text-anchor="middle" style="font-size:12px">one process per VM</text>
+  <path d="M600,296 L600,313" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="450" y="388" width="300" height="50" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="600.0" y="408.8" class="t" text-anchor="middle" style="font-size:15px">VirtIO</text>
+  <text x="600.0" y="427.34" class="s" text-anchor="middle" style="font-size:12px">virtio-blk, virtio-net</text>
+  <path d="M600,368 L600,385" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="450" y="460" width="300" height="50" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="600.0" y="480.8" class="t" text-anchor="middle" style="font-size:15px">Converted VM</text>
+  <text x="600.0" y="499.34" class="s" text-anchor="middle" style="font-size:12px">UEFI via OVMF</text>
+  <path d="M600,440 L600,457" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="840" y="172" width="300" height="50" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="990.0" y="192.8" class="t" text-anchor="middle" style="font-size:15px">Kubernetes</text>
+  <text x="990.0" y="211.34" class="s" text-anchor="middle" style="font-size:12px">API + controllers</text>
+  <rect x="840" y="244" width="300" height="50" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="990.0" y="264.8" class="t" text-anchor="middle" style="font-size:15px">KubeVirt</text>
+  <text x="990.0" y="283.34" class="s" text-anchor="middle" style="font-size:12px">add-on</text>
+  <path d="M990,224 L990,241" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="840" y="316" width="300" height="50" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="990.0" y="336.8" class="t" text-anchor="middle" style="font-size:15px">VirtualMachine</text>
+  <text x="990.0" y="355.34" class="s" text-anchor="middle" style="font-size:12px">custom resource</text>
+  <path d="M990,296 L990,313" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="840" y="388" width="300" height="50" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="990.0" y="408.8" class="t" text-anchor="middle" style="font-size:15px">virt-launcher Pod</text>
+  <text x="990.0" y="427.34" class="s" text-anchor="middle" style="font-size:12px">one per running VM</text>
+  <path d="M990,368 L990,385" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="840" y="460" width="300" height="50" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="990.0" y="480.8" class="t" text-anchor="middle" style="font-size:15px">QEMU / KVM</text>
+  <text x="990.0" y="499.34" class="s" text-anchor="middle" style="font-size:12px">inside the Pod, on the node</text>
+  <path d="M990,440 L990,457" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="840" y="532" width="300" height="50" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="990.0" y="561.8" class="t" text-anchor="middle" style="font-size:15px">VM</text>
+  <path d="M990,512 L990,529" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="60" y="330" width="92" height="46" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="106.0" y="357.16" class="t" text-anchor="middle" style="font-size:13px">PVSCSI</text>
+  <path d="M210,294 L106,327" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="164" y="330" width="92" height="46" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="210.0" y="357.16" class="t" text-anchor="middle" style="font-size:13px">VMXNET3</text>
+  <path d="M210,294 L210,327" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="268" y="330" width="92" height="46" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="314.0" y="357.16" class="t" text-anchor="middle" style="font-size:13px">VMDK</text>
+  <path d="M210,294 L314,327" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="210" y="400" class="xs" text-anchor="middle" style="font-weight:600">VMware devices + disk</text>
+  <rect x="60" y="612" width="300" height="46" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="210.0" y="639.8" class="t" text-anchor="middle" style="font-size:15px">Ubuntu 24.04.5 + nginx</text>
+  <path d="M210,410 L210,609" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="450" y="612" width="300" height="46" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="600.0" y="639.8" class="t" text-anchor="middle" style="font-size:15px">Ubuntu 24.04.5 + nginx</text>
+  <path d="M600,532 L600,609" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="840" y="612" width="300" height="46" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="990.0" y="639.8" class="t" text-anchor="middle" style="font-size:15px">Ubuntu 24.04.5 + nginx</text>
+  <path d="M990,604 L990,609" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="405" y="645" class="h" text-anchor="middle" style="font-size:34px;fill:#15803d">=</text>
+  <text x="795" y="645" class="h" text-anchor="middle" style="font-size:34px;fill:#15803d">=</text>
+  <rect x="30" y="700" width="560" height="76" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <text x="310.0" y="724.3" class="t" text-anchor="middle" style="font-size:15px">WHAT CHANGED</text>
+  <text x="310.0" y="743.25" class="s" text-anchor="middle" style="font-size:12.5px">the manager + the virtual hardware</text>
+  <text x="310.0" y="761.75" class="s" text-anchor="middle" style="font-size:12.5px">(PVSCSI / VMXNET3  &#8594;  VirtIO)</text>
+  <rect x="610" y="700" width="560" height="76" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="890.0" y="724.3" class="t" text-anchor="middle" style="font-size:15px">WHAT STAYED</text>
+  <text x="890.0" y="743.25" class="s" text-anchor="middle" style="font-size:12.5px">the guest OS, its disk content and nginx</text>
+  <text x="890.0" y="761.75" class="s" text-anchor="middle" style="font-size:12.5px">- still a VM, not a container</text>
+</svg>

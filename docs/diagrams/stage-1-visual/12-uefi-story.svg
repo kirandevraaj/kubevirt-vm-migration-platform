@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="790" viewBox="0 0 1200 790" role="img" aria-labelledby="title desc">
+  <title id="title">The UEFI story</title>
+  <desc id="desc">VMware UEFI with its .nvram stays with the VMware VM. Only the disk travels. Under KVM, OVMF starts with a fresh variable store and no boot entries, adds one for the virtio disk, loads the ESP fallback loader BOOTX64.EFI (shim), then GRUB, then the Ubuntu kernel. The VMware .nvram was not required. Secure Boot was off; Secure Boot on is not tested.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m15803d" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#15803d"/></marker><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker></defs>
+  <rect width="1200" height="790" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">The UEFI story</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">Firmware state is separate from the guest disk</text>
+  <rect x="30" y="100" width="330" height="62" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="195.0" y="126.55" class="t" text-anchor="middle" style="font-size:15px">VMware UEFI</text>
+  <text x="195.0" y="145.5" class="s" text-anchor="middle" style="font-size:12.5px">legacy-source-vm on ESXi</text>
+  <path d="M195,164 L195,193" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="30" y="196" width="330" height="70" rx="10" fill="#f1f5f9" stroke="#64748b" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="195.0" y="226.55" class="t" text-anchor="middle" style="font-size:15px">.nvram</text>
+  <text x="195.0" y="245.5" class="s" text-anchor="middle" style="font-size:12.5px">UEFI variables, boot entries</text>
+  <rect x="256" y="186" width="94" height="20" rx="10.0" fill="#475569"/>
+  <text x="303.0" y="199.96" class="pill" text-anchor="middle" style="font-size:11px">NOT CARRIED</text>
+  <text x="195" y="292" class="xs" text-anchor="middle" style="font-weight:600">stays with the VMware VM</text>
+  <rect x="30" y="340" width="330" height="90" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="195.0" y="371.3" class="t" text-anchor="middle" style="font-size:15px">The disk travels</text>
+  <text x="195.0" y="390.25" class="s" text-anchor="middle" style="font-size:12.5px">ESP (shim, GRUB) + ext4 root</text>
+  <text x="195.0" y="408.75" class="s" text-anchor="middle" style="font-size:12.5px">copied cold, then converted</text>
+  <rect x="430" y="100" width="400" height="58" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="630.0" y="124.87" class="t" text-anchor="middle" style="font-size:16px">KVM + OVMF 2024.02</text>
+  <text x="630.0" y="144.0" class="s" text-anchor="middle" style="font-size:12.5px">UEFI firmware for QEMU</text>
+  <rect x="430" y="184" width="400" height="58" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="630.0" y="208.87" class="t" text-anchor="middle" style="font-size:16px">fresh variable store</text>
+  <text x="630.0" y="228.0" class="s" text-anchor="middle" style="font-size:12.5px">new copy of the OVMF template per boot</text>
+  <path d="M630,160 L630,181" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="430" y="268" width="400" height="58" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="630.0" y="292.87" class="t" text-anchor="middle" style="font-size:16px">no boot entries yet</text>
+  <text x="630.0" y="312.0" class="s" text-anchor="middle" style="font-size:12.5px">OVMF adds one for the virtio disk</text>
+  <path d="M630,244 L630,265" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="430" y="352" width="400" height="66" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <text x="630.0" y="380.87" class="t" text-anchor="middle" style="font-size:16px">ESP fallback loader</text>
+  <text x="630.0" y="400.0" class="s" text-anchor="middle" style="font-size:12.5px">\EFI\BOOT\BOOTX64.EFI  (= shim)</text>
+  <path d="M630,328 L630,349" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="430" y="444" width="400" height="50" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="630.0" y="474.12" class="t" text-anchor="middle" style="font-size:16px">GRUB</text>
+  <path d="M630,420 L630,441" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="430" y="520" width="400" height="58" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="630.0" y="544.87" class="t" text-anchor="middle" style="font-size:16px">Ubuntu kernel</text>
+  <text x="630.0" y="564.0" class="s" text-anchor="middle" style="font-size:12.5px">root=UUID=... (unchanged)</text>
+  <path d="M630,496 L630,517" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="430" y="604" width="400" height="52" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="630.0" y="635.12" class="t" text-anchor="middle" style="font-size:16px">Ubuntu 24.04.5 running</text>
+  <path d="M630,580 L630,601" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="698" y="90" width="122" height="20" rx="10.0" fill="#334155"/>
+  <text x="759.0" y="103.96" class="pill" text-anchor="middle" style="font-size:11px">SECURE BOOT OFF</text>
+  <path d="M362,385 L427,385" fill="none" stroke="#15803d" stroke-width="2.2" marker-end="url(#m15803d)"/>
+  <text x="394" y="376" class="xs halo" text-anchor="middle" style="font-weight:600">on the disk</text>
+  <rect x="880" y="100" width="290" height="150" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="1025.0" y="140.76" class="t" text-anchor="middle" style="font-size:18px">The VMware .nvram</text>
+  <text x="1025.0" y="161.48" class="s" text-anchor="middle" style="font-size:14px">was NOT required</text>
+  <text x="1025.0" y="181.48" class="s" text-anchor="middle" style="font-size:14px">for the KVM boot</text>
+  <text x="1025.0" y="201.48" class="s" text-anchor="middle" style="font-size:14px"></text>
+  <text x="1025.0" y="221.48" class="s" text-anchor="middle" style="font-size:14px">OBSERVED in all three 1G boots</text>
+  <rect x="1101" y="90" width="59" height="20" rx="10.0" fill="#15803d"/>
+  <text x="1130.5" y="103.96" class="pill" text-anchor="middle" style="font-size:11px">PROVEN</text>
+  <rect x="880" y="290" width="290" height="100" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="1025.0" y="326.26" class="t" text-anchor="middle" style="font-size:18px">Secure Boot: OFF</text>
+  <text x="1025.0" y="346.57" class="s" text-anchor="middle" style="font-size:13.5px">as on the source VM (1C)</text>
+  <text x="1025.0" y="366.07" class="s" text-anchor="middle" style="font-size:13.5px">a boot with it ON was not run</text>
+  <rect x="1045" y="280" width="115" height="20" rx="10.0" fill="#6d28d9"/>
+  <text x="1102.5" y="293.96" class="pill" text-anchor="middle" style="font-size:11px">ON: NOT TESTED</text>
+  <rect x="880" y="450" width="290" height="130" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <text x="1025.0" y="481.12" class="t" text-anchor="middle" style="font-size:16px">Why it matters</text>
+  <text x="1025.0" y="501.07" class="s" text-anchor="middle" style="font-size:13.5px">firmware state does not</text>
+  <text x="1025.0" y="520.57" class="s" text-anchor="middle" style="font-size:13.5px">travel with the disk;</text>
+  <text x="1025.0" y="540.07" class="s" text-anchor="middle" style="font-size:13.5px">this boot relied on the</text>
+  <text x="1025.0" y="559.57" class="s" text-anchor="middle" style="font-size:13.5px">fallback loader on the ESP</text>
+  <rect x="30" y="690" width="1140" height="60" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="600.0" y="725.12" class="s" text-anchor="middle" style="font-size:16px">Firmware is part of the VM, not the disk: plan it separately from the disk copy.</text>
+</svg>

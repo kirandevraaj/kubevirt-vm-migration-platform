@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="920" viewBox="0 0 1200 920" role="img" aria-labelledby="title desc">
+  <title id="title">Protect the golden artifact</title>
+  <desc id="desc">A shield holds the golden VMDK copy on Windows: SHA256 verified, read-only, recovery baseline, never modified. It is copied once to a protected, immutable working copy on conversion-host-01. qemu-img and virt-v2v each write to a new directory; a disposable remediated copy is made from the virt-v2v output. Boots use throwaway overlays. Disk bytes flow one way.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m15803d" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#15803d"/></marker><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker></defs>
+  <rect width="1200" height="920" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">Protect the golden artifact</text>
+  <path d="M440,92 L760,92 L760,200 Q760,300 600,354 Q440,300 440,200 Z" fill="#dcfce7" stroke="#15803d" stroke-width="3.5"/>
+  <path d="M589.6,124 L589.6,114.9 A10.4,10.4 0 0 1 610.4,114.9 L610.4,124" fill="none" stroke="#15803d" stroke-width="4.55"/>
+  <rect x="583.1" y="124" width="33.800000000000004" height="26.0" rx="3.9000000000000004" fill="#15803d"/>
+  <circle cx="600" cy="135.7" r="3.9000000000000004" fill="#ffffff"/>
+  <text x="600" y="188" class="h2" text-anchor="middle" style="font-size:21px">GOLDEN VMDK COPY</text>
+  <text x="600" y="210" class="xs" text-anchor="middle">descriptor + 40 GiB flat extent</text>
+  <text x="600" y="228" class="xs" text-anchor="middle">C:\VMs\legacy-source-vm\stage-1e\</text>
+  <rect x="538.0" y="244" width="124" height="21" rx="10.5" fill="#15803d"/>
+  <text x="600.0" y="258.82" class="pill" text-anchor="middle" style="font-size:12px">NEVER MODIFIED</text>
+  <rect x="800" y="96" width="370" height="58" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="814" y="120.87" class="t" text-anchor="start" style="font-size:16px">= SHA256 verified</text>
+  <text x="814" y="140.0" class="s" text-anchor="start" style="font-size:12.5px">72ca45c7...c9e7, re-hashed each stage</text>
+  <rect x="800" y="168" width="370" height="58" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="814" y="192.87" class="t" text-anchor="start" style="font-size:16px">= read-only</text>
+  <text x="814" y="212.0" class="s" text-anchor="start" style="font-size:12.5px">Windows read-only attribute (since 1G)</text>
+  <rect x="800" y="240" width="370" height="58" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="814" y="264.87" class="t" text-anchor="start" style="font-size:16px">= recovery baseline</text>
+  <text x="814" y="284.0" class="s" text-anchor="start" style="font-size:12.5px">every experiment can restart from here</text>
+  <rect x="30" y="110" width="370" height="80" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="44" y="136.3" class="t" text-anchor="start" style="font-size:15px">Where it lives</text>
+  <text x="44" y="155.25" class="s" text-anchor="start" style="font-size:12.5px">Windows host, outside Git</text>
+  <text x="44" y="173.75" class="s" text-anchor="start" style="font-size:12.5px">only ever read (hash, copy)</text>
+  <rect x="30" y="214" width="370" height="70" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="44" y="244.55" class="t" text-anchor="start" style="font-size:15px">Made in 1E</text>
+  <text x="44" y="263.5" class="s" text-anchor="start" style="font-size:12.5px">cold copy, same sha256 three times</text>
+  <path d="M600,356 L600,397" fill="none" stroke="#15803d" stroke-width="2.2" marker-end="url(#m15803d)"/>
+  <text x="614" y="382" class="xs halo" text-anchor="start" style="font-weight:600">1F: scp, hash-verified</text>
+  <rect x="380" y="400" width="440" height="88" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="600.0" y="430.3" class="t" text-anchor="middle" style="font-size:15px">PROTECTED WORKING COPY</text>
+  <text x="600.0" y="449.25" class="s" text-anchor="middle" style="font-size:12.5px">/srv/migration-lab/working/ on conversion-host-01</text>
+  <text x="600.0" y="467.75" class="s" text-anchor="middle" style="font-size:12.5px">mode 0444 + chattr +i, hash checked every step</text>
+  <rect x="730" y="390" width="80" height="20" rx="10.0" fill="#15803d"/>
+  <text x="770.0" y="403.96" class="pill" text-anchor="middle" style="font-size:11px">IMMUTABLE</text>
+  <path d="M500,490 L330,557" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="392" y="530" class="xs halo" text-anchor="middle" style="font-weight:600">qemu-img</text>
+  <path d="M700,490 L870,557" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="810" y="530" class="xs halo" text-anchor="middle" style="font-weight:600">virt-v2v</text>
+  <rect x="150" y="560" width="360" height="80" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="330.0" y="595.55" class="t" text-anchor="middle" style="font-size:15px">Path A output (new directory)</text>
+  <text x="330.0" y="614.5" class="s" text-anchor="middle" style="font-size:12.5px">qcow2 - 08c62ac5... - read-only</text>
+  <rect x="690" y="560" width="360" height="80" rx="10" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.8"/>
+  <text x="870.0" y="595.55" class="t" text-anchor="middle" style="font-size:15px">Path B output (new directory)</text>
+  <text x="870.0" y="614.5" class="s" text-anchor="middle" style="font-size:12.5px">qcow2 + XML - 94bc1cd6... - read-only</text>
+  <path d="M870,642 L870,677" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="882" y="664" class="xs halo" text-anchor="start" style="font-weight:600">full copy</text>
+  <rect x="690" y="680" width="360" height="80" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <text x="870.0" y="715.55" class="t" text-anchor="middle" style="font-size:15px">Disposable remediated copy</text>
+  <text x="870.0" y="734.5" class="s" text-anchor="middle" style="font-size:12.5px">netplan fix - 5326b130... - read-only</text>
+  <rect x="150" y="800" width="900" height="64" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="600.0" y="827.55" class="t" text-anchor="middle" style="font-size:15px">Boot tests: throwaway qcow2 overlay + fresh OVMF variables, deleted afterwards</text>
+  <text x="600.0" y="846.5" class="s" text-anchor="middle" style="font-size:12.5px">the outputs themselves never change while a guest runs</text>
+  <path d="M330,642 L330,797" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M870,762 L870,797" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M1052,600 L1085,600 L1085,832 L1053,832" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="600" y="900" class="sub" text-anchor="middle" style="font-weight:600">One-way flow: disk bytes go golden &#8594; working copy &#8594; outputs. Only text evidence flows back.</text>
+</svg>

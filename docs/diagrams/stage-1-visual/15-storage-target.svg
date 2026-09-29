@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
+  <title id="title">Target storage design (ADR 009)</title>
+  <desc id="desc">Golden VMDK and the virt-v2v qcow2 exist. Designed: a new disposable copy with the ADR 010 fix, qcow2 in transit (about 2.7 GiB), CDI upload on the node, a standalone DataVolume, a PVC, a 40 GiB gp3 Block RWO volume, the KubeVirt VM reading it over virtio, raw disk at rest. Stage 1H design only; nothing has been provisioned.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker><marker id="ma16207" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#a16207"/></marker></defs>
+  <rect width="1200" height="700" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">Target storage (ADR 009)</text>
+  <rect x="200" y="70" width="800" height="50" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="600.0" y="100.76" class="t" text-anchor="middle" style="font-size:18px">STAGE 1H DESIGN ONLY - nothing has been provisioned</text>
+  <rect x="40" y="160" width="250" height="100" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="165.0" y="196.12" class="t" text-anchor="middle" style="font-size:16px">golden VMDK</text>
+  <text x="165.0" y="215.66" class="s" text-anchor="middle" style="font-size:13px">read-only, never</text>
+  <text x="165.0" y="234.66" class="s" text-anchor="middle" style="font-size:13px">converted in place</text>
+  <rect x="236" y="150" width="44" height="20" rx="10.0" fill="#15803d"/>
+  <text x="258.0" y="163.96" class="pill" text-anchor="middle" style="font-size:11px">DONE</text>
+  <path d="M292,210 L317,210" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="320" y="160" width="250" height="100" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="445.0" y="196.12" class="t" text-anchor="middle" style="font-size:16px">virt-v2v qcow2 (1G)</text>
+  <text x="445.0" y="215.66" class="s" text-anchor="middle" style="font-size:13px">guest-adapted output</text>
+  <text x="445.0" y="234.66" class="s" text-anchor="middle" style="font-size:13px">(kept, read-only)</text>
+  <rect x="516" y="150" width="44" height="20" rx="10.0" fill="#15803d"/>
+  <text x="538.0" y="163.96" class="pill" text-anchor="middle" style="font-size:11px">DONE</text>
+  <path d="M572,210 L597,210" fill="none" stroke="#a16207" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#ma16207)"/>
+  <rect x="600" y="160" width="250" height="100" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="725.0" y="196.12" class="t" text-anchor="middle" style="font-size:16px">new disposable copy</text>
+  <text x="725.0" y="215.66" class="s" text-anchor="middle" style="font-size:13px">netplan driver + DHCP fix,</text>
+  <text x="725.0" y="234.66" class="s" text-anchor="middle" style="font-size:13px">guest agent offline (ADR 010)</text>
+  <rect x="781" y="150" width="59" height="20" rx="10.0" fill="#a16207"/>
+  <text x="810.5" y="163.96" class="pill" text-anchor="middle" style="font-size:11px">DESIGN</text>
+  <path d="M852,210 L877,210" fill="none" stroke="#a16207" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#ma16207)"/>
+  <rect x="880" y="160" width="250" height="100" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="1005.0" y="196.12" class="t" text-anchor="middle" style="font-size:16px">qcow2 in transit</text>
+  <text x="1005.0" y="215.66" class="s" text-anchor="middle" style="font-size:13px">about 2.7 GiB to move</text>
+  <text x="1005.0" y="234.66" class="s" text-anchor="middle" style="font-size:13px">instead of 40 GiB</text>
+  <rect x="1061" y="150" width="59" height="20" rx="10.0" fill="#a16207"/>
+  <text x="1090.5" y="163.96" class="pill" text-anchor="middle" style="font-size:11px">DESIGN</text>
+  <rect x="40" y="340" width="250" height="100" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="165.0" y="376.12" class="t" text-anchor="middle" style="font-size:16px">CDI upload</text>
+  <text x="165.0" y="395.66" class="s" text-anchor="middle" style="font-size:13px">virtctl image-upload on the</text>
+  <text x="165.0" y="414.66" class="s" text-anchor="middle" style="font-size:13px">node via kubectl port-forward</text>
+  <rect x="221" y="330" width="59" height="20" rx="10.0" fill="#a16207"/>
+  <text x="250.5" y="343.96" class="pill" text-anchor="middle" style="font-size:11px">DESIGN</text>
+  <path d="M292,390 L317,390" fill="none" stroke="#a16207" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#ma16207)"/>
+  <rect x="320" y="340" width="250" height="100" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="445.0" y="376.12" class="t" text-anchor="middle" style="font-size:16px">DataVolume</text>
+  <text x="445.0" y="395.66" class="s" text-anchor="middle" style="font-size:13px">standalone: kept if the</text>
+  <text x="445.0" y="414.66" class="s" text-anchor="middle" style="font-size:13px">VM is deleted</text>
+  <rect x="501" y="330" width="59" height="20" rx="10.0" fill="#a16207"/>
+  <text x="530.5" y="343.96" class="pill" text-anchor="middle" style="font-size:11px">DESIGN</text>
+  <path d="M572,390 L597,390" fill="none" stroke="#a16207" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#ma16207)"/>
+  <rect x="600" y="340" width="250" height="100" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="725.0" y="376.12" class="t" text-anchor="middle" style="font-size:16px">PVC</text>
+  <text x="725.0" y="395.66" class="s" text-anchor="middle" style="font-size:13px">gp3, Block, RWO, 40Gi</text>
+  <text x="725.0" y="414.66" class="s" text-anchor="middle" style="font-size:13px">(never smaller than source)</text>
+  <rect x="781" y="330" width="59" height="20" rx="10.0" fill="#a16207"/>
+  <text x="810.5" y="343.96" class="pill" text-anchor="middle" style="font-size:11px">DESIGN</text>
+  <path d="M852,390 L877,390" fill="none" stroke="#a16207" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#ma16207)"/>
+  <rect x="880" y="340" width="250" height="100" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="1005.0" y="376.12" class="t" text-anchor="middle" style="font-size:16px">40 GiB Block volume</text>
+  <text x="1005.0" y="395.66" class="s" text-anchor="middle" style="font-size:13px">EBS gp3</text>
+  <text x="1005.0" y="414.66" class="s" text-anchor="middle" style="font-size:13px">CDI writes raw onto it</text>
+  <rect x="1061" y="330" width="59" height="20" rx="10.0" fill="#a16207"/>
+  <text x="1090.5" y="343.96" class="pill" text-anchor="middle" style="font-size:11px">DESIGN</text>
+  <path d="M1005,262 L1005,300 L165,300 L165,337" fill="none" stroke="#a16207" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#ma16207)"/>
+  <text x="585" y="292" class="xs halo" text-anchor="middle" style="font-weight:700">route from the laptop to AWS: a Stage 1I detail (DEFERRED)</text>
+  <path d="M1005,442 L1005,517" fill="none" stroke="#a16207" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#ma16207)"/>
+  <rect x="880" y="520" width="250" height="100" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="1005.0" y="556.12" class="t" text-anchor="middle" style="font-size:16px">KubeVirt VM</text>
+  <text x="1005.0" y="575.66" class="s" text-anchor="middle" style="font-size:13px">reads the raw block device</text>
+  <text x="1005.0" y="594.66" class="s" text-anchor="middle" style="font-size:13px">(disk bus virtio)</text>
+  <rect x="1061" y="510" width="59" height="20" rx="10.0" fill="#a16207"/>
+  <text x="1090.5" y="523.96" class="pill" text-anchor="middle" style="font-size:11px">DESIGN</text>
+  <rect x="600" y="520" width="250" height="100" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="725.0" y="556.12" class="t" text-anchor="middle" style="font-size:16px">raw disk at rest</text>
+  <text x="725.0" y="575.66" class="s" text-anchor="middle" style="font-size:13px">CDI converts qcow2 to raw</text>
+  <text x="725.0" y="594.66" class="s" text-anchor="middle" style="font-size:13px">on the Block PVC</text>
+  <path d="M852,570 L877,570" fill="none" stroke="#a16207" stroke-width="2.2" stroke-dasharray="2 5" stroke-linecap="round"/>
+  <rect x="40" y="520" width="250" height="100" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="165.0" y="555.8" class="t" text-anchor="middle" style="font-size:15px">scratch space</text>
+  <text x="165.0" y="575.16" class="s" text-anchor="middle" style="font-size:13px">Filesystem RWO, temporary</text>
+  <text x="165.0" y="594.16" class="s" text-anchor="middle" style="font-size:13px">(about 2x disk during import)</text>
+  <rect x="320" y="520" width="250" height="100" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="445.0" y="555.8" class="t" text-anchor="middle" style="font-size:15px">RWO storage</text>
+  <text x="445.0" y="575.16" class="s" text-anchor="middle" style="font-size:13px">not live-migratable:</text>
+  <text x="445.0" y="594.16" class="s" text-anchor="middle" style="font-size:13px">accepted for a cold migration</text>
+  <text x="600" y="668" class="sub" text-anchor="middle" style="font-weight:600">Why qcow2 in transit: it moves only allocated data, and CDI converts it to raw anyway.</text>
+</svg>

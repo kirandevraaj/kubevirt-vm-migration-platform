@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="770" viewBox="0 0 1200 770" role="img" aria-labelledby="title desc">
+  <title id="title">What changed from VMware to KVM and KubeVirt</title>
+  <desc id="desc">Nine cards compare VMware with KVM/KubeVirt: manager, CPU virtualization, VM process, disk, NIC, firmware, network, VM definition and storage management, each marked proven in 1G or design in 1H. Unchanged, observed in 1G: Ubuntu, kernel command line, filesystem and partition UUIDs, machine-id, SSH host keys, nginx.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker></defs>
+  <rect width="1200" height="770" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">What changed?</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">VMware  &#8594;  KVM / KubeVirt</text>
+  <rect x="30" y="96" width="370" height="150" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.6"/>
+  <text x="46" y="124" class="h2" text-anchor="start" style="font-size:16px">Manager</text>
+  <rect x="44" y="138" width="150" height="62" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="119.0" y="164.64" class="t" text-anchor="middle" style="font-size:14.5px">ESXi</text>
+  <text x="119.0" y="183.09" class="s" text-anchor="middle" style="font-size:12px">hostd</text>
+  <path d="M198,169 L233,169" fill="none" stroke="#475569" stroke-width="2.6" marker-end="url(#m475569)"/>
+  <rect x="236" y="138" width="150" height="62" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="311.0" y="164.64" class="t" text-anchor="middle" style="font-size:14.5px">Kubernetes</text>
+  <text x="311.0" y="183.09" class="s" text-anchor="middle" style="font-size:12px">+ KubeVirt</text>
+  <rect x="46" y="212" width="94" height="20" rx="10.0" fill="#a16207"/>
+  <text x="93.0" y="225.96" class="pill" text-anchor="middle" style="font-size:11px">DESIGN (1H)</text>
+  <rect x="420" y="96" width="370" height="150" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.6"/>
+  <text x="436" y="124" class="h2" text-anchor="start" style="font-size:16px">CPU virtualization</text>
+  <rect x="434" y="138" width="150" height="62" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="509.0" y="164.64" class="t" text-anchor="middle" style="font-size:14.5px">ESXi VMkernel</text>
+  <text x="509.0" y="183.09" class="s" text-anchor="middle" style="font-size:12px">(VMM)</text>
+  <path d="M588,169 L623,169" fill="none" stroke="#475569" stroke-width="2.6" marker-end="url(#m475569)"/>
+  <rect x="626" y="138" width="150" height="62" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="701.0" y="164.64" class="t" text-anchor="middle" style="font-size:14.5px">KVM</text>
+  <text x="701.0" y="183.09" class="s" text-anchor="middle" style="font-size:12px">/dev/kvm</text>
+  <rect x="436" y="212" width="122" height="20" rx="10.0" fill="#15803d"/>
+  <text x="497.0" y="225.96" class="pill" text-anchor="middle" style="font-size:11px">PROVEN (1B, 1G)</text>
+  <rect x="810" y="96" width="370" height="150" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.6"/>
+  <text x="826" y="124" class="h2" text-anchor="start" style="font-size:16px">VM process</text>
+  <rect x="824" y="138" width="150" height="62" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="899.0" y="173.64" class="t" text-anchor="middle" style="font-size:14.5px">VMX process</text>
+  <path d="M978,169 L1013,169" fill="none" stroke="#475569" stroke-width="2.6" marker-end="url(#m475569)"/>
+  <rect x="1016" y="138" width="150" height="62" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="1091.0" y="164.64" class="t" text-anchor="middle" style="font-size:14.5px">QEMU</text>
+  <text x="1091.0" y="183.09" class="s" text-anchor="middle" style="font-size:12px">(in a Pod: design)</text>
+  <rect x="826" y="212" width="137" height="20" rx="10.0" fill="#15803d"/>
+  <text x="894.5" y="225.96" class="pill" text-anchor="middle" style="font-size:11px">PROVEN (QEMU, 1G)</text>
+  <rect x="30" y="264" width="370" height="150" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.6"/>
+  <text x="46" y="292" class="h2" text-anchor="start" style="font-size:16px">Disk</text>
+  <rect x="44" y="306" width="150" height="62" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="119.0" y="332.64" class="t" text-anchor="middle" style="font-size:14.5px">PVSCSI</text>
+  <text x="119.0" y="351.09" class="s" text-anchor="middle" style="font-size:12px">+ VMDK</text>
+  <path d="M198,337 L233,337" fill="none" stroke="#475569" stroke-width="2.6" marker-end="url(#m475569)"/>
+  <rect x="236" y="306" width="150" height="62" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="311.0" y="332.64" class="t" text-anchor="middle" style="font-size:14.5px">virtio-blk</text>
+  <text x="311.0" y="351.09" class="s" text-anchor="middle" style="font-size:12px">+ PVC</text>
+  <rect x="46" y="380" width="108" height="20" rx="10.0" fill="#15803d"/>
+  <text x="100.0" y="393.96" class="pill" text-anchor="middle" style="font-size:11px">VIRTIO PROVEN</text>
+  <rect x="162" y="380" width="87" height="20" rx="10.0" fill="#a16207"/>
+  <text x="205.5" y="393.96" class="pill" text-anchor="middle" style="font-size:11px">PVC DESIGN</text>
+  <rect x="420" y="264" width="370" height="150" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.6"/>
+  <text x="436" y="292" class="h2" text-anchor="start" style="font-size:16px">NIC</text>
+  <rect x="434" y="306" width="150" height="62" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="509.0" y="332.64" class="t" text-anchor="middle" style="font-size:14.5px">VMXNET3</text>
+  <text x="509.0" y="351.09" class="s" text-anchor="middle" style="font-size:12px">ens192</text>
+  <path d="M588,337 L623,337" fill="none" stroke="#475569" stroke-width="2.6" marker-end="url(#m475569)"/>
+  <rect x="626" y="306" width="150" height="62" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="701.0" y="332.64" class="t" text-anchor="middle" style="font-size:14.5px">virtio-net</text>
+  <text x="701.0" y="351.09" class="s" text-anchor="middle" style="font-size:12px">enp0s3 in 1G</text>
+  <rect x="436" y="380" width="94" height="20" rx="10.0" fill="#15803d"/>
+  <text x="483.0" y="393.96" class="pill" text-anchor="middle" style="font-size:11px">PROVEN (1G)</text>
+  <rect x="810" y="264" width="370" height="150" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.6"/>
+  <text x="826" y="292" class="h2" text-anchor="start" style="font-size:16px">Firmware</text>
+  <rect x="824" y="306" width="150" height="62" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="899.0" y="332.64" class="t" text-anchor="middle" style="font-size:14.5px">VMware UEFI</text>
+  <text x="899.0" y="351.09" class="s" text-anchor="middle" style="font-size:12px">+ .nvram</text>
+  <path d="M978,337 L1013,337" fill="none" stroke="#475569" stroke-width="2.6" marker-end="url(#m475569)"/>
+  <rect x="1016" y="306" width="150" height="62" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="1091.0" y="332.64" class="t" text-anchor="middle" style="font-size:14.5px">OVMF</text>
+  <text x="1091.0" y="351.09" class="s" text-anchor="middle" style="font-size:12px">fresh variables</text>
+  <rect x="826" y="380" width="94" height="20" rx="10.0" fill="#15803d"/>
+  <text x="873.0" y="393.96" class="pill" text-anchor="middle" style="font-size:11px">PROVEN (1G)</text>
+  <rect x="30" y="432" width="370" height="150" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.6"/>
+  <text x="46" y="460" class="h2" text-anchor="start" style="font-size:16px">Network</text>
+  <rect x="44" y="474" width="150" height="62" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="119.0" y="500.64" class="t" text-anchor="middle" style="font-size:14.5px">static</text>
+  <text x="119.0" y="519.09" class="s" text-anchor="middle" style="font-size:12px">192.168.50.31</text>
+  <path d="M198,505 L233,505" fill="none" stroke="#475569" stroke-width="2.6" marker-end="url(#m475569)"/>
+  <rect x="236" y="474" width="150" height="62" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="311.0" y="500.64" class="t" text-anchor="middle" style="font-size:14.5px">masquerade</text>
+  <text x="311.0" y="519.09" class="s" text-anchor="middle" style="font-size:12px">DHCP 10.0.2.2</text>
+  <rect x="46" y="548" width="130" height="20" rx="10.0" fill="#a16207"/>
+  <text x="111.0" y="561.96" class="pill" text-anchor="middle" style="font-size:11px">DESIGN (ADR 008)</text>
+  <rect x="420" y="432" width="370" height="150" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.6"/>
+  <text x="436" y="460" class="h2" text-anchor="start" style="font-size:16px">VM definition</text>
+  <rect x="434" y="474" width="150" height="62" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="509.0" y="509.64" class="t" text-anchor="middle" style="font-size:14.5px">.vmx</text>
+  <path d="M588,505 L623,505" fill="none" stroke="#475569" stroke-width="2.6" marker-end="url(#m475569)"/>
+  <rect x="626" y="474" width="150" height="62" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="701.0" y="500.64" class="t" text-anchor="middle" style="font-size:14.5px">VirtualMachine</text>
+  <text x="701.0" y="519.09" class="s" text-anchor="middle" style="font-size:12px">custom resource</text>
+  <rect x="436" y="548" width="94" height="20" rx="10.0" fill="#a16207"/>
+  <text x="483.0" y="561.96" class="pill" text-anchor="middle" style="font-size:11px">DESIGN (1H)</text>
+  <rect x="810" y="432" width="370" height="150" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.6"/>
+  <text x="826" y="460" class="h2" text-anchor="start" style="font-size:16px">Storage management</text>
+  <rect x="824" y="474" width="150" height="62" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="899.0" y="509.64" class="t" text-anchor="middle" style="font-size:14.5px">VMFS datastore</text>
+  <path d="M978,505 L1013,505" fill="none" stroke="#475569" stroke-width="2.6" marker-end="url(#m475569)"/>
+  <rect x="1016" y="474" width="150" height="62" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="1091.0" y="500.64" class="t" text-anchor="middle" style="font-size:14.5px">PVC via CDI</text>
+  <text x="1091.0" y="519.09" class="s" text-anchor="middle" style="font-size:12px">EBS gp3</text>
+  <rect x="826" y="548" width="130" height="20" rx="10.0" fill="#a16207"/>
+  <text x="891.0" y="561.96" class="pill" text-anchor="middle" style="font-size:11px">DESIGN (ADR 009)</text>
+  <rect x="30" y="612" width="1140" height="120" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="600.0" y="657.08" class="t" text-anchor="middle" style="font-size:19px">UNCHANGED (OBSERVED in 1G)</text>
+  <text x="600.0" y="678.8" class="s" text-anchor="middle" style="font-size:15px">Ubuntu 24.04.5 - kernel command line - filesystem and partition UUIDs</text>
+  <text x="600.0" y="699.8" class="s" text-anchor="middle" style="font-size:15px">machine-id - SSH host keys - nginx config and page</text>
+  <rect x="1101" y="602" width="59" height="20" rx="10.0" fill="#15803d"/>
+  <text x="1130.5" y="615.96" class="pill" text-anchor="middle" style="font-size:11px">PROVEN</text>
+</svg>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="780" viewBox="0 0 1200 780" role="img" aria-labelledby="title desc">
+  <title id="title">Hardware change underneath the same Ubuntu</title>
+  <desc id="desc">Before: on VMware, Ubuntu sees /dev/sda from PVSCSI and ens192 from VMXNET3. After conversion under QEMU/KVM: /dev/vda from virtio-blk and enp0s3 from virtio-net. Filesystem UUIDs still work so the disk mounts. Network config still expects ens192, so it breaks.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker></defs>
+  <rect width="1200" height="780" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">Same Ubuntu, different hardware underneath</text>
+  <rect x="30" y="90" width="520" height="370" rx="16" fill="#eff6ff" stroke="#1d4ed8" stroke-width="2"/>
+  <text x="50" y="116" class="lab" text-anchor="start" style="fill:#1d4ed8">VMWARE (ESXi, 1C)</text>
+  <rect x="180" y="134" width="220" height="50" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="290.0" y="164.12" class="t" text-anchor="middle" style="font-size:16px">Ubuntu 24.04.5</text>
+  <path d="M260,186 L170,237" fill="none" stroke="#475569" stroke-width="2.2"/>
+  <path d="M320,186 L410,237" fill="none" stroke="#475569" stroke-width="2.2"/>
+  <rect x="80" y="240" width="180" height="52" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="170.0" y="262.69" class="t" text-anchor="middle" style="font-size:17px">/dev/sda</text>
+  <text x="170.0" y="281.18" class="s" text-anchor="middle" style="font-size:11.5px">disk device</text>
+  <rect x="320" y="240" width="180" height="52" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="410.0" y="262.69" class="t" text-anchor="middle" style="font-size:17px">ens192</text>
+  <text x="410.0" y="281.18" class="s" text-anchor="middle" style="font-size:11.5px">network interface</text>
+  <rect x="80" y="372" width="180" height="56" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="170.0" y="396.37" class="t" text-anchor="middle" style="font-size:16px">PVSCSI</text>
+  <text x="170.0" y="414.68" class="s" text-anchor="middle" style="font-size:11.5px">disk controller</text>
+  <rect x="320" y="372" width="180" height="56" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="410.0" y="396.37" class="t" text-anchor="middle" style="font-size:16px">VMXNET3</text>
+  <text x="410.0" y="414.68" class="s" text-anchor="middle" style="font-size:11.5px">NIC</text>
+  <path d="M170,370 L170,295" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M410,370 L410,295" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="650" y="90" width="520" height="370" rx="16" fill="#ecfdf5" stroke="#15803d" stroke-width="2"/>
+  <text x="670" y="116" class="lab" text-anchor="start" style="fill:#15803d">MIGRATED (QEMU/KVM, OBSERVED 1G)</text>
+  <rect x="800" y="134" width="220" height="50" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="910.0" y="164.12" class="t" text-anchor="middle" style="font-size:16px">Ubuntu 24.04.5</text>
+  <path d="M880,186 L790,237" fill="none" stroke="#475569" stroke-width="2.2"/>
+  <path d="M940,186 L1030,237" fill="none" stroke="#475569" stroke-width="2.2"/>
+  <rect x="700" y="240" width="180" height="52" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="790.0" y="262.69" class="t" text-anchor="middle" style="font-size:17px">/dev/vda</text>
+  <text x="790.0" y="281.18" class="s" text-anchor="middle" style="font-size:11.5px">disk device</text>
+  <rect x="940" y="240" width="180" height="52" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="1030.0" y="262.69" class="t" text-anchor="middle" style="font-size:17px">enp0s3</text>
+  <text x="1030.0" y="281.18" class="s" text-anchor="middle" style="font-size:11.5px">network interface</text>
+  <rect x="700" y="372" width="180" height="56" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="790.0" y="396.37" class="t" text-anchor="middle" style="font-size:16px">virtio-blk</text>
+  <text x="790.0" y="414.68" class="s" text-anchor="middle" style="font-size:11.5px">disk controller</text>
+  <rect x="940" y="372" width="180" height="56" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="1030.0" y="396.37" class="t" text-anchor="middle" style="font-size:16px">virtio-net</text>
+  <text x="1030.0" y="414.68" class="s" text-anchor="middle" style="font-size:11.5px">NIC</text>
+  <path d="M790,370 L790,295" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M1030,370 L1030,295" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M554,275 L646,275" fill="none" stroke="#475569" stroke-width="4" marker-end="url(#m475569)"/>
+  <text x="600" y="262" class="xs halo" text-anchor="middle" style="font-weight:600">conversion</text>
+  <rect x="30" y="506" width="250" height="84" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="155.0" y="543.87" class="t" text-anchor="middle" style="font-size:16px">Filesystem UUID</text>
+  <text x="155.0" y="563.0" class="s" text-anchor="middle" style="font-size:12.5px">fstab + GRUB find root by UUID</text>
+  <path d="M282,548 L317,548" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="320" y="506" width="250" height="84" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="445.0" y="543.87" class="t" text-anchor="middle" style="font-size:16px">device name does not matter</text>
+  <text x="445.0" y="563.0" class="s" text-anchor="middle" style="font-size:12.5px">sda or vda: same UUID</text>
+  <path d="M572,548 L607,548" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="610" y="506" width="250" height="84" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="735.0" y="545.15" class="t" text-anchor="middle" style="font-size:20px">STILL WORKS</text>
+  <text x="735.0" y="565.0" class="s" text-anchor="middle" style="font-size:12.5px">disk mounts, VM boots</text>
+  <rect x="791" y="496" width="59" height="20" rx="10.0" fill="#15803d"/>
+  <text x="820.5" y="509.96" class="pill" text-anchor="middle" style="font-size:11px">PROVEN</text>
+  <rect x="30" y="626" width="250" height="84" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="155.0" y="663.87" class="t" text-anchor="middle" style="font-size:16px">Network config (netplan)</text>
+  <text x="155.0" y="683.0" class="s" text-anchor="middle" style="font-size:12.5px">match: name ens192</text>
+  <path d="M282,668 L317,668" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="320" y="626" width="250" height="84" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <text x="445.0" y="663.87" class="t" text-anchor="middle" style="font-size:16px">still expects ens192</text>
+  <text x="445.0" y="683.0" class="s" text-anchor="middle" style="font-size:12.5px">but the NIC is now enp0s3</text>
+  <path d="M572,668 L607,668" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="610" y="626" width="250" height="84" rx="10" fill="#fee2e2" stroke="#b91c1c" stroke-width="1.8"/>
+  <text x="735.0" y="665.15" class="t" text-anchor="middle" style="font-size:20px">BREAKS</text>
+  <text x="735.0" y="685.0" class="s" text-anchor="middle" style="font-size:12.5px">NIC unconfigured, no IP</text>
+  <rect x="806" y="616" width="44" height="20" rx="10.0" fill="#b91c1c"/>
+  <text x="828.0" y="629.96" class="pill" text-anchor="middle" style="font-size:11px">RISK</text>
+  <rect x="910" y="506" width="260" height="204" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="1040.0" y="555.8" class="t" text-anchor="middle" style="font-size:15px">Note</text>
+  <text x="1040.0" y="575.16" class="s" text-anchor="middle" style="font-size:13px">enp0s3 is the name seen</text>
+  <text x="1040.0" y="594.16" class="s" text-anchor="middle" style="font-size:13px">under plain QEMU (1G).</text>
+  <text x="1040.0" y="613.16" class="s" text-anchor="middle" style="font-size:13px">The name under KubeVirt:</text>
+  <text x="1040.0" y="632.16" class="s" text-anchor="middle" style="font-size:13px">NOT TESTED.</text>
+  <text x="1040.0" y="651.16" class="s" text-anchor="middle" style="font-size:13px">Fix: match the NIC by</text>
+  <text x="1040.0" y="670.16" class="s" text-anchor="middle" style="font-size:13px">driver, not by name.</text>
+</svg>

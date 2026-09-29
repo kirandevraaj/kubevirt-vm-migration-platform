@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="880" viewBox="0 0 1200 880" role="img" aria-labelledby="title desc">
+  <title id="title">The network failure and the lab proof</title>
+  <desc id="desc">Before, on VMware: VMXNET3, ens192, netplan matches ens192, static 192.168.50.31, nginx reachable. After conversion: virtio-net, enp0s3, netplan still expects ens192, no match, no IP, nginx unreachable from outside. Lab proof on a disposable copy: netplan match by driver virtio_net, static test address 10.0.2.15 on an isolated QEMU network, interface routable, nginx HTTP 200, same page sha256. 192.168.50.31 was never used in the test. Target design ADR 010 uses the driver match with DHCP.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker></defs>
+  <rect width="1200" height="880" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">The network failure, and the lab proof</text>
+  <rect x="30" y="84" width="360" height="58" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="210.0" y="109.51" class="t" text-anchor="middle" style="font-size:18px">BEFORE</text>
+  <text x="210.0" y="129.0" class="s" text-anchor="middle" style="font-size:12.5px">VMware, 1C</text>
+  <rect x="420" y="84" width="360" height="58" rx="10" fill="#fee2e2" stroke="#b91c1c" stroke-width="1.8"/>
+  <text x="600.0" y="109.51" class="t" text-anchor="middle" style="font-size:18px">AFTER CONVERSION</text>
+  <text x="600.0" y="129.0" class="s" text-anchor="middle" style="font-size:12.5px">both paths, 1G</text>
+  <rect x="718" y="74" width="52" height="20" rx="10.0" fill="#b91c1c"/>
+  <text x="744.0" y="87.96" class="pill" text-anchor="middle" style="font-size:11px">FAILS</text>
+  <rect x="810" y="84" width="360" height="58" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="990.0" y="109.51" class="t" text-anchor="middle" style="font-size:18px">LAB PROOF</text>
+  <text x="990.0" y="129.0" class="s" text-anchor="middle" style="font-size:12.5px">disposable copy, 1G</text>
+  <rect x="1080" y="74" width="80" height="20" rx="10.0" fill="#15803d"/>
+  <text x="1120.0" y="87.96" class="pill" text-anchor="middle" style="font-size:11px">LAB PROOF</text>
+  <rect x="50" y="170" width="320" height="58" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="210.0" y="204.12" class="t" text-anchor="middle" style="font-size:16px">VMXNET3</text>
+  <rect x="50" y="254" width="320" height="58" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="210.0" y="288.12" class="t" text-anchor="middle" style="font-size:16px">ens192</text>
+  <path d="M210,230 L210,251" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="50" y="338" width="320" height="58" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="210.0" y="362.87" class="t" text-anchor="middle" style="font-size:16px">netplan match</text>
+  <text x="210.0" y="382.0" class="s" text-anchor="middle" style="font-size:12.5px">name: ens192</text>
+  <path d="M210,314 L210,335" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="50" y="422" width="320" height="58" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="210.0" y="446.87" class="t" text-anchor="middle" style="font-size:16px">192.168.50.31</text>
+  <text x="210.0" y="466.0" class="s" text-anchor="middle" style="font-size:12.5px">static address</text>
+  <path d="M210,398 L210,419" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="50" y="506" width="320" height="58" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="210.0" y="530.87" class="t" text-anchor="middle" style="font-size:16px">nginx reachable</text>
+  <text x="210.0" y="550.0" class="s" text-anchor="middle" style="font-size:12.5px">HTTP 200 from Windows</text>
+  <path d="M210,482 L210,503" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="440" y="170" width="320" height="58" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="600.0" y="204.12" class="t" text-anchor="middle" style="font-size:16px">virtio-net</text>
+  <rect x="440" y="254" width="320" height="58" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="600.0" y="288.12" class="t" text-anchor="middle" style="font-size:16px">enp0s3</text>
+  <path d="M600,230 L600,251" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="440" y="338" width="320" height="58" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <text x="600.0" y="372.12" class="t" text-anchor="middle" style="font-size:16px">netplan still expects ens192</text>
+  <path d="M600,314 L600,335" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="440" y="422" width="320" height="58" rx="10" fill="#fee2e2" stroke="#b91c1c" stroke-width="1.8"/>
+  <text x="600.0" y="456.12" class="t" text-anchor="middle" style="font-size:16px">NO MATCH</text>
+  <path d="M600,398 L600,419" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="440" y="506" width="320" height="58" rx="10" fill="#fee2e2" stroke="#b91c1c" stroke-width="1.8"/>
+  <text x="600.0" y="530.87" class="t" text-anchor="middle" style="font-size:16px">NO IP</text>
+  <text x="600.0" y="550.0" class="s" text-anchor="middle" style="font-size:12.5px">link down, unmanaged</text>
+  <path d="M600,482 L600,503" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="440" y="590" width="320" height="58" rx="10" fill="#fee2e2" stroke="#b91c1c" stroke-width="1.8"/>
+  <text x="600.0" y="614.87" class="t" text-anchor="middle" style="font-size:16px">nginx unreachable externally</text>
+  <text x="600.0" y="634.0" class="s" text-anchor="middle" style="font-size:12.5px">running and healthy inside</text>
+  <path d="M600,566 L600,587" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="830" y="170" width="320" height="58" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="990.0" y="194.87" class="t" text-anchor="middle" style="font-size:16px">netplan match</text>
+  <text x="990.0" y="214.0" class="s" text-anchor="middle" style="font-size:12.5px">driver = virtio_net</text>
+  <rect x="830" y="254" width="320" height="58" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="990.0" y="278.87" class="t" text-anchor="middle" style="font-size:16px">test address 10.0.2.15/24</text>
+  <text x="990.0" y="298.0" class="s" text-anchor="middle" style="font-size:12.5px">static, dhcp4: false</text>
+  <path d="M990,230 L990,251" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="830" y="338" width="320" height="58" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="990.0" y="362.87" class="t" text-anchor="middle" style="font-size:16px">isolated QEMU network</text>
+  <text x="990.0" y="382.0" class="s" text-anchor="middle" style="font-size:12.5px">no DNS: NOT TESTED</text>
+  <path d="M990,314 L990,335" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="830" y="422" width="320" height="58" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="990.0" y="456.12" class="t" text-anchor="middle" style="font-size:16px">enp0s3 UP, routable</text>
+  <path d="M990,398 L990,419" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="830" y="506" width="320" height="58" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="990.0" y="530.87" class="t" text-anchor="middle" style="font-size:16px">nginx HTTP 200</text>
+  <text x="990.0" y="550.0" class="s" text-anchor="middle" style="font-size:12.5px">from outside the guest</text>
+  <path d="M990,482 L990,503" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="830" y="590" width="320" height="58" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="990.0" y="614.87" class="t" text-anchor="middle" style="font-size:16px">same page sha256</text>
+  <text x="990.0" y="634.0" class="s" text-anchor="middle" style="font-size:12.5px">b9826e18...0046</text>
+  <path d="M990,566 L990,587" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M478,439 L502,463 M502,439 L478,463" stroke="#b91c1c" stroke-width="6" stroke-linecap="round"/>
+  <path d="M478,523 L502,547 M502,523 L478,547" stroke="#b91c1c" stroke-width="6" stroke-linecap="round"/>
+  <path d="M871,619 L878.3333333333334,626.7 L893,610.2" fill="none" stroke="#15803d" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="30" y="690" width="1140" height="66" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <text x="600.0" y="718.44" class="t" text-anchor="middle" style="font-size:17px">Do NOT use .31 during the test</text>
+  <text x="600.0" y="738.98" class="s" text-anchor="middle" style="font-size:14px">192.168.50.31 belongs to the live source VM - it was never assigned to any test guest</text>
+  <rect x="30" y="782" width="1140" height="74" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="600.0" y="814.12" class="t" text-anchor="middle" style="font-size:16px">Target design (ADR 010, not yet applied)</text>
+  <text x="600.0" y="834.48" class="s" text-anchor="middle" style="font-size:14px">same driver match, but DHCP (dhcp4: true)  &#8594;  guest gets 10.0.2.2 from KubeVirt masquerade (ADR 008)</text>
+  <rect x="1101" y="772" width="59" height="20" rx="10.0" fill="#a16207"/>
+  <text x="1130.5" y="785.96" class="pill" text-anchor="middle" style="font-size:11px">DESIGN</text>
+</svg>

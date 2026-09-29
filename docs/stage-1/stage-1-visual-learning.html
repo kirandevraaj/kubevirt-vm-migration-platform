@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stage 1 Visual Learning - VM-to-Kubernetes Migration Platform</title>
+<style>
+  :root {
+    --ink: #0f172a; --muted: #475569; --line: #cbd5e1; --bg: #f8fafc;
+    --green: #15803d; --blue: #1d4ed8; --yellow: #a16207; --gray: #475569; --red: #b91c1c; --purple: #6d28d9;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 118px; }
+  body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; color: var(--ink); background: var(--bg); line-height: 1.45; }
+  a { color: var(--blue); }
+
+  header { position: sticky; top: 0; z-index: 20; background: #0f172a; color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,.25); }
+  .bar { max-width: 1320px; margin: 0 auto; padding: 10px 18px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+  .brand { font-weight: 700; font-size: 16px; white-space: nowrap; }
+  .brand small { display: block; font-weight: 400; font-size: 12px; color: #cbd5e1; }
+  nav { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; }
+  nav a, nav button {
+    font: inherit; font-size: 13px; font-weight: 700; letter-spacing: .5px; color: #fff; text-decoration: none;
+    background: #1e293b; border: 1px solid #334155; border-radius: 999px; padding: 5px 12px; cursor: pointer;
+  }
+  nav a:hover, nav button:hover, nav a:focus-visible, nav button:focus-visible { background: #334155; outline: 2px solid #93c5fd; outline-offset: 1px; }
+  nav a.active { background: #1d4ed8; border-color: #1d4ed8; }
+  nav button.st { background: #14532d; border-color: #15803d; }
+  nav button.st.design { background: #713f12; border-color: #a16207; border-style: dashed; }
+  .toggle { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; white-space: nowrap; cursor: pointer; }
+  .toggle input { position: absolute; opacity: 0; }
+  .switch { width: 44px; height: 24px; border-radius: 12px; background: #475569; position: relative; transition: background .2s; }
+  .switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: left .2s; }
+  .toggle input:checked + .switch { background: #15803d; }
+  .toggle input:checked + .switch::after { left: 23px; }
+  .toggle input:focus-visible + .switch { outline: 2px solid #93c5fd; outline-offset: 2px; }
+  .mode { min-width: 64px; }
+
+  main { max-width: 1320px; margin: 0 auto; padding: 18px; }
+  .hero { text-align: center; padding: 26px 10px 10px; }
+  .hero h1 { margin: 0; font-size: clamp(24px, 3.4vw, 40px); }
+  .hero p { margin: 8px 0 0; color: var(--muted); font-size: 17px; }
+  .status { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 16px 0 6px; }
+
+  .tag { display: inline-block; font-size: 11.5px; font-weight: 700; letter-spacing: .6px; color: #fff; border-radius: 999px; padding: 3px 10px; white-space: nowrap; }
+  .tag.done { background: var(--green); }
+  .tag.design { background: var(--yellow); }
+  .tag.future { background: var(--gray); }
+  .tag.risk { background: var(--red); }
+  .tag.nt { background: var(--purple); }
+  .tag.comp { background: var(--blue); }
+  .tag.big { font-size: 13px; padding: 5px 14px; }
+
+  .legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 22px; margin: 14px auto 4px; font-size: 13px; color: var(--muted); }
+  .legend span.k { display: inline-flex; align-items: center; gap: 7px; }
+  .sw { display: inline-block; width: 30px; height: 18px; border-radius: 5px; border: 2px solid; }
+  .sw.done { background: #dcfce7; border-color: var(--green); }
+  .sw.design { background: #fef9c3; border-color: var(--yellow); border-style: dashed; }
+  .sw.future { background: #f1f5f9; border-color: #64748b; border-style: dotted; }
+  .sw.risk { background: #fee2e2; border-color: var(--red); }
+  .sw.comp { background: #dbeafe; border-color: var(--blue); }
+
+  .level { margin: 34px 0 10px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; border-bottom: 3px solid var(--ink); padding-bottom: 8px; }
+  .level .lv { font-size: 13px; font-weight: 800; letter-spacing: 2px; color: #fff; background: var(--ink); border-radius: 6px; padding: 3px 10px; }
+  .level h2 { margin: 0; font-size: clamp(20px, 2.4vw, 28px); }
+  .level .hint { color: var(--muted); font-size: 14px; }
+
+  .fig { background: #fff; border: 1px solid var(--line); border-radius: 16px; margin: 18px 0; padding: 14px 16px 16px; box-shadow: 0 1px 3px rgba(15,23,42,.06); }
+  .fig.key { border: 3px solid var(--yellow); }
+  .fig-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 10px; }
+  .num { font-weight: 800; font-size: 13px; color: #fff; background: #334155; border-radius: 6px; padding: 2px 8px; }
+  .fig-head h3 { margin: 0; font-size: clamp(17px, 1.9vw, 22px); flex: 1; min-width: 200px; }
+  .fig-head .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .fig a.img { display: block; }
+  .fig img { display: block; width: 100%; height: auto; border-radius: 8px; }
+  .fig.wide img { max-width: 1100px; margin: 0 auto; }
+  .fig.tall img { max-width: 900px; margin: 0 auto; }
+  .caption { display: none; margin: 12px 4px 0; padding: 10px 14px; background: #f1f5f9; border-left: 4px solid var(--blue); border-radius: 6px; font-size: 15px; color: #1e293b; }
+  body.learning .caption { display: block; }
+  .caption b { color: var(--ink); }
+
+  .stagebtns { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 4px 0 12px; }
+  .stagebtns button { font: inherit; font-weight: 800; font-size: 18px; width: 64px; height: 48px; border-radius: 12px; cursor: pointer; color: #fff; background: var(--green); border: 2px solid var(--green); }
+  .stagebtns button.design { background: #fef9c3; color: #713f12; border: 2px dashed var(--yellow); }
+  .stagebtns button:hover, .stagebtns button:focus-visible { outline: 3px solid #93c5fd; outline-offset: 2px; }
+  .stagebtns .lbl { width: 100%; text-align: center; font-size: 13px; color: var(--muted); }
+
+  .five { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin: 16px 0 8px; }
+  .card { background: #fff; border: 2px solid var(--ink); border-radius: 16px; padding: 18px 18px 20px; position: relative; min-height: 170px; }
+  .card .n { font-size: 44px; font-weight: 800; line-height: 1; color: var(--blue); }
+  .card p { margin: 10px 0 0; font-size: 19px; font-weight: 700; }
+  .card:nth-child(3) .n { color: var(--red); }
+  .card:nth-child(4) .n { color: var(--purple); }
+  .card:nth-child(5) .n { color: var(--green); }
+
+  .srcs { margin: 34px 0 10px; font-size: 13px; color: var(--muted); }
+  .srcs ul { margin: 6px 0 0; padding-left: 18px; columns: 2 320px; }
+  footer { text-align: center; color: var(--muted); font-size: 12.5px; padding: 18px 10px 40px; }
+
+  #overlay { position: fixed; inset: 0; z-index: 50; background: rgba(15,23,42,.55); display: none; align-items: center; justify-content: center; padding: 16px; }
+  #overlay.open { display: flex; }
+  .panel { background: #fff; border-radius: 18px; width: min(460px, 100%); padding: 20px 22px 18px; box-shadow: 0 20px 50px rgba(0,0,0,.35); border-top: 10px solid var(--green); }
+  .panel.design { border-top: 10px dashed var(--yellow); }
+  .panel .top { display: flex; align-items: center; gap: 12px; }
+  .panel .sn { font-size: 40px; font-weight: 800; line-height: 1; }
+  .panel h4 { margin: 0; font-size: 19px; }
+  .panel dl { margin: 14px 0 6px; display: grid; grid-template-columns: auto 1fr; gap: 8px 12px; }
+  .panel dt { font-size: 12px; font-weight: 800; letter-spacing: 1px; color: var(--muted); padding-top: 3px; }
+  .panel dd { margin: 0; font-size: 15.5px; font-weight: 600; }
+  .panel .acts { display: flex; justify-content: space-between; gap: 10px; margin-top: 14px; }
+  .panel button { font: inherit; font-weight: 700; font-size: 14px; border-radius: 10px; padding: 8px 14px; cursor: pointer; border: 2px solid var(--ink); background: #fff; }
+  .panel button.go { background: var(--ink); color: #fff; }
+
+  @media (max-width: 760px) {
+    html { scroll-padding-top: 110px; }
+    .bar { padding: 8px 10px; gap: 6px 8px; }
+    .toggle { margin-left: auto; }
+    nav { order: 3; flex: 1 1 100%; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; }
+    nav a, nav button { font-size: 12px; padding: 4px 9px; flex: 0 0 auto; }
+    main { padding: 10px; }
+    .fig { padding: 10px; border-radius: 12px; }
+    .card p { font-size: 17px; }
+  }
+  @media print {
+    header, #overlay, .stagebtns { display: none; }
+    .fig { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div class="brand">Stage 1 &#8212; Visual Learning<small>VM-to-Kubernetes Migration Platform</small></div>
+    <nav aria-label="Sections">
+      <a href="#big-picture">BIG PICTURE</a>
+      <a href="#lab">LAB</a>
+      <button class="st" data-stage="1A" type="button">1A</button>
+      <button class="st" data-stage="1B" type="button">1B</button>
+      <button class="st" data-stage="1C" type="button">1C</button>
+      <button class="st" data-stage="1D" type="button">1D</button>
+      <button class="st" data-stage="1E" type="button">1E</button>
+      <button class="st" data-stage="1F" type="button">1F</button>
+      <button class="st" data-stage="1G" type="button">1G</button>
+      <button class="st design" data-stage="1H" type="button">1H</button>
+      <a href="#final-flow">FINAL FLOW</a>
+    </nav>
+    <label class="toggle" title="Show short explanations under each visual">
+      <input type="checkbox" id="learn"><span class="switch"></span><span class="mode" id="modeLabel">VISUAL</span>
+    </label>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <h1>Stage 1 &#8212; From VMware VM to Kubernetes-Managed VM</h1>
+    <p>Look first. Turn on <b>Learning Mode</b> only if you want a short explanation under each picture.</p>
+    <div class="status">
+      <span class="tag done big">1A &#8211; 1G: DONE (PASS)</span>
+      <span class="tag design big">1H: DESIGN ONLY &#8212; awaiting review</span>
+      <span class="tag future big">1I: NOT YET DEFINED</span>
+    </div>
+    <div class="legend" aria-label="Visual language">
+      <span class="k"><span class="sw done"></span>DONE / PROVEN (solid)</span>
+      <span class="k"><span class="sw design"></span>DESIGN (dashed)</span>
+      <span class="k"><span class="sw future"></span>FUTURE (dotted)</span>
+      <span class="k"><span class="sw risk"></span>RISK / FAILURE</span>
+      <span class="k"><span class="sw comp"></span>COMPONENT</span>
+      <span class="k"><span class="tag nt">NOT TESTED</span></span>
+    </div>
+  </div>
+
+  <!-- LEVEL 1 -->
+  <div class="level"><span class="lv">LEVEL 1</span><h2>Understand the story</h2><span class="hint">Stop after this level and you already know what Stage 1 accomplished.</span></div>
+
+  <section class="fig tall" id="big-picture">
+    <div class="fig-head"><span class="num">01</span><h3>The big picture</h3>
+      <span class="tags"><span class="tag done">DONE 1A-1G</span><span class="tag design">DESIGN 1H</span><span class="tag future">FUTURE</span></span></div>
+    <a class="img" href="../diagrams/stage-1-visual/01-big-picture.svg" target="_blank"><img src="../diagrams/stage-1-visual/01-big-picture.svg" alt="Stage 1 big picture: VMware Workstation, ESXi, legacy-source-vm, VMDK, cold acquisition, conversion workbench, qemu-img and virt-v2v, KVM/QEMU, bootable VM, KubeVirt target (design), Kubernetes VM and modernization (future)."></a>
+    <p class="caption">Stage 1 moved step by step from the VMware world into the KVM world, and stopped at the edge of the Kubernetes world. <b>1A to 1G happened in the lab</b>: the disk was copied cold, converted and booted under KVM. <b>1H is a design on paper</b>. Running it on Kubernetes and modernizing it come later. 1B is a side branch that taught the KVM building blocks.</p>
+  </section>
+
+  <section class="fig" id="stage-map">
+    <div class="fig-head"><span class="num">03</span><h3>Stage 1 map: eight steps, one story</h3>
+      <span class="tags"><span class="tag done">DONE</span><span class="tag design">1H DESIGN</span></span></div>
+    <div class="stagebtns" aria-label="Open a stage summary">
+      <span class="lbl">Click a stage for a 20-second summary</span>
+      <button type="button" data-stage="1A">1A</button><button type="button" data-stage="1B">1B</button>
+      <button type="button" data-stage="1C">1C</button><button type="button" data-stage="1D">1D</button>
+      <button type="button" data-stage="1E">1E</button><button type="button" data-stage="1F">1F</button>
+      <button type="button" data-stage="1G">1G</button><button type="button" data-stage="1H" class="design">1H</button>
+    </div>
+    <a class="img" href="../diagrams/stage-1-visual/03-stage-map.svg" target="_blank"><img src="../diagrams/stage-1-visual/03-stage-map.svg" alt="Eight cards 1A to 1H, each with WHY, WHAT, PROVED and NEXT."></a>
+    <p class="caption">Each card answers four questions. Every step removes one unknown the next step depends on. It starts with "is the host stable?" and ends with "what should the target look like?".</p>
+  </section>
+
+  <section class="fig" id="three-worlds">
+    <div class="fig-head"><span class="num">02</span><h3>Three worlds: what changes, what stays</h3>
+      <span class="tags"><span class="tag done">VMware + KVM: PROVEN</span><span class="tag design">KUBERNETES: DESIGN</span></span></div>
+    <a class="img" href="../diagrams/stage-1-visual/02-three-worlds.svg" target="_blank"><img src="../diagrams/stage-1-visual/02-three-worlds.svg" alt="Three columns VMware, KVM/QEMU and Kubernetes, all ending in the same Ubuntu plus nginx guest."></a>
+    <p class="caption">The <b>manager</b> changes from ESXi, to KVM plus QEMU, to Kubernetes plus KubeVirt. The virtual hardware changes from VMware devices to VirtIO. The <b>guest does not</b> change: the same Ubuntu and nginx, still a VM.</p>
+  </section>
+
+  <!-- LEVEL 2 -->
+  <div class="level"><span class="lv">LEVEL 2</span><h2>Understand the components</h2><span class="hint">What exists, and what a VM is made of.</span></div>
+
+  <section class="fig" id="lab">
+    <div class="fig-head"><span class="num">04</span><h3>Our actual lab</h3>
+      <span class="tags"><span class="tag comp">DOCUMENTED STATE (README)</span><span class="tag design">AWS: DESIGN ONLY</span></span></div>
+    <a class="img" href="../diagrams/stage-1-visual/04-real-lab.svg" target="_blank"><img src="../diagrams/stage-1-visual/04-real-lab.svg" alt="Windows 11 runs VMware Workstation, which runs nested ESXi with legacy-source-vm, kvm-learning-01 and conversion-host-01; golden artifact on Windows; AWS target design only."></a>
+    <p class="caption">Everything runs on one laptop, three layers deep. There are three VMs with separate jobs: <b>source</b> (legacy-source-vm, running), <b>learning</b> (kvm-learning-01, off) and <b>conversion</b> (conversion-host-01, running). The golden disk copy lives on Windows, outside VMware. The AWS target does not exist yet.</p>
+  </section>
+
+  <section class="fig" id="vm-anatomy">
+    <div class="fig-head"><span class="num">05</span><h3>What is a VM? More than a disk</h3>
+      <span class="tags"><span class="tag comp">COMPONENTS</span><span class="tag risk">RISK: NETPLAN</span></span></div>
+    <a class="img" href="../diagrams/stage-1-visual/05-vm-anatomy.svg" target="_blank"><img src="../diagrams/stage-1-visual/05-vm-anatomy.svg" alt="Generic VM parts mapped to legacy-source-vm on VMware."></a>
+    <p class="caption">A VM has virtual CPU, memory, firmware, NIC, disk and a guest OS. <b>Only the disk bytes are copied.</b> Everything else is re-created on the target, so any guest setting tied to VMware hardware becomes a risk.</p>
+  </section>
+
+  <section class="fig" id="vmdk-anatomy">
+    <div class="fig-head"><span class="num">06</span><h3>VMDK anatomy</h3>
+      <span class="tags"><span class="tag done">OBSERVED 1D</span></span></div>
+    <a class="img" href="../diagrams/stage-1-visual/06-vmdk-anatomy.svg" target="_blank"><img src="../diagrams/stage-1-visual/06-vmdk-anatomy.svg" alt="The .vmx, .nvram and VMDK (descriptor plus flat extent with GPT, EFI partition and ext4 root) and what happens to each."></a>
+    <p class="caption">The .vmx is <b>reference only</b> and the .nvram is <b>not carried</b>. The VMDK is a small text descriptor plus a 40 GiB data file that holds the real guest disk: GPT, an EFI partition and ext4 root. That data file is locked while the VM runs.</p>
+  </section>
+
+  <section class="fig" id="kubevirt-model">
+    <div class="fig-head"><span class="num">13</span><h3>KubeVirt mental model</h3>
+      <span class="tags"><span class="tag design">CONCEPT / DESIGN &#8212; NOT DEPLOYED</span></span></div>
+    <a class="img" href="../diagrams/stage-1-visual/13-kubevirt-mental-model.svg" target="_blank"><img src="../diagrams/stage-1-visual/13-kubevirt-mental-model.svg" alt="VirtualMachine to VMI to virt-launcher Pod to QEMU to KVM to guest, with CDI filling a PVC used as the VM disk."></a>
+    <p class="caption"><b>CDI</b> puts the disk into a PVC (import or upload, stored raw). <b>KubeVirt</b> runs the VM: VirtualMachine, then VMI, then a virt-launcher Pod with QEMU on KVM. The PVC is where one hands over to the other. CDI never runs the VM.</p>
+  </section>
+
+  <!-- LEVEL 3 -->
+  <div class="level"><span class="lv">LEVEL 3</span><h2>Understand what actually changed</h2><span class="hint">The mechanics behind each lesson.</span></div>
+
+  <section class="fig" id="cold-copy">
+    <div class="fig-head"><span class="num">07</span><h3>Why a cold copy?</h3>
+      <span class="tags"><span class="tag done">OBSERVED 1D + 1E</span></span></div>
+    <a class="img" href="../diagrams/stage-1-visual/07-cold-copy.svg" target="_blank"><img src="../diagrams/stage-1-visual/07-cold-copy.svg" alt="Running VM locks its disk; cold copy sequence with three matching SHA256 hashes; 10.5 minutes downtime, 40 GiB, 148 MiB/s."></a>
+    <p class="caption">While the VM runs, its disk cannot even be read, and snapshots are not allowed. So: shut down, copy, and hash three times. Matching hashes prove the copy is exact and the source was not touched. The numbers are <b>lab observations, not benchmarks</b>.</p>
+  </section>
+
+  <section class="fig" id="golden">
+    <div class="fig-head"><span class="num">08</span><h3>Protect the golden artifact</h3>
+      <span class="tags"><span class="tag done">OBSERVED 1E-1G</span></span></div>
+    <a class="img" href="../diagrams/stage-1-visual/08-golden-artifact.svg" target="_blank"><img src="../diagrams/stage-1-visual/08-golden-artifact.svg" alt="Golden VMDK shield, protected working copy, two conversion outputs, a disposable remediated copy and throwaway boot overlays."></a>
+    <p class="caption">The golden copy is never touched. One immutable working copy feeds both conversions, and each conversion writes to a new directory. Fixes go onto a separate disposable copy. Boot tests run on throwaway overlays, and disk bytes only ever flow one way.</p>
+  </section>
+
+  <section class="fig key" id="qemu-vs-v2v">
+    <div class="fig-head"><span class="num">09</span><h3>qemu-img vs virt-v2v</h3>
+      <span class="tags"><span class="tag design">MOST IMPORTANT</span><span class="tag done">OBSERVED 1G</span></span></div>
+    <a class="img" href="../diagrams/stage-1-visual/09-qemu-vs-virtv2v.svg" target="_blank"><img src="../diagrams/stage-1-visual/09-qemu-vs-virtv2v.svg" alt="Path A qemu-img changes only the container; Path B virt-v2v changes the guest; both boot on KVM, neither has network."></a>
+    <p class="caption"><b>qemu-img</b> only repackaged the disk: the guest bytes are identical. <b>virt-v2v</b> changed the guest: it removed VMware Tools, rebuilt the initramfs, added a first-boot job and wrote libvirt XML. Both booted under KVM. Neither fixed netplan, so neither had a network.</p>
+  </section>
+
+  <section class="fig" id="hardware-change">
+    <div class="fig-head"><span class="num">10</span><h3>The hardware change</h3>
+      <span class="tags"><span class="tag done">OBSERVED 1G</span><span class="tag risk">RISK</span></span></div>
+    <a class="img" href="../diagrams/stage-1-visual/10-hardware-change.svg" target="_blank"><img src="../diagrams/stage-1-visual/10-hardware-change.svg" alt="PVSCSI/sda and VMXNET3/ens192 become virtio-blk/vda and virtio-net/enp0s3; UUIDs still work, netplan breaks."></a>
+    <p class="caption">The disk moves from sda to vda, but mounts use UUIDs, so it <b>still works</b>. The NIC moves from ens192 to enp0s3, but netplan still asks for ens192, so it <b>breaks</b>. The interface name under KubeVirt is not tested yet.</p>
+  </section>
+
+  <section class="fig" id="network-failure">
+    <div class="fig-head"><span class="num">11</span><h3>The network failure and the lab proof</h3>
+      <span class="tags"><span class="tag risk">FAILURE</span><span class="tag done">LAB PROOF</span><span class="tag design">ADR 010 DESIGN</span></span></div>
+    <a class="img" href="../diagrams/stage-1-visual/11-network-failure.svg" target="_blank"><img src="../diagrams/stage-1-visual/11-network-failure.svg" alt="Before, after conversion, and lab proof network chains; do not use .31; target design uses DHCP."></a>
+    <p class="caption">After conversion the guest is healthy but unreachable. On a disposable copy, matching the NIC <b>by driver</b> (<code>virtio_net</code>) fixed it. The lab test used a <b>static</b> test address, 10.0.2.15, on an isolated network, and got HTTP 200 with the same page hash. DHCP is the target design (ADR 010), not what the lab test used.</p>
+  </section>
+
+  <section class="fig" id="uefi">
+    <div class="fig-head"><span class="num">12</span><h3>The UEFI story</h3>
+      <span class="tags"><span class="tag done">OBSERVED 1G</span><span class="tag nt">SECURE BOOT ON: NOT TESTED</span></span></div>
+    <a class="img" href="../diagrams/stage-1-visual/12-uefi-story.svg" target="_blank"><img src="../diagrams/stage-1-visual/12-uefi-story.svg" alt="VMware .nvram not carried; OVMF fresh variable store, fallback loader BOOTX64.EFI (shim), GRUB, Ubuntu."></a>
+    <p class="caption">Firmware settings live in the VM, not on the disk. With a fresh, empty variable store, OVMF found the disk's fallback loader (<code>BOOTX64.EFI</code>, which is shim), then GRUB, then Ubuntu. <b>The VMware .nvram was not needed.</b> Secure Boot was off throughout.</p>
+  </section>
+
+  <section class="fig" id="network-target">
+    <div class="fig-head"><span class="num">14</span><h3>Target network</h3>
+      <span class="tags"><span class="tag design">DESIGN (ADR 008)</span></span></div>
+    <a class="img" href="../diagrams/stage-1-visual/14-network-target.svg" target="_blank"><img src="../diagrams/stage-1-visual/14-network-target.svg" alt="Masquerade on the pod network, guest 10.0.2.2, NodePort 30080 path to nginx; 192.168.50.31 not preserved."></a>
+    <p class="caption">In KubeVirt the guest sits behind its Pod (masquerade) and gets 10.0.2.2 by DHCP. Clients reach it through a NodePort Service. The old address 192.168.50.31 does <b>not</b> follow it; the proof of success is the same page content.</p>
+  </section>
+
+  <section class="fig" id="storage-target">
+    <div class="fig-head"><span class="num">15</span><h3>Target storage</h3>
+      <span class="tags"><span class="tag design">DESIGN (ADR 009) &#8212; NOTHING PROVISIONED</span></span></div>
+    <a class="img" href="../diagrams/stage-1-visual/15-storage-target.svg" target="_blank"><img src="../diagrams/stage-1-visual/15-storage-target.svg" alt="VMDK to qcow2 in transit to CDI upload, DataVolume, PVC, 40 GiB Block volume, KubeVirt VM; raw at rest. Design only."></a>
+    <p class="caption">The design moves the prepared qcow2 (about 2.7 GiB) to the node, uploads it through CDI, and stores it <b>raw</b> on a 40 GiB gp3 Block PVC. Only the golden VMDK and the 1G virt-v2v output exist today. Everything else is design.</p>
+  </section>
+
+  <section class="fig" id="what-changed">
+    <div class="fig-head"><span class="num">17</span><h3>What changed?</h3>
+      <span class="tags"><span class="tag done">PROVEN 1G</span><span class="tag design">DESIGN 1H</span></span></div>
+    <a class="img" href="../diagrams/stage-1-visual/17-what-changed.svg" target="_blank"><img src="../diagrams/stage-1-visual/17-what-changed.svg" alt="Nine before and after cards from VMware to KVM/KubeVirt, each marked proven or design, plus what stayed unchanged."></a>
+    <p class="caption">The hypervisor, VM process, devices and firmware changes were <b>proven under QEMU/KVM in 1G</b>. The manager, network, VM definition and storage changes are <b>design only</b>. The guest's identity and content stayed the same.</p>
+  </section>
+
+  <section class="fig" id="migration-vs-modernization">
+    <div class="fig-head"><span class="num">18</span><h3>Migration vs modernization</h3>
+      <span class="tags"><span class="tag comp">MIGRATION: STAGE 1 PATH</span><span class="tag future">MODERNIZATION: FUTURE</span></span></div>
+    <a class="img" href="../diagrams/stage-1-visual/18-migration-vs-modernization.svg" target="_blank"><img src="../diagrams/stage-1-visual/18-migration-vs-modernization.svg" alt="Migration keeps the VM with the same Ubuntu and nginx; modernization extracts nginx into a container, Deployment and Service."></a>
+    <p class="caption">Migration keeps the whole VM and changes only its manager. Modernization takes the application out of the VM and runs it as containers. Stage 1 worked only on the migration path; modernization is a later, separate step.</p>
+  </section>
+
+  <!-- FINAL -->
+  <div class="level"><span class="lv">FINAL FLOW</span><h2>The whole pipeline in 30 seconds</h2></div>
+
+  <section class="fig tall" id="final-flow">
+    <div class="fig-head"><span class="num">16</span><h3>Final full pipeline</h3>
+      <span class="tags"><span class="tag done">DONE</span><span class="tag design">DESIGNED</span><span class="tag future">FUTURE</span></span></div>
+    <a class="img" href="../diagrams/stage-1-visual/16-final-pipeline.svg" target="_blank"><img src="../diagrams/stage-1-visual/16-final-pipeline.svg" alt="Done band from VMware to bootable VM, designed band with KubeVirt, CDI, PVC, virt-launcher, QEMU, KVM and VM, future band native application."></a>
+    <p class="caption">Green is what the lab proved. Yellow is what Stage 1H designed; nothing is built. Grey is future work. The next stage (1I) is not yet defined.</p>
+  </section>
+
+  <div class="level"><span class="lv">REMEMBER</span><h2>5 things to remember</h2></div>
+  <div class="five">
+    <div class="card"><div class="n">1</div><p>A VM is more than its disk.</p></div>
+    <div class="card"><div class="n">2</div><p>KVM is the kernel virtualization engine; QEMU creates the VM.</p></div>
+    <div class="card"><div class="n">3</div><p>Changing VMware hardware to VirtIO can break guest configuration.</p></div>
+    <div class="card"><div class="n">4</div><p>qemu-img changes the disk container; virt-v2v can change the guest.</p></div>
+    <div class="card"><div class="n">5</div><p>KubeVirt puts the VM lifecycle under Kubernetes.</p></div>
+  </div>
+
+  <div class="srcs">
+    <b>Source of truth</b> (this page adds no facts; the records win):
+    <ul>
+      <li><a href="README.md">Stage 1 README</a> (current status)</li>
+      <li><a href="stage-1a-esxi-reboot-validation.md">1A ESXi reboot validation</a></li>
+      <li><a href="stage-1b-kvm-qemu-fundamentals.md">1B KVM / QEMU fundamentals</a></li>
+      <li><a href="stage-1c-migration-source.md">1C migration source</a></li>
+      <li><a href="stage-1d-vmware-source-artifacts.md">1D source artifacts</a></li>
+      <li><a href="stage-1e-cold-acquisition.md">1E cold acquisition</a></li>
+      <li><a href="stage-1f-conversion-host.md">1F conversion host</a></li>
+      <li><a href="stage-1g-controlled-conversion.md">1G controlled conversion</a></li>
+      <li><a href="stage-1h-kubevirt-target-feasibility.md">1H KubeVirt target feasibility</a></li>
+      <li><a href="../adr/006-dedicated-conversion-host.md">ADR 006</a>, <a href="../adr/007-kubevirt-target-platform.md">ADR 007</a>, <a href="../adr/008-kubevirt-network-model.md">ADR 008</a>, <a href="../adr/009-kubevirt-storage-model.md">ADR 009</a>, <a href="../adr/010-migration-network-remediation.md">ADR 010</a></li>
+    </ul>
+  </div>
+</main>
+<footer>Self-contained page: no network access, no external scripts, styles or fonts. Diagrams: <code>docs/diagrams/stage-1-visual/</code>.</footer>
+
+<div id="overlay" role="dialog" aria-modal="true" aria-labelledby="ovTitle">
+  <div class="panel" id="panel">
+    <div class="top"><span class="sn" id="ovNum"></span><div><h4 id="ovTitle"></h4><span class="tag" id="ovTag"></span></div></div>
+    <dl id="ovBody"></dl>
+    <div class="acts"><button type="button" class="go" id="ovGo">Show the visual</button><button type="button" id="ovClose">Close</button></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var STAGES = {
+    '1A': { t: 'ESXi reboot validation', s: 'done', go: '#lab', rows: [
+      ['WHY', 'Prove ESXi survives a reboot.'],
+      ['LEARN', 'Readiness &#8800; ping: check SSH, HTTPS and a real login.'],
+      ['ALSO', 'Maintenance mode survives a reboot; NTP needs a few minutes.']] },
+    '1B': { t: 'KVM / QEMU / libvirt', s: 'done', go: '#three-worlds', rows: [
+      ['KVM', 'kernel virtualization (/dev/kvm)'],
+      ['QEMU', 'the VM / device process'],
+      ['libvirt', 'management (domain XML, virsh)'],
+      ['LEARN', 'Nested KVM is accelerated but slow on VM exits. VirtIO appears only under KVM.']] },
+    '1C': { t: 'Migration source', s: 'done', go: '#vm-anatomy', rows: [
+      ['WHY', 'Create a real migration subject.'],
+      ['WHAT', 'legacy-source-vm: Ubuntu 24.04.5 + nginx, PVSCSI, VMXNET3, UEFI, 192.168.50.31.'],
+      ['RISK', 'netplan matches the NIC by the name ens192.']] },
+    '1D': { t: 'Source artifacts', s: 'done', go: '#vmdk-anatomy', rows: [
+      ['WHY', 'Understand the VM artifacts.'],
+      ['LEARN', '.vmx = config, .nvram = firmware state, VMDK = descriptor + flat extent. Only the disk travels.'],
+      ['KEY', 'The disk is locked while the VM runs, so the copy must be cold.']] },
+    '1E': { t: 'Cold acquisition', s: 'done', go: '#cold-copy', rows: [
+      ['WHY', 'Create the golden copy.'],
+      ['WHAT', 'Graceful shutdown, scp (276 s), the same SHA256 three times.'],
+      ['SEEN', 'About 10.5 min downtime (lab observation).']] },
+    '1F': { t: 'Conversion workbench', s: 'done', go: '#golden', rows: [
+      ['WHY', 'Build the conversion workbench.'],
+      ['WHAT', 'conversion-host-01 with qemu-img, libguestfs, virt-v2v; immutable working copy.'],
+      ['PROVED', 'Read-only inspection matches the baseline. Nothing converted.']] },
+    '1G': { t: 'Controlled conversion', s: 'done', go: '#qemu-vs-v2v', rows: [
+      ['WHY', 'Convert + boot + discover the network problem.'],
+      ['PROVED', 'Both paths boot on QEMU/KVM with UEFI + VirtIO. NIC enp0s3 vs netplan ens192: no network.'],
+      ['FIX', 'netplan match by driver virtio_net on a disposable copy: HTTP 200, same page hash.']] },
+    '1H': { t: 'KubeVirt target (design)', s: 'design', go: '#kubevirt-model', rows: [
+      ['WHY', 'Design the Kubernetes/KubeVirt destination.'],
+      ['DECIDED', 'kubeadm single node on EC2 (nested virt), KubeVirt v1.9.0, CDI v1.66.1 (candidate), masquerade, CDI upload to a gp3 Block PVC.'],
+      ['STATUS', 'DESIGN ONLY: nothing provisioned. AWS credentials BLOCKED.']] }
+  };
+
+  var ov = document.getElementById('overlay'), panel = document.getElementById('panel');
+  var lastFocus = null, current = null;
+
+  function openStage(id) {
+    var d = STAGES[id]; if (!d) return;
+    current = d; lastFocus = document.activeElement;
+    document.getElementById('ovNum').textContent = id;
+    document.getElementById('ovNum').style.color = d.s === 'design' ? '#a16207' : '#15803d';
+    document.getElementById('ovTitle').textContent = d.t;
+    var tag = document.getElementById('ovTag');
+    tag.className = 'tag ' + (d.s === 'design' ? 'design' : 'done');
+    tag.textContent = d.s === 'design' ? 'DESIGN ONLY' : 'DONE (PASS)';
+    panel.className = 'panel' + (d.s === 'design' ? ' design' : '');
+    var html = '';
+    for (var i = 0; i < d.rows.length; i++) { html += '<dt>' + d.rows[i][0] + '</dt><dd>' + d.rows[i][1] + '</dd>'; }
+    document.getElementById('ovBody').innerHTML = html;
+    ov.classList.add('open');
+    document.getElementById('ovGo').focus();
+  }
+  function closeStage() {
+    ov.classList.remove('open');
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+
+  var btns = document.querySelectorAll('[data-stage]');
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].addEventListener('click', function () { openStage(this.getAttribute('data-stage')); });
+  }
+  document.getElementById('ovClose').addEventListener('click', closeStage);
+  document.getElementById('ovGo').addEventListener('click', function () {
+    var target = current && document.querySelector(current.go);
+    closeStage();
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+  ov.addEventListener('click', function (e) { if (e.target === ov) closeStage(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && ov.classList.contains('open')) closeStage(); });
+
+  var learn = document.getElementById('learn'), label = document.getElementById('modeLabel');
+  function setMode(on) {
+    document.body.classList.toggle('learning', on);
+    label.textContent = on ? 'LEARNING' : 'VISUAL';
+    learn.checked = on;
+    try { localStorage.setItem('stage1-learning-mode', on ? '1' : '0'); } catch (err) {}
+  }
+  var saved = null;
+  try { saved = localStorage.getItem('stage1-learning-mode'); } catch (err) {}
+  setMode(saved === '1');
+  learn.addEventListener('change', function () { setMode(learn.checked); });
+
+  var navLinks = document.querySelectorAll('nav a[href^="#"]');
+  var NAV_FOR = {
+    'big-picture': 'big-picture', 'stage-map': 'big-picture', 'three-worlds': 'big-picture',
+    'lab': 'lab', 'vm-anatomy': 'lab', 'vmdk-anatomy': 'lab', 'kubevirt-model': 'lab',
+    'final-flow': 'final-flow'
+  };
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        var target = NAV_FOR[en.target.id] || '';
+        for (var j = 0; j < navLinks.length; j++) {
+          navLinks[j].classList.toggle('active', navLinks[j].getAttribute('href') === '#' + target);
+        }
+      });
+    }, { rootMargin: '-40% 0px -55% 0px' });
+    var figs = document.querySelectorAll('section.fig');
+    for (var k = 0; k < figs.length; k++) io.observe(figs[k]);
+  }
+})();
+</script>
+</body>
+</html>

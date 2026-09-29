@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="830" viewBox="0 0 1200 830" role="img" aria-labelledby="title desc">
+  <title id="title">VMDK anatomy of legacy-source-vm</title>
+  <desc id="desc">Left: the datastore folder holds the .vmx (VM metadata), the .nvram (firmware state) and the VMDK (disk artifact): a 541-byte descriptor plus a 40 GiB flat extent containing the guest disk sectors: GPT, EFI system partition and ext4 root. Right: what happens to each in a migration: .vmx is reference only, .nvram is not carried, the VMDK bytes are copied cold, the extent is locked while the VM runs.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker></defs>
+  <rect width="1200" height="830" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">Inside legacy-source-vm's folder on the datastore</text>
+  <rect x="30" y="84" width="580" height="720" rx="16" fill="#f8fafc" stroke="#334155" stroke-width="2"/>
+  <text x="50" y="112" class="t" text-anchor="start" style="font-size:15px">[migration-datastore] legacy-source-vm/</text>
+  <rect x="55" y="136" width="530" height="64" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="320.0" y="163.55" class="t" text-anchor="middle" style="font-size:15px">.vmx</text>
+  <text x="320.0" y="182.5" class="s" text-anchor="middle" style="font-size:12.5px">VM configuration: vCPU, RAM, PVSCSI, VMXNET3, UEFI</text>
+  <rect x="481" y="126" width="94" height="20" rx="10.0" fill="#1d4ed8"/>
+  <text x="528.0" y="139.96" class="pill" text-anchor="middle" style="font-size:11px">VM METADATA</text>
+  <rect x="55" y="222" width="530" height="60" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="320.0" y="247.55" class="t" text-anchor="middle" style="font-size:15px">.nvram</text>
+  <text x="320.0" y="266.5" class="s" text-anchor="middle" style="font-size:12.5px">UEFI variables (boot entries)</text>
+  <rect x="460" y="212" width="115" height="20" rx="10.0" fill="#1d4ed8"/>
+  <text x="517.5" y="225.96" class="pill" text-anchor="middle" style="font-size:11px">FIRMWARE STATE</text>
+  <rect x="55" y="304" width="530" height="480" rx="12" fill="#fffbeb" stroke="#b45309" stroke-width="2"/>
+  <rect x="467" y="294" width="108" height="20" rx="10.0" fill="#b45309"/>
+  <text x="521.0" y="307.96" class="pill" text-anchor="middle" style="font-size:11px">DISK ARTIFACT</text>
+  <text x="75" y="332" class="t" text-anchor="start" style="font-size:15px">VMDK (vmfs type, no snapshot chain)</text>
+  <rect x="75" y="348" width="490" height="56" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="320.0" y="371.23" class="t" text-anchor="middle" style="font-size:14px">descriptor: legacy-source-vm.vmdk</text>
+  <text x="320.0" y="390.0" class="s" text-anchor="middle" style="font-size:12.5px">541-byte text file: geometry + pointer to the extent</text>
+  <rect x="75" y="420" width="490" height="348" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="320" y="446" class="t" text-anchor="middle" style="font-size:14px">flat extent: legacy-source-vm-flat.vmdk</text>
+  <text x="320" y="466" class="s" text-anchor="middle" style="font-size:12.5px">40 GiB logical, 3,487 MiB allocated (thin)</text>
+  <rect x="95" y="484" width="450" height="268" rx="10" fill="#ecfdf5" stroke="#15803d" stroke-width="1.6"/>
+  <rect x="448" y="474" width="87" height="20" rx="10.0" fill="#15803d"/>
+  <text x="491.5" y="487.96" class="pill" text-anchor="middle" style="font-size:11px">GUEST DATA</text>
+  <text x="320" y="506" class="t" text-anchor="middle" style="font-size:13px">guest disk sectors</text>
+  <rect x="115" y="518" width="410" height="36" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="320.0" y="540.16" class="t" text-anchor="middle" style="font-size:13px">GPT partition table</text>
+  <rect x="115" y="564" width="410" height="56" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="320.0" y="587.16" class="t" text-anchor="middle" style="font-size:13px">partition 1: EFI System Partition</text>
+  <text x="320.0" y="605.34" class="s" text-anchor="middle" style="font-size:12px">vfat, /boot/efi - shim (BOOTX64.EFI) + GRUB</text>
+  <rect x="115" y="630" width="410" height="108" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="320.0" y="661.16" class="t" text-anchor="middle" style="font-size:13px">partition 2: ext4 root  /</text>
+  <text x="320.0" y="679.34" class="s" text-anchor="middle" style="font-size:12px">Ubuntu 24.04.5, kernel, /swap.img</text>
+  <text x="320.0" y="697.34" class="s" text-anchor="middle" style="font-size:12px">netplan, nginx, site content</text>
+  <text x="320.0" y="715.34" class="s" text-anchor="middle" style="font-size:12px">mounted by filesystem UUID</text>
+  <rect x="690" y="136" width="480" height="64" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <text x="930.0" y="162.57" class="s" text-anchor="middle" style="font-size:13.5px">translated into a new VM definition;</text>
+  <text x="930.0" y="182.07" class="s" text-anchor="middle" style="font-size:13.5px">not copied as-is</text>
+  <rect x="1045" y="126" width="115" height="20" rx="10.0" fill="#b45309"/>
+  <text x="1102.5" y="139.96" class="pill" text-anchor="middle" style="font-size:11px">REFERENCE ONLY</text>
+  <rect x="690" y="222" width="480" height="60" rx="10" fill="#f1f5f9" stroke="#64748b" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="930.0" y="246.57" class="s" text-anchor="middle" style="font-size:13.5px">the KVM boot used a fresh</text>
+  <text x="930.0" y="266.07" class="s" text-anchor="middle" style="font-size:13.5px">OVMF variable store (1G)</text>
+  <rect x="1066" y="212" width="94" height="20" rx="10.0" fill="#475569"/>
+  <text x="1113.0" y="225.96" class="pill" text-anchor="middle" style="font-size:11px">NOT CARRIED</text>
+  <rect x="690" y="348" width="480" height="72" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="930.0" y="378.57" class="s" text-anchor="middle" style="font-size:13.5px">only the disk bytes travel:</text>
+  <text x="930.0" y="398.07" class="s" text-anchor="middle" style="font-size:13.5px">cold copy (1E), convert (1G)</text>
+  <rect x="1101" y="338" width="59" height="20" rx="10.0" fill="#15803d"/>
+  <text x="1130.5" y="351.96" class="pill" text-anchor="middle" style="font-size:11px">COPIED</text>
+  <rect x="690" y="440" width="480" height="72" rx="10" fill="#fee2e2" stroke="#b91c1c" stroke-width="1.8"/>
+  <text x="930.0" y="470.57" class="s" text-anchor="middle" style="font-size:13.5px">the extent cannot be read while</text>
+  <text x="930.0" y="490.07" class="s" text-anchor="middle" style="font-size:13.5px">the VM runs &#8594; copy it cold</text>
+  <rect x="1002" y="430" width="158" height="20" rx="10.0" fill="#b91c1c"/>
+  <text x="1081.0" y="443.96" class="pill" text-anchor="middle" style="font-size:11px">LOCKED WHILE RUNNING</text>
+  <rect x="690" y="600" width="480" height="90" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="930.0" y="629.82" class="s" text-anchor="middle" style="font-size:13.5px">qemu-img: unchanged (compare = identical)</text>
+  <text x="930.0" y="649.32" class="s" text-anchor="middle" style="font-size:13.5px">virt-v2v: changes some guest files</text>
+  <text x="930.0" y="668.82" class="s" text-anchor="middle" style="font-size:13.5px">(see the qemu-img vs virt-v2v visual)</text>
+  <rect x="1073" y="590" width="87" height="20" rx="10.0" fill="#15803d"/>
+  <text x="1116.5" y="603.96" class="pill" text-anchor="middle" style="font-size:11px">GUEST DATA</text>
+  <path d="M587,168 L687,168" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M587,252 L687,252" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M567,376 L687,384" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M567,470 L687,476" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M547,645 L687,645" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+</svg>

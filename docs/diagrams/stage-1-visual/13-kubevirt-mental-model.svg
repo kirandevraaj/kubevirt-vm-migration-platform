@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="810" viewBox="0 0 1200 810" role="img" aria-labelledby="title desc">
+  <title id="title">KubeVirt mental model</title>
+  <desc id="desc">Main chain: Kubernetes API, VirtualMachine custom resource, KubeVirt controllers, VMI, virt-launcher Pod, QEMU, KVM, VM guest. Beside it, CDI turns a disk image into a DataVolume and a PVC, which the virt-launcher Pod mounts as the VM disk. CDI handles disk import and storage; KubeVirt handles the VM lifecycle; CDI never runs the VM. Concept only; nothing is deployed.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m15803d" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#15803d"/></marker><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker></defs>
+  <rect width="1200" height="810" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">KubeVirt mental model</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">Concept from Stage 0 + Stage 1H design - nothing is deployed</text>
+  <rect x="998" y="84" width="172" height="20" rx="10.0" fill="#a16207"/>
+  <text x="1084.0" y="97.96" class="pill" text-anchor="middle" style="font-size:11px">CONCEPT - NOT DEPLOYED</text>
+  <rect x="490" y="166" width="440" height="444" rx="14" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.6" stroke-dasharray="6 4"/>
+  <text x="506" y="184" class="lab" text-anchor="start" style="fill:#1d4ed8">KUBEVIRT: VM LIFECYCLE</text>
+  <rect x="40" y="248" width="390" height="450" rx="14" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.6" stroke-dasharray="6 4"/>
+  <text x="56" y="272" class="lab" text-anchor="start" style="fill:#b45309">CDI: DISK IMPORT + STORAGE</text>
+  <rect x="520" y="100" width="380" height="56" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="710.0" y="123.87" class="t" text-anchor="middle" style="font-size:16px">Kubernetes API</text>
+  <text x="710.0" y="143.0" class="s" text-anchor="middle" style="font-size:12.5px">kubectl / Git</text>
+  <rect x="520" y="188" width="380" height="56" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="710.0" y="211.87" class="t" text-anchor="middle" style="font-size:16px">VirtualMachine</text>
+  <text x="710.0" y="231.0" class="s" text-anchor="middle" style="font-size:12.5px">custom resource: desired state</text>
+  <path d="M710,158 L710,185" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="520" y="276" width="380" height="56" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="710.0" y="299.87" class="t" text-anchor="middle" style="font-size:16px">KubeVirt controllers</text>
+  <text x="710.0" y="319.0" class="s" text-anchor="middle" style="font-size:12.5px">virt-controller</text>
+  <path d="M710,246 L710,273" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="520" y="364" width="380" height="56" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="710.0" y="387.87" class="t" text-anchor="middle" style="font-size:16px">VMI</text>
+  <text x="710.0" y="407.0" class="s" text-anchor="middle" style="font-size:12.5px">VirtualMachineInstance: one running instance</text>
+  <path d="M710,334 L710,361" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="520" y="452" width="380" height="56" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="710.0" y="475.87" class="t" text-anchor="middle" style="font-size:16px">virt-launcher Pod</text>
+  <text x="710.0" y="495.0" class="s" text-anchor="middle" style="font-size:12.5px">+ virt-handler on the node</text>
+  <path d="M710,422 L710,449" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="520" y="540" width="380" height="56" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="710.0" y="563.87" class="t" text-anchor="middle" style="font-size:16px">QEMU</text>
+  <text x="710.0" y="583.0" class="s" text-anchor="middle" style="font-size:12.5px">with libvirt, inside the Pod</text>
+  <path d="M710,510 L710,537" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="520" y="628" width="380" height="56" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="710.0" y="651.87" class="t" text-anchor="middle" style="font-size:16px">KVM</text>
+  <text x="710.0" y="671.0" class="s" text-anchor="middle" style="font-size:12.5px">/dev/kvm on the node</text>
+  <path d="M710,598 L710,625" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="520" y="716" width="380" height="56" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="710.0" y="739.87" class="t" text-anchor="middle" style="font-size:16px">VM guest</text>
+  <text x="710.0" y="759.0" class="s" text-anchor="middle" style="font-size:12.5px">Ubuntu + nginx</text>
+  <path d="M710,686 L710,713" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="70" y="290" width="330" height="60" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="235.0" y="315.87" class="t" text-anchor="middle" style="font-size:16px">PVC</text>
+  <text x="235.0" y="335.0" class="s" text-anchor="middle" style="font-size:12.5px">40Gi gp3, Block, RWO (ADR 009)</text>
+  <rect x="70" y="400" width="330" height="60" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="235.0" y="425.87" class="t" text-anchor="middle" style="font-size:16px">DataVolume</text>
+  <text x="235.0" y="445.0" class="s" text-anchor="middle" style="font-size:12.5px">CDI object: create + fill a PVC</text>
+  <path d="M235,398 L235,353" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="70" y="510" width="330" height="60" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="235.0" y="535.87" class="t" text-anchor="middle" style="font-size:16px">CDI upload</text>
+  <text x="235.0" y="555.0" class="s" text-anchor="middle" style="font-size:12.5px">converts the image to raw</text>
+  <path d="M235,508 L235,463" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="70" y="620" width="330" height="60" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="235.0" y="645.87" class="t" text-anchor="middle" style="font-size:16px">disk image</text>
+  <text x="235.0" y="665.0" class="s" text-anchor="middle" style="font-size:12.5px">prepared qcow2 (virt-v2v + fix)</text>
+  <path d="M235,618 L235,573" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M402,320 L455,320 L455,480 L517,480" fill="none" stroke="#15803d" stroke-width="2.6" marker-end="url(#m15803d)"/>
+  <text x="461" y="430" class="xs halo" text-anchor="start" style="fill:#15803d;font-weight:700">VM disk</text>
+  <rect x="950" y="188" width="220" height="110" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="1060.0" y="218.87" class="t" text-anchor="middle" style="font-size:16px">CDI</text>
+  <text x="1060.0" y="238.82" class="s" text-anchor="middle" style="font-size:13.5px">ends when the PVC</text>
+  <text x="1060.0" y="258.32" class="s" text-anchor="middle" style="font-size:13.5px">holds a raw</text>
+  <text x="1060.0" y="277.82" class="s" text-anchor="middle" style="font-size:13.5px">bootable disk</text>
+  <rect x="950" y="318" width="220" height="110" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="1060.0" y="348.87" class="t" text-anchor="middle" style="font-size:16px">KubeVirt</text>
+  <text x="1060.0" y="368.82" class="s" text-anchor="middle" style="font-size:13.5px">starts when a</text>
+  <text x="1060.0" y="388.32" class="s" text-anchor="middle" style="font-size:13.5px">VirtualMachine</text>
+  <text x="1060.0" y="407.82" class="s" text-anchor="middle" style="font-size:13.5px">references the PVC</text>
+  <rect x="950" y="448" width="220" height="90" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <text x="1060.0" y="488.37" class="t" text-anchor="middle" style="font-size:16px">CDI never</text>
+  <text x="1060.0" y="508.32" class="s" text-anchor="middle" style="font-size:13.5px">runs the VM</text>
+  <rect x="950" y="560" width="220" height="80" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="1060.0" y="595.37" class="t" text-anchor="middle" style="font-size:16px">The seam</text>
+  <text x="1060.0" y="615.32" class="s" text-anchor="middle" style="font-size:13.5px">is the PVC</text>
+</svg>

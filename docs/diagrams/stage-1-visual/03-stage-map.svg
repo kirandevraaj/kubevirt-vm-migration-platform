@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="940" viewBox="0 0 1200 940" role="img" aria-labelledby="title desc">
+  <title id="title">Stage 1 map: eight sub-stages</title>
+  <desc id="desc">Eight cards, 1A to 1H, each with WHY, WHAT, PROVED and NEXT in one or two short lines. 1A to 1G are done; 1H is design only.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker></defs>
+  <rect width="1200" height="940" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">Stage 1 map: eight steps, one story</text>
+  <rect x="22" y="84" width="276" height="404" rx="14" fill="#ffffff" stroke="#15803d" stroke-width="2.2"/>
+  <path d="M22,98 A14,14 0 0 1 36,84 L284,84 A14,14 0 0 1 298,98 L298,150 L22,150 Z" fill="#15803d"/>
+  <text x="40" y="130" class="h" text-anchor="start" style="font-size:30px;fill:#ffffff">1A</text>
+  <text x="104" y="114" class="t" text-anchor="start" style="font-size:17px;fill:#ffffff">ESXi reboot</text>
+  <text x="104" y="136" class="pill" text-anchor="start" style="font-size:12px">DONE (PASS)</text>
+  <text x="40" y="176" class="lab" text-anchor="start" style="fill:#334155">WHY</text>
+  <text x="40" y="198" class="s" text-anchor="start" style="font-size:14px">Everything runs on one</text>
+  <text x="40" y="217" class="s" text-anchor="start" style="font-size:14px">remote ESXi host</text>
+  <line x1="38" y1="238" x2="282" y2="238" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="40" y="254" class="lab" text-anchor="start" style="fill:#1d4ed8">WHAT</text>
+  <text x="40" y="276" class="s" text-anchor="start" style="font-size:14px">Controlled reboot, then</text>
+  <text x="40" y="295" class="s" text-anchor="start" style="font-size:14px">re-check every setting</text>
+  <line x1="38" y1="316" x2="282" y2="316" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="40" y="332" class="lab" text-anchor="start" style="fill:#15803d">PROVED</text>
+  <text x="40" y="354" class="s" text-anchor="start" style="font-size:14px">Config persists;</text>
+  <text x="40" y="373" class="s" text-anchor="start" style="font-size:14px">readiness is not ping</text>
+  <line x1="38" y1="394" x2="282" y2="394" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="40" y="410" class="lab" text-anchor="start" style="fill:#475569">NEXT</text>
+  <text x="40" y="432" class="s" text-anchor="start" style="font-size:14px">Safe to build VMs on it</text>
+  <path d="M300,117 L315,117" fill="none" stroke="#475569" stroke-width="2.5" marker-end="url(#m475569)"/>
+  <rect x="318" y="84" width="276" height="404" rx="14" fill="#ffffff" stroke="#15803d" stroke-width="2.2"/>
+  <path d="M318,98 A14,14 0 0 1 332,84 L580,84 A14,14 0 0 1 594,98 L594,150 L318,150 Z" fill="#15803d"/>
+  <text x="336" y="130" class="h" text-anchor="start" style="font-size:30px;fill:#ffffff">1B</text>
+  <text x="400" y="114" class="t" text-anchor="start" style="font-size:17px;fill:#ffffff">Learn KVM</text>
+  <text x="400" y="136" class="pill" text-anchor="start" style="font-size:12px">DONE (PASS)</text>
+  <text x="336" y="176" class="lab" text-anchor="start" style="fill:#334155">WHY</text>
+  <text x="336" y="198" class="s" text-anchor="start" style="font-size:14px">KubeVirt runs on KVM,</text>
+  <text x="336" y="217" class="s" text-anchor="start" style="font-size:14px">QEMU and libvirt</text>
+  <line x1="334" y1="238" x2="578" y2="238" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="336" y="254" class="lab" text-anchor="start" style="fill:#1d4ed8">WHAT</text>
+  <text x="336" y="276" class="s" text-anchor="start" style="font-size:14px">kvm-learning-01 +</text>
+  <text x="336" y="295" class="s" text-anchor="start" style="font-size:14px">a tiny nested guest</text>
+  <line x1="334" y1="316" x2="578" y2="316" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="336" y="332" class="lab" text-anchor="start" style="fill:#15803d">PROVED</text>
+  <text x="336" y="354" class="s" text-anchor="start" style="font-size:14px">Nested KVM is accelerated</text>
+  <text x="336" y="373" class="s" text-anchor="start" style="font-size:14px">(slow on VM exits)</text>
+  <line x1="334" y1="394" x2="578" y2="394" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="336" y="410" class="lab" text-anchor="start" style="fill:#475569">NEXT</text>
+  <text x="336" y="432" class="s" text-anchor="start" style="font-size:14px">Build the real source VM</text>
+  <path d="M596,117 L611,117" fill="none" stroke="#475569" stroke-width="2.5" marker-end="url(#m475569)"/>
+  <rect x="614" y="84" width="276" height="404" rx="14" fill="#ffffff" stroke="#15803d" stroke-width="2.2"/>
+  <path d="M614,98 A14,14 0 0 1 628,84 L876,84 A14,14 0 0 1 890,98 L890,150 L614,150 Z" fill="#15803d"/>
+  <text x="632" y="130" class="h" text-anchor="start" style="font-size:30px;fill:#ffffff">1C</text>
+  <text x="696" y="114" class="t" text-anchor="start" style="font-size:17px;fill:#ffffff">Source VM</text>
+  <text x="696" y="136" class="pill" text-anchor="start" style="font-size:12px">DONE (PASS)</text>
+  <text x="632" y="176" class="lab" text-anchor="start" style="fill:#334155">WHY</text>
+  <text x="632" y="198" class="s" text-anchor="start" style="font-size:14px">We need a real VM</text>
+  <text x="632" y="217" class="s" text-anchor="start" style="font-size:14px">to migrate</text>
+  <line x1="630" y1="238" x2="874" y2="238" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="632" y="254" class="lab" text-anchor="start" style="fill:#1d4ed8">WHAT</text>
+  <text x="632" y="276" class="s" text-anchor="start" style="font-size:14px">legacy-source-vm: Ubuntu,</text>
+  <text x="632" y="295" class="s" text-anchor="start" style="font-size:14px">nginx, PVSCSI, VMXNET3</text>
+  <line x1="630" y1="316" x2="874" y2="316" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="632" y="332" class="lab" text-anchor="start" style="fill:#15803d">PROVED</text>
+  <text x="632" y="354" class="s" text-anchor="start" style="font-size:14px">Baseline recorded;</text>
+  <text x="632" y="373" class="s" text-anchor="start" style="font-size:14px">RISK: netplan uses ens192</text>
+  <line x1="630" y1="394" x2="874" y2="394" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="632" y="410" class="lab" text-anchor="start" style="fill:#475569">NEXT</text>
+  <text x="632" y="432" class="s" text-anchor="start" style="font-size:14px">Study its files on ESXi</text>
+  <path d="M892,117 L907,117" fill="none" stroke="#475569" stroke-width="2.5" marker-end="url(#m475569)"/>
+  <rect x="910" y="84" width="276" height="404" rx="14" fill="#ffffff" stroke="#15803d" stroke-width="2.2"/>
+  <path d="M910,98 A14,14 0 0 1 924,84 L1172,84 A14,14 0 0 1 1186,98 L1186,150 L910,150 Z" fill="#15803d"/>
+  <text x="928" y="130" class="h" text-anchor="start" style="font-size:30px;fill:#ffffff">1D</text>
+  <text x="992" y="114" class="t" text-anchor="start" style="font-size:17px;fill:#ffffff">Artifacts</text>
+  <text x="992" y="136" class="pill" text-anchor="start" style="font-size:12px">DONE (PASS)</text>
+  <text x="928" y="176" class="lab" text-anchor="start" style="fill:#334155">WHY</text>
+  <text x="928" y="198" class="s" text-anchor="start" style="font-size:14px">Know what a VM is on</text>
+  <text x="928" y="217" class="s" text-anchor="start" style="font-size:14px">disk before copying</text>
+  <line x1="926" y1="238" x2="1170" y2="238" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="928" y="254" class="lab" text-anchor="start" style="fill:#1d4ed8">WHAT</text>
+  <text x="928" y="276" class="s" text-anchor="start" style="font-size:14px">Read-only look at .vmx,</text>
+  <text x="928" y="295" class="s" text-anchor="start" style="font-size:14px">.nvram and the VMDK</text>
+  <line x1="926" y1="316" x2="1170" y2="316" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="928" y="332" class="lab" text-anchor="start" style="fill:#15803d">PROVED</text>
+  <text x="928" y="354" class="s" text-anchor="start" style="font-size:14px">Only the disk moves; it is</text>
+  <text x="928" y="373" class="s" text-anchor="start" style="font-size:14px">locked while running</text>
+  <line x1="926" y1="394" x2="1170" y2="394" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="928" y="410" class="lab" text-anchor="start" style="fill:#475569">NEXT</text>
+  <text x="928" y="432" class="s" text-anchor="start" style="font-size:14px">Plan a cold scp copy</text>
+  <rect x="22" y="510" width="276" height="404" rx="14" fill="#ffffff" stroke="#15803d" stroke-width="2.2"/>
+  <path d="M22,524 A14,14 0 0 1 36,510 L284,510 A14,14 0 0 1 298,524 L298,576 L22,576 Z" fill="#15803d"/>
+  <text x="40" y="556" class="h" text-anchor="start" style="font-size:30px;fill:#ffffff">1E</text>
+  <text x="104" y="540" class="t" text-anchor="start" style="font-size:17px;fill:#ffffff">Cold copy</text>
+  <text x="104" y="562" class="pill" text-anchor="start" style="font-size:12px">DONE (PASS)</text>
+  <text x="40" y="602" class="lab" text-anchor="start" style="fill:#334155">WHY</text>
+  <text x="40" y="624" class="s" text-anchor="start" style="font-size:14px">We need a trustworthy</text>
+  <text x="40" y="643" class="s" text-anchor="start" style="font-size:14px">copy of the disk</text>
+  <line x1="38" y1="664" x2="282" y2="664" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="40" y="680" class="lab" text-anchor="start" style="fill:#1d4ed8">WHAT</text>
+  <text x="40" y="702" class="s" text-anchor="start" style="font-size:14px">Graceful shutdown +</text>
+  <text x="40" y="721" class="s" text-anchor="start" style="font-size:14px">scp + SHA256 x3</text>
+  <line x1="38" y1="742" x2="282" y2="742" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="40" y="758" class="lab" text-anchor="start" style="fill:#15803d">PROVED</text>
+  <text x="40" y="780" class="s" text-anchor="start" style="font-size:14px">Byte-identical copy,</text>
+  <text x="40" y="799" class="s" text-anchor="start" style="font-size:14px">source unchanged</text>
+  <line x1="38" y1="820" x2="282" y2="820" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="40" y="836" class="lab" text-anchor="start" style="fill:#475569">NEXT</text>
+  <text x="40" y="858" class="s" text-anchor="start" style="font-size:14px">Work safely on a copy</text>
+  <path d="M300,543 L315,543" fill="none" stroke="#475569" stroke-width="2.5" marker-end="url(#m475569)"/>
+  <rect x="318" y="510" width="276" height="404" rx="14" fill="#ffffff" stroke="#15803d" stroke-width="2.2"/>
+  <path d="M318,524 A14,14 0 0 1 332,510 L580,510 A14,14 0 0 1 594,524 L594,576 L318,576 Z" fill="#15803d"/>
+  <text x="336" y="556" class="h" text-anchor="start" style="font-size:30px;fill:#ffffff">1F</text>
+  <text x="400" y="540" class="t" text-anchor="start" style="font-size:17px;fill:#ffffff">Workbench</text>
+  <text x="400" y="562" class="pill" text-anchor="start" style="font-size:12px">DONE (PASS)</text>
+  <text x="336" y="602" class="lab" text-anchor="start" style="fill:#334155">WHY</text>
+  <text x="336" y="624" class="s" text-anchor="start" style="font-size:14px">We need a safe place</text>
+  <text x="336" y="643" class="s" text-anchor="start" style="font-size:14px">for Linux disk tools</text>
+  <line x1="334" y1="664" x2="578" y2="664" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="336" y="680" class="lab" text-anchor="start" style="fill:#1d4ed8">WHAT</text>
+  <text x="336" y="702" class="s" text-anchor="start" style="font-size:14px">conversion-host-01 +</text>
+  <text x="336" y="721" class="s" text-anchor="start" style="font-size:14px">read-only inspection</text>
+  <line x1="334" y1="742" x2="578" y2="742" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="336" y="758" class="lab" text-anchor="start" style="fill:#15803d">PROVED</text>
+  <text x="336" y="780" class="s" text-anchor="start" style="font-size:14px">Disk matches baseline;</text>
+  <text x="336" y="799" class="s" text-anchor="start" style="font-size:14px">nothing was changed</text>
+  <line x1="334" y1="820" x2="578" y2="820" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="336" y="836" class="lab" text-anchor="start" style="fill:#475569">NEXT</text>
+  <text x="336" y="858" class="s" text-anchor="start" style="font-size:14px">Try real conversions</text>
+  <path d="M596,543 L611,543" fill="none" stroke="#475569" stroke-width="2.5" marker-end="url(#m475569)"/>
+  <rect x="614" y="510" width="276" height="404" rx="14" fill="#ffffff" stroke="#15803d" stroke-width="2.2"/>
+  <path d="M614,524 A14,14 0 0 1 628,510 L876,510 A14,14 0 0 1 890,524 L890,576 L614,576 Z" fill="#15803d"/>
+  <text x="632" y="556" class="h" text-anchor="start" style="font-size:30px;fill:#ffffff">1G</text>
+  <text x="696" y="540" class="t" text-anchor="start" style="font-size:17px;fill:#ffffff">Convert + boot</text>
+  <text x="696" y="562" class="pill" text-anchor="start" style="font-size:12px">DONE (PASS)</text>
+  <text x="632" y="602" class="lab" text-anchor="start" style="fill:#334155">WHY</text>
+  <text x="632" y="624" class="s" text-anchor="start" style="font-size:14px">Does a converted disk</text>
+  <text x="632" y="643" class="s" text-anchor="start" style="font-size:14px">boot on KVM?</text>
+  <line x1="630" y1="664" x2="874" y2="664" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="632" y="680" class="lab" text-anchor="start" style="fill:#1d4ed8">WHAT</text>
+  <text x="632" y="702" class="s" text-anchor="start" style="font-size:14px">qemu-img vs virt-v2v,</text>
+  <text x="632" y="721" class="s" text-anchor="start" style="font-size:14px">QEMU/KVM + UEFI + VirtIO</text>
+  <line x1="630" y1="742" x2="874" y2="742" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="632" y="758" class="lab" text-anchor="start" style="fill:#15803d">PROVED</text>
+  <text x="632" y="780" class="s" text-anchor="start" style="font-size:14px">Both boot; no network</text>
+  <text x="632" y="799" class="s" text-anchor="start" style="font-size:14px">until netplan driver match</text>
+  <line x1="630" y1="820" x2="874" y2="820" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="632" y="836" class="lab" text-anchor="start" style="fill:#475569">NEXT</text>
+  <text x="632" y="858" class="s" text-anchor="start" style="font-size:14px">Design the KubeVirt target</text>
+  <path d="M892,543 L907,543" fill="none" stroke="#475569" stroke-width="2.5" marker-end="url(#m475569)"/>
+  <rect x="910" y="510" width="276" height="404" rx="14" fill="#ffffff" stroke="#a16207" stroke-width="2.2" stroke-dasharray="9 5"/>
+  <path d="M910,524 A14,14 0 0 1 924,510 L1172,510 A14,14 0 0 1 1186,524 L1186,576 L910,576 Z" fill="#a16207"/>
+  <text x="928" y="556" class="h" text-anchor="start" style="font-size:30px;fill:#ffffff">1H</text>
+  <text x="992" y="540" class="t" text-anchor="start" style="font-size:17px;fill:#ffffff">Target design</text>
+  <text x="992" y="562" class="pill" text-anchor="start" style="font-size:12px">DESIGN ONLY</text>
+  <text x="928" y="602" class="lab" text-anchor="start" style="fill:#334155">WHY</text>
+  <text x="928" y="624" class="s" text-anchor="start" style="font-size:14px">Choose the target before</text>
+  <text x="928" y="643" class="s" text-anchor="start" style="font-size:14px">spending money</text>
+  <line x1="926" y1="664" x2="1170" y2="664" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="928" y="680" class="lab" text-anchor="start" style="fill:#1d4ed8">WHAT</text>
+  <text x="928" y="702" class="s" text-anchor="start" style="font-size:14px">Platform, network, storage:</text>
+  <text x="928" y="721" class="s" text-anchor="start" style="font-size:14px">ADRs 007 to 010</text>
+  <line x1="926" y1="742" x2="1170" y2="742" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="928" y="758" class="lab" text-anchor="start" style="fill:#a16207">PROVED</text>
+  <text x="928" y="780" class="s" text-anchor="start" style="font-size:14px">On paper only;</text>
+  <text x="928" y="799" class="s" text-anchor="start" style="font-size:14px">nothing provisioned</text>
+  <line x1="926" y1="820" x2="1170" y2="820" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="928" y="836" class="lab" text-anchor="start" style="fill:#475569">NEXT</text>
+  <text x="928" y="858" class="s" text-anchor="start" style="font-size:14px">1I not yet defined;</text>
+  <text x="928" y="877" class="s" text-anchor="start" style="font-size:14px">AWS credentials BLOCKED</text>
+  <path d="M1048,488 L1048,498 L160,498 L160,508" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+</svg>

@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1340" viewBox="0 0 1100 1340" role="img" aria-labelledby="title desc">
+  <title id="title">Stage 1 big picture: from VMware VM to Kubernetes-managed VM</title>
+  <desc id="desc">Vertical journey. Source world: VMware Workstation, ESXi (1A), legacy-source-vm with Ubuntu and nginx (1C), its VMDK (1D). Moving the disk: cold acquisition (1E). KVM world: conversion workbench (1F), qemu-img and virt-v2v paths (1G) into KVM/QEMU and a bootable VM. Kubernetes world: KubeVirt target designed in 1H, Kubernetes VM future. Modernization: future native workload. Side branch 1B: kvm-learning-01 taught KVM, QEMU, libvirt and VirtIO. Solid green boxes are done, dashed yellow are designed, dotted grey are future.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker><marker id="m64748b" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker><marker id="m6d28d9" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#6d28d9"/></marker><marker id="ma16207" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#a16207"/></marker></defs>
+  <rect width="1100" height="1340" fill="#ffffff"/>
+  <text x="550.0" y="44" class="h" text-anchor="middle">Stage 1 &#8212; From VMware VM to Kubernetes-Managed VM</text>
+  <rect x="250" y="64" width="34" height="20" rx="5" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <rect x="292" y="64" width="44" height="20" rx="10.0" fill="#15803d"/>
+  <text x="314.0" y="77.96" class="pill" text-anchor="middle" style="font-size:11px">DONE</text>
+  <text x="344" y="79" class="xs" text-anchor="start">proven in the lab</text>
+  <rect x="486.2" y="64" width="34" height="20" rx="5" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <rect x="528.2" y="64" width="59" height="20" rx="10.0" fill="#a16207"/>
+  <text x="557.7" y="77.96" class="pill" text-anchor="middle" style="font-size:11px">DESIGN</text>
+  <text x="595.2" y="79" class="xs" text-anchor="start">on paper (Stage 1H)</text>
+  <rect x="750.5999999999999" y="64" width="34" height="20" rx="5" fill="#f1f5f9" stroke="#64748b" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <rect x="792.5999999999999" y="64" width="59" height="20" rx="10.0" fill="#475569"/>
+  <text x="822.0999999999999" y="77.96" class="pill" text-anchor="middle" style="font-size:11px">FUTURE</text>
+  <text x="859.5999999999999" y="79" class="xs" text-anchor="start">not started</text>
+  <rect x="20" y="110" width="250" height="346" rx="14" fill="#eff6ff" stroke="#eff6ff" stroke-width="1.5"/>
+  <text x="36" y="136" class="lab" text-anchor="start">SOURCE WORLD</text>
+  <text x="36" y="156" class="xs" text-anchor="start">where the VM</text>
+  <text x="36" y="173" class="xs" text-anchor="start">lives today</text>
+  <rect x="270" y="110" width="520" height="346" rx="0" fill="#eff6ff" stroke="#eff6ff" stroke-width="0"/>
+  <rect x="20" y="464" width="250" height="84" rx="14" fill="#fffbeb" stroke="#fffbeb" stroke-width="1.5"/>
+  <text x="36" y="490" class="lab" text-anchor="start">MOVING THE DISK</text>
+  <text x="36" y="510" class="xs" text-anchor="start">only disk bytes</text>
+  <rect x="270" y="464" width="520" height="84" rx="0" fill="#fffbeb" stroke="#fffbeb" stroke-width="0"/>
+  <rect x="20" y="556" width="250" height="384" rx="14" fill="#ecfdf5" stroke="#ecfdf5" stroke-width="1.5"/>
+  <text x="36" y="582" class="lab" text-anchor="start">KVM WORLD</text>
+  <text x="36" y="602" class="xs" text-anchor="start">conversion lab,</text>
+  <text x="36" y="619" class="xs" text-anchor="start">outside VMware</text>
+  <rect x="270" y="556" width="520" height="384" rx="0" fill="#ecfdf5" stroke="#ecfdf5" stroke-width="0"/>
+  <rect x="20" y="948" width="250" height="186" rx="14" fill="#fff7ed" stroke="#fff7ed" stroke-width="1.5"/>
+  <text x="36" y="974" class="lab" text-anchor="start">KUBERNETES WORLD</text>
+  <text x="36" y="994" class="xs" text-anchor="start">the VM becomes a</text>
+  <text x="36" y="1011" class="xs" text-anchor="start">Kubernetes object</text>
+  <rect x="270" y="948" width="520" height="186" rx="0" fill="#fff7ed" stroke="#fff7ed" stroke-width="0"/>
+  <rect x="20" y="1142" width="250" height="180" rx="14" fill="#f1f5f9" stroke="#f1f5f9" stroke-width="1.5"/>
+  <text x="36" y="1168" class="lab" text-anchor="start">MODERNIZATION</text>
+  <text x="36" y="1188" class="xs" text-anchor="start">the VM goes away</text>
+  <rect x="270" y="1142" width="520" height="180" rx="0" fill="#f1f5f9" stroke="#f1f5f9" stroke-width="0"/>
+  <rect x="390" y="120" width="340" height="58" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="560.0" y="144.55" class="t" text-anchor="middle" style="font-size:15px">VMware Workstation</text>
+  <text x="560.0" y="163.5" class="s" text-anchor="middle" style="font-size:12.5px">Windows 11 laptop - outer layer (L0)</text>
+  <rect x="390" y="206" width="340" height="58" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="560.0" y="230.55" class="t" text-anchor="middle" style="font-size:15px">ESXi 8.0.3</text>
+  <text x="560.0" y="249.5" class="s" text-anchor="middle" style="font-size:12.5px">esxi-8-lab - 192.168.50.11</text>
+  <rect x="676" y="196" width="44" height="20" rx="10.0" fill="#15803d"/>
+  <text x="698.0" y="209.96" class="pill" text-anchor="middle" style="font-size:11px">DONE</text>
+  <circle cx="345" cy="235.0" r="18" fill="#1d4ed8"/>
+  <text x="345" y="240.0" class="pill" text-anchor="middle" style="font-size:13px">1A</text>
+  <rect x="390" y="292" width="340" height="58" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="560.0" y="316.55" class="t" text-anchor="middle" style="font-size:15px">legacy-source-vm</text>
+  <text x="560.0" y="335.5" class="s" text-anchor="middle" style="font-size:12.5px">Ubuntu 24.04.5 + nginx - 192.168.50.31</text>
+  <rect x="676" y="282" width="44" height="20" rx="10.0" fill="#15803d"/>
+  <text x="698.0" y="295.96" class="pill" text-anchor="middle" style="font-size:11px">DONE</text>
+  <circle cx="345" cy="321.0" r="18" fill="#1d4ed8"/>
+  <text x="345" y="326.0" class="pill" text-anchor="middle" style="font-size:13px">1C</text>
+  <rect x="390" y="378" width="340" height="58" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="560.0" y="402.55" class="t" text-anchor="middle" style="font-size:15px">VMDK</text>
+  <text x="560.0" y="421.5" class="s" text-anchor="middle" style="font-size:12.5px">descriptor + 40 GiB flat extent</text>
+  <rect x="676" y="368" width="44" height="20" rx="10.0" fill="#15803d"/>
+  <text x="698.0" y="381.96" class="pill" text-anchor="middle" style="font-size:11px">DONE</text>
+  <circle cx="345" cy="407.0" r="18" fill="#1d4ed8"/>
+  <text x="345" y="412.0" class="pill" text-anchor="middle" style="font-size:13px">1D</text>
+  <rect x="390" y="474" width="340" height="58" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="560.0" y="498.55" class="t" text-anchor="middle" style="font-size:15px">Cold acquisition</text>
+  <text x="560.0" y="517.5" class="s" text-anchor="middle" style="font-size:12.5px">graceful shutdown - scp - sha256 x3</text>
+  <rect x="676" y="464" width="44" height="20" rx="10.0" fill="#15803d"/>
+  <text x="698.0" y="477.96" class="pill" text-anchor="middle" style="font-size:11px">DONE</text>
+  <circle cx="345" cy="503.0" r="18" fill="#b45309"/>
+  <text x="345" y="508.0" class="pill" text-anchor="middle" style="font-size:13px">1E</text>
+  <rect x="390" y="566" width="340" height="58" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="560.0" y="590.55" class="t" text-anchor="middle" style="font-size:15px">Conversion workbench</text>
+  <text x="560.0" y="609.5" class="s" text-anchor="middle" style="font-size:12.5px">conversion-host-01 - protected copy</text>
+  <rect x="676" y="556" width="44" height="20" rx="10.0" fill="#15803d"/>
+  <text x="698.0" y="569.96" class="pill" text-anchor="middle" style="font-size:11px">DONE</text>
+  <circle cx="345" cy="595.0" r="18" fill="#15803d"/>
+  <text x="345" y="600.0" class="pill" text-anchor="middle" style="font-size:13px">1F</text>
+  <rect x="390" y="762" width="340" height="58" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="560.0" y="786.55" class="t" text-anchor="middle" style="font-size:15px">KVM / QEMU</text>
+  <text x="560.0" y="805.5" class="s" text-anchor="middle" style="font-size:12.5px">OVMF (UEFI) + VirtIO devices</text>
+  <rect x="676" y="752" width="44" height="20" rx="10.0" fill="#15803d"/>
+  <text x="698.0" y="765.96" class="pill" text-anchor="middle" style="font-size:11px">DONE</text>
+  <rect x="390" y="850" width="340" height="58" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="560.0" y="874.55" class="t" text-anchor="middle" style="font-size:15px">Bootable VM</text>
+  <text x="560.0" y="893.5" class="s" text-anchor="middle" style="font-size:12.5px">nginx serves the same page</text>
+  <rect x="676" y="840" width="44" height="20" rx="10.0" fill="#15803d"/>
+  <text x="698.0" y="853.96" class="pill" text-anchor="middle" style="font-size:11px">DONE</text>
+  <rect x="390" y="962" width="340" height="58" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="560.0" y="986.55" class="t" text-anchor="middle" style="font-size:15px">KubeVirt target</text>
+  <text x="560.0" y="1005.5" class="s" text-anchor="middle" style="font-size:12.5px">designed on paper - nothing built</text>
+  <rect x="661" y="952" width="59" height="20" rx="10.0" fill="#a16207"/>
+  <text x="690.5" y="965.96" class="pill" text-anchor="middle" style="font-size:11px">DESIGN</text>
+  <circle cx="345" cy="991.0" r="18" fill="#c2410c"/>
+  <text x="345" y="996.0" class="pill" text-anchor="middle" style="font-size:13px">1H</text>
+  <rect x="390" y="1052" width="340" height="58" rx="10" fill="#f1f5f9" stroke="#64748b" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="560.0" y="1076.55" class="t" text-anchor="middle" style="font-size:15px">Kubernetes-managed VM</text>
+  <text x="560.0" y="1095.5" class="s" text-anchor="middle" style="font-size:12.5px">VirtualMachine on the cluster</text>
+  <rect x="661" y="1042" width="59" height="20" rx="10.0" fill="#475569"/>
+  <text x="690.5" y="1055.96" class="pill" text-anchor="middle" style="font-size:11px">FUTURE</text>
+  <rect x="390" y="1156" width="340" height="58" rx="10" fill="#f1f5f9" stroke="#64748b" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="560.0" y="1180.55" class="t" text-anchor="middle" style="font-size:15px">Future modernization</text>
+  <text x="560.0" y="1199.5" class="s" text-anchor="middle" style="font-size:12.5px">extract nginx from the VM</text>
+  <rect x="661" y="1146" width="59" height="20" rx="10.0" fill="#475569"/>
+  <text x="690.5" y="1159.96" class="pill" text-anchor="middle" style="font-size:11px">FUTURE</text>
+  <rect x="390" y="1246" width="340" height="58" rx="10" fill="#f1f5f9" stroke="#64748b" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="560.0" y="1270.55" class="t" text-anchor="middle" style="font-size:15px">Native workload</text>
+  <text x="560.0" y="1289.5" class="s" text-anchor="middle" style="font-size:12.5px">container + Deployment + Service</text>
+  <rect x="661" y="1236" width="59" height="20" rx="10.0" fill="#475569"/>
+  <text x="690.5" y="1249.96" class="pill" text-anchor="middle" style="font-size:11px">FUTURE</text>
+  <rect x="390" y="664" width="160" height="58" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="470.0" y="688.73" class="t" text-anchor="middle" style="font-size:14px">qemu-img</text>
+  <text x="470.0" y="706.68" class="s" text-anchor="middle" style="font-size:11.5px">Path A: format only</text>
+  <rect x="570" y="664" width="160" height="58" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="650.0" y="688.73" class="t" text-anchor="middle" style="font-size:14px">virt-v2v</text>
+  <text x="650.0" y="706.68" class="s" text-anchor="middle" style="font-size:11.5px">Path B: guest-aware</text>
+  <circle cx="345" cy="693" r="18" fill="#15803d"/>
+  <text x="345" y="698" class="pill" text-anchor="middle" style="font-size:13px">1G</text>
+  <path d="M560,180 L560,203" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M560,266 L560,289" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M560,352 L560,375" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M560,438 L560,471" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M560,534 L560,563" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M560,822 L560,847" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M560,910 L560,959" fill="none" stroke="#a16207" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#ma16207)"/>
+  <path d="M560,1022 L560,1049" fill="none" stroke="#64748b" stroke-width="2.2" stroke-dasharray="2 5" marker-end="url(#m64748b)" stroke-linecap="round"/>
+  <path d="M560,1112 L560,1153" fill="none" stroke="#64748b" stroke-width="2.2" stroke-dasharray="2 5" marker-end="url(#m64748b)" stroke-linecap="round"/>
+  <path d="M560,1216 L560,1243" fill="none" stroke="#64748b" stroke-width="2.2" stroke-dasharray="2 5" marker-end="url(#m64748b)" stroke-linecap="round"/>
+  <path d="M560,626 L560,640 L470,640 L470,661" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M560,640 L650,640 L650,661" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M470,724 L470,742 L560,742 L560,759" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M650,724 L650,742 L560,742" fill="none" stroke="#475569" stroke-width="2.2"/>
+  <rect x="810" y="120" width="260" height="150" rx="10" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.8"/>
+  <rect x="1016" y="110" width="44" height="20" rx="10.0" fill="#15803d"/>
+  <text x="1038.0" y="123.96" class="pill" text-anchor="middle" style="font-size:11px">DONE</text>
+  <circle cx="840" cy="150" r="18" fill="#6d28d9"/>
+  <text x="840" y="155" class="pill" text-anchor="middle" style="font-size:13px">1B</text>
+  <text x="866" y="156" class="t" text-anchor="start" style="font-size:15px">learning branch</text>
+  <text x="826" y="190" class="s" text-anchor="start" style="font-size:13px">kvm-learning-01 on ESXi</text>
+  <text x="826" y="209" class="s" text-anchor="start" style="font-size:13px">learned KVM, QEMU,</text>
+  <text x="826" y="228" class="s" text-anchor="start" style="font-size:13px">libvirt and VirtIO</text>
+  <text x="826" y="247" class="s" text-anchor="start" style="font-size:13px">nested KVM: accelerated</text>
+  <path d="M732,235 L806,235" fill="none" stroke="#6d28d9" stroke-width="2.2" stroke-dasharray="2 5" marker-end="url(#m6d28d9)" stroke-linecap="round"/>
+  <text x="770" y="227" class="xs halo" text-anchor="middle" style="font-weight:600">on ESXi</text>
+  <path d="M940,272 L940,791 L734,791" fill="none" stroke="#6d28d9" stroke-width="2.2" stroke-dasharray="2 5" marker-end="url(#m6d28d9)" stroke-linecap="round"/>
+  <text x="946" y="540" class="xs halo" text-anchor="start" style="font-weight:600">knowledge</text>
+  <text x="946" y="557" class="xs" text-anchor="start" style="font-weight:600">reused in 1F/1G</text>
+  <text x="748" y="325" class="xs" text-anchor="start" style="font-weight:600">the VM we migrate</text>
+  <text x="748" y="411" class="xs" text-anchor="start" style="font-weight:600">locked while it runs</text>
+  <text x="748" y="507" class="xs" text-anchor="start" style="font-weight:600">byte-identical copy</text>
+  <text x="748" y="599" class="xs" text-anchor="start" style="font-weight:600">read-only inspection</text>
+  <text x="748" y="701" class="xs" text-anchor="start" style="font-weight:600">both paths boot</text>
+  <text x="748" y="883" class="xs" text-anchor="start" style="font-weight:600">after one netplan fix</text>
+  <text x="748" y="995" class="xs" text-anchor="start" style="font-weight:600">ADRs 007-010</text>
+  <text x="748" y="1085" class="xs" text-anchor="start" style="font-weight:600">Stage 1I not defined</text>
+  <text x="748" y="1279" class="xs" text-anchor="start" style="font-weight:600">Stage 0 idea only</text>
+</svg>

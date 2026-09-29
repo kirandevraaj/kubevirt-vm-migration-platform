@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1020" viewBox="0 0 1200 1020" role="img" aria-labelledby="title desc">
+  <title id="title">qemu-img versus virt-v2v</title>
+  <desc id="desc">Two paths from the same protected VMDK. Path A qemu-img: 5 s, qcow2 3.21 GiB, guest bytes unchanged, boots on KVM, no network. Path B virt-v2v: 136 s, guest-aware conversion that purged open-vm-tools, rebuilt the initramfs, added a virtio_blk alias, a first-boot guest-agent job and libvirt XML, but left netplan, fstab, GRUB config, machine-id and SSH keys untouched; qcow2 2.73 GiB; boots on KVM; no network. Key idea: qemu-img changes the disk container, virt-v2v transforms the guest.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker></defs>
+  <rect width="1200" height="1020" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">qemu-img vs virt-v2v</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">Stage 1G - OBSERVED on disposable data</text>
+  <rect x="390" y="86" width="420" height="62" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="600.0" y="112.55" class="t" text-anchor="middle" style="font-size:15px">VMDK (protected working copy)</text>
+  <text x="600.0" y="131.5" class="s" text-anchor="middle" style="font-size:12.5px">read by both tools, unchanged by both</text>
+  <rect x="40" y="200" width="520" height="680" rx="16" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.6"/>
+  <rect x="640" y="200" width="520" height="680" rx="16" fill="#f5f3ff" stroke="#ddd6fe" stroke-width="1.6"/>
+  <path d="M500,150 L300,197" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M700,150 L900,197" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="300" y="232" class="h2" text-anchor="middle" style="fill:#1d4ed8">PATH A: qemu-img</text>
+  <text x="900" y="232" class="h2" text-anchor="middle" style="fill:#6d28d9">PATH B: virt-v2v</text>
+  <rect x="90" y="250" width="420" height="60" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="300.0" y="275.55" class="t" text-anchor="middle" style="font-size:15px">qemu-img convert -O qcow2</text>
+  <text x="300.0" y="294.5" class="s" text-anchor="middle" style="font-size:12.5px">5 s</text>
+  <rect x="90" y="340" width="420" height="56" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="300.0" y="372.8" class="t" text-anchor="middle" style="font-size:15px">qcow2, 3.21 GiB</text>
+  <rect x="90" y="426" width="420" height="110" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="300.0" y="467.94" class="t" text-anchor="middle" style="font-size:17px">guest bytes unchanged</text>
+  <text x="300.0" y="487.25" class="s" text-anchor="middle" style="font-size:12.5px">qemu-img compare:</text>
+  <text x="300.0" y="505.75" class="s" text-anchor="middle" style="font-size:12.5px">"Images are identical."</text>
+  <rect x="385" y="416" width="115" height="20" rx="10.0" fill="#1d4ed8"/>
+  <text x="442.5" y="429.96" class="pill" text-anchor="middle" style="font-size:11px">CONTAINER ONLY</text>
+  <rect x="690" y="250" width="420" height="60" rx="10" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.8"/>
+  <text x="900.0" y="275.23" class="t" text-anchor="middle" style="font-size:14px">virt-v2v -i disk -o local -of qcow2</text>
+  <text x="900.0" y="294.0" class="s" text-anchor="middle" style="font-size:12.5px">136 s</text>
+  <rect x="690" y="340" width="420" height="262" rx="10" fill="#ffffff" stroke="#6d28d9" stroke-width="1.8"/>
+  <rect x="1006" y="330" width="94" height="20" rx="10.0" fill="#6d28d9"/>
+  <text x="1053.0" y="343.96" class="pill" text-anchor="middle" style="font-size:11px">GUEST-AWARE</text>
+  <text x="900" y="366" class="t" text-anchor="middle" style="font-size:16px">guest-aware conversion</text>
+  <path d="M711,390 L715.6666666666666,394.9 L725,384.4" fill="none" stroke="#15803d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="736" y="394" class="s" text-anchor="start" style="font-size:13.5px">open-vm-tools (VMware Tools) purged</text>
+  <path d="M711,416 L715.6666666666666,420.9 L725,410.4" fill="none" stroke="#15803d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="736" y="420" class="s" text-anchor="start" style="font-size:13.5px">initramfs rebuilt (+ bochs), old one kept</text>
+  <path d="M711,442 L715.6666666666666,446.9 L725,436.4" fill="none" stroke="#15803d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="736" y="446" class="s" text-anchor="start" style="font-size:13.5px">alias scsi_hostadapter virtio_blk</text>
+  <path d="M711,468 L715.6666666666666,472.9 L725,462.4" fill="none" stroke="#15803d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="736" y="472" class="s" text-anchor="start" style="font-size:13.5px">first-boot job: install qemu-guest-agent</text>
+  <path d="M711,494 L715.6666666666666,498.9 L725,488.4" fill="none" stroke="#15803d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="736" y="498" class="s" text-anchor="start" style="font-size:13.5px">libvirt XML: q35, OVMF, virtio</text>
+  <line x1="710" y1="524" x2="1090" y2="524" stroke="#ddd6fe" stroke-width="1.5"/>
+  <text x="710" y="546" class="t" text-anchor="start" style="font-size:13px;fill:#b91c1c">left untouched:</text>
+  <path d="M715,560 L725,570 M725,560 L715,570" stroke="#b91c1c" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="736" y="570" class="s" text-anchor="start" style="font-size:13.5px">netplan, fstab, GRUB config</text>
+  <path d="M715,582 L725,592 M725,582 L715,592" stroke="#b91c1c" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="736" y="592" class="s" text-anchor="start" style="font-size:13.5px">machine-id, SSH host keys, nginx</text>
+  <rect x="690" y="622" width="420" height="56" rx="10" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.8"/>
+  <text x="900.0" y="645.55" class="t" text-anchor="middle" style="font-size:15px">qcow2, 2.73 GiB</text>
+  <text x="900.0" y="664.5" class="s" text-anchor="middle" style="font-size:12.5px">unused blocks skipped</text>
+  <rect x="90" y="702" width="420" height="64" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="300.0" y="729.55" class="t" text-anchor="middle" style="font-size:15px">KVM boot: YES</text>
+  <text x="300.0" y="748.5" class="s" text-anchor="middle" style="font-size:12.5px">UEFI (OVMF), virtio-blk vda</text>
+  <rect x="441" y="692" width="59" height="20" rx="10.0" fill="#15803d"/>
+  <text x="470.5" y="705.96" class="pill" text-anchor="middle" style="font-size:11px">PROVEN</text>
+  <rect x="90" y="796" width="420" height="64" rx="10" fill="#fee2e2" stroke="#b91c1c" stroke-width="1.8"/>
+  <text x="300.0" y="823.55" class="t" text-anchor="middle" style="font-size:15px">network: NO</text>
+  <text x="300.0" y="842.5" class="s" text-anchor="middle" style="font-size:12.5px">netplan still expects ens192</text>
+  <rect x="448" y="786" width="52" height="20" rx="10.0" fill="#b91c1c"/>
+  <text x="474.0" y="799.96" class="pill" text-anchor="middle" style="font-size:11px">FAILS</text>
+  <rect x="690" y="702" width="420" height="64" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="900.0" y="729.55" class="t" text-anchor="middle" style="font-size:15px">KVM boot: YES</text>
+  <text x="900.0" y="748.5" class="s" text-anchor="middle" style="font-size:12.5px">UEFI (OVMF), virtio-blk vda</text>
+  <rect x="1041" y="692" width="59" height="20" rx="10.0" fill="#15803d"/>
+  <text x="1070.5" y="705.96" class="pill" text-anchor="middle" style="font-size:11px">PROVEN</text>
+  <rect x="690" y="796" width="420" height="64" rx="10" fill="#fee2e2" stroke="#b91c1c" stroke-width="1.8"/>
+  <text x="900.0" y="823.55" class="t" text-anchor="middle" style="font-size:15px">network: NO</text>
+  <text x="900.0" y="842.5" class="s" text-anchor="middle" style="font-size:12.5px">netplan still expects ens192</text>
+  <rect x="1048" y="786" width="52" height="20" rx="10.0" fill="#b91c1c"/>
+  <text x="1074.0" y="799.96" class="pill" text-anchor="middle" style="font-size:11px">FAILS</text>
+  <path d="M300,312 L300,337" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M300,398 L300,423" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="90" y="566" width="420" height="106" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="300.0" y="595.3" class="t" text-anchor="middle" style="font-size:15px">guest left as it was</text>
+  <text x="300.0" y="614.66" class="s" text-anchor="middle" style="font-size:13px">VMware Tools still installed</text>
+  <text x="300.0" y="633.66" class="s" text-anchor="middle" style="font-size:13px">(skipped at boot by a VMware-only condition)</text>
+  <text x="300.0" y="652.66" class="s" text-anchor="middle" style="font-size:13px">initramfs unchanged, still boots</text>
+  <path d="M300,538 L300,563" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M300,674 L300,699" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M300,768 L300,793" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M900,312 L900,337" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M900,604 L900,619" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M900,680 L900,699" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M900,768 L900,793" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="40" y="900" width="1120" height="100" rx="12" fill="#fef3c7" stroke="#b45309" stroke-width="2"/>
+  <text x="70" y="958" class="h2" text-anchor="start" style="font-size:22px;fill:#b45309">KEY IDEA</text>
+  <text x="230" y="932" class="t" text-anchor="start" style="font-size:17px">qemu-img  =  changes the disk container</text>
+  <text x="230" y="958" class="t" text-anchor="start" style="font-size:17px">virt-v2v  =  understands and transforms the guest</text>
+  <text x="230" y="984" class="t" text-anchor="start" style="font-size:17px;fill:#b91c1c">neither one fixed the network configuration (netplan)</text>
+</svg>

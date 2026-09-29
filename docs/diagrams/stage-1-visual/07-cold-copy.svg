@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="870" viewBox="0 0 1200 870" role="img" aria-labelledby="title desc">
+  <title id="title">Why a cold copy?</title>
+  <desc id="desc">Top: while legacy-source-vm runs, its VMDK flat extent is exclusively locked, so it cannot be read or copied, and snapshots are forbidden. Bottom: the Stage 1E sequence: graceful shutdown, VM off, lock released, sha256 of the source, scp copy, sha256 of the destination, sha256 of the source again, power on, validate. Metrics: about 10.5 minutes downtime, 40 GiB disk, about 148 MiB/s copy, lab observations not benchmarks.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker><marker id="mb91c1c" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#b91c1c"/></marker></defs>
+  <rect width="1200" height="870" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">Why a cold copy?</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">On this host, a running VM's disk cannot even be read</text>
+  <rect x="30" y="92" width="1140" height="196" rx="14" fill="#fef2f2" stroke="#fecaca" stroke-width="1.6"/>
+  <text x="50" y="118" class="lab" text-anchor="start" style="fill:#b91c1c">WHILE THE VM RUNS (OBSERVED, 1D)</text>
+  <rect x="60" y="140" width="210" height="110" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="165.0" y="181.62" class="t" text-anchor="middle" style="font-size:16px">VM RUNNING</text>
+  <text x="165.0" y="200.75" class="s" text-anchor="middle" style="font-size:12.5px">legacy-source-vm</text>
+  <text x="165.0" y="219.25" class="s" text-anchor="middle" style="font-size:12.5px">serving nginx</text>
+  <path d="M272,195 L338,195" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="340" y="140" width="260" height="110" rx="10" fill="#fee2e2" stroke="#b91c1c" stroke-width="1.8"/>
+  <text x="470.0" y="181.62" class="t" text-anchor="middle" style="font-size:16px">VMDK flat extent</text>
+  <text x="470.0" y="200.75" class="s" text-anchor="middle" style="font-size:12.5px">exclusive lock (mode 1)</text>
+  <text x="470.0" y="219.25" class="s" text-anchor="middle" style="font-size:12.5px">held by the running VM</text>
+  <path d="M568.6,156 L568.6,150.4 A6.4,6.4 0 0 1 581.4,150.4 L581.4,156" fill="none" stroke="#b91c1c" stroke-width="2.8000000000000003"/>
+  <rect x="564.6" y="156" width="20.8" height="16.0" rx="2.4000000000000004" fill="#b91c1c"/>
+  <circle cx="575" cy="163.2" r="2.4000000000000004" fill="#ffffff"/>
+  <path d="M602,195 L700,195" fill="none" stroke="#b91c1c" stroke-width="2.2" marker-end="url(#mb91c1c)"/>
+  <text x="650" y="186" class="xs halo" text-anchor="middle" style="font-weight:600">read?</text>
+  <path d="M723,173 L767,217 M767,173 L723,217" stroke="#b91c1c" stroke-width="6" stroke-linecap="round"/>
+  <rect x="800" y="140" width="190" height="110" rx="10" fill="#f1f5f9" stroke="#64748b" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="895.0" y="181.62" class="t" text-anchor="middle" style="font-size:16px">READ / COPY</text>
+  <text x="895.0" y="200.75" class="s" text-anchor="middle" style="font-size:12.5px">not possible:</text>
+  <text x="895.0" y="219.25" class="s" text-anchor="middle" style="font-size:12.5px">cannot even be read</text>
+  <rect x="1010" y="140" width="140" height="110" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <text x="1080.0" y="181.3" class="t" text-anchor="middle" style="font-size:15px">No snapshots</text>
+  <text x="1080.0" y="200.25" class="s" text-anchor="middle" style="font-size:12.5px">project rule</text>
+  <text x="1080.0" y="218.75" class="s" text-anchor="middle" style="font-size:12.5px">(1D)</text>
+  <rect x="30" y="310" width="1140" height="390" rx="14" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.6"/>
+  <text x="50" y="336" class="lab" text-anchor="start" style="fill:#15803d">THE COLD COPY (OBSERVED, 1E)</text>
+  <rect x="50" y="362" width="196" height="100" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="148.0" y="397.98" class="t" text-anchor="middle" style="font-size:14px">GRACEFUL SHUTDOWN</text>
+  <text x="148.0" y="416.75" class="s" text-anchor="middle" style="font-size:12.5px">via VMware Tools</text>
+  <text x="148.0" y="435.25" class="s" text-anchor="middle" style="font-size:12.5px">(OS halt about 3 s)</text>
+  <circle cx="54" cy="364" r="14" fill="#0f172a"/>
+  <text x="54" y="369" class="pill" text-anchor="middle" style="font-size:13px">1</text>
+  <path d="M248,412.0 L269,412.0" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="272" y="362" width="196" height="100" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="370.0" y="407.23" class="t" text-anchor="middle" style="font-size:14px">VM OFF</text>
+  <text x="370.0" y="426.0" class="s" text-anchor="middle" style="font-size:12.5px">cleanShutdown = TRUE</text>
+  <circle cx="276" cy="364" r="14" fill="#0f172a"/>
+  <text x="276" y="369" class="pill" text-anchor="middle" style="font-size:13px">2</text>
+  <path d="M470,412.0 L491,412.0" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="494" y="362" width="196" height="100" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="592.0" y="397.98" class="t" text-anchor="middle" style="font-size:14px">LOCK RELEASED</text>
+  <text x="592.0" y="416.75" class="s" text-anchor="middle" style="font-size:12.5px">lock mode 0</text>
+  <text x="592.0" y="435.25" class="s" text-anchor="middle" style="font-size:12.5px">.vmx.lck gone</text>
+  <circle cx="498" cy="364" r="14" fill="#0f172a"/>
+  <text x="498" y="369" class="pill" text-anchor="middle" style="font-size:13px">3</text>
+  <path d="M692,412.0 L713,412.0" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="716" y="362" width="196" height="100" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <text x="814.0" y="407.23" class="t" text-anchor="middle" style="font-size:14px">SHA256 SOURCE</text>
+  <text x="814.0" y="426.0" class="s" text-anchor="middle" style="font-size:12.5px">72ca45c7...c9e7</text>
+  <circle cx="720" cy="364" r="14" fill="#0f172a"/>
+  <text x="720" y="369" class="pill" text-anchor="middle" style="font-size:13px">4</text>
+  <path d="M914,412.0 L935,412.0" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="938" y="362" width="196" height="100" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="1036.0" y="397.98" class="t" text-anchor="middle" style="font-size:14px">COPY</text>
+  <text x="1036.0" y="416.75" class="s" text-anchor="middle" style="font-size:12.5px">scp to Windows</text>
+  <text x="1036.0" y="435.25" class="s" text-anchor="middle" style="font-size:12.5px">276 s</text>
+  <circle cx="942" cy="364" r="14" fill="#0f172a"/>
+  <text x="942" y="369" class="pill" text-anchor="middle" style="font-size:13px">5</text>
+  <rect x="50" y="532" width="196" height="100" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <text x="148.0" y="567.98" class="t" text-anchor="middle" style="font-size:14px">SHA256 DESTINATION</text>
+  <text x="148.0" y="586.75" class="s" text-anchor="middle" style="font-size:12.5px">72ca45c7...c9e7</text>
+  <text x="148.0" y="605.25" class="s" text-anchor="middle" style="font-size:12.5px">= match</text>
+  <circle cx="54" cy="534" r="14" fill="#0f172a"/>
+  <text x="54" y="539" class="pill" text-anchor="middle" style="font-size:13px">6</text>
+  <path d="M248,582.0 L269,582.0" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="272" y="532" width="196" height="100" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <text x="370.0" y="567.98" class="t" text-anchor="middle" style="font-size:14px">SHA256 SOURCE AGAIN</text>
+  <text x="370.0" y="586.75" class="s" text-anchor="middle" style="font-size:12.5px">72ca45c7...c9e7</text>
+  <text x="370.0" y="605.25" class="s" text-anchor="middle" style="font-size:12.5px">= match</text>
+  <circle cx="276" cy="534" r="14" fill="#0f172a"/>
+  <text x="276" y="539" class="pill" text-anchor="middle" style="font-size:13px">7</text>
+  <path d="M470,582.0 L491,582.0" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="494" y="532" width="196" height="100" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="592.0" y="577.23" class="t" text-anchor="middle" style="font-size:14px">POWER ON</text>
+  <text x="592.0" y="596.0" class="s" text-anchor="middle" style="font-size:12.5px">VM back at .31</text>
+  <circle cx="498" cy="534" r="14" fill="#0f172a"/>
+  <text x="498" y="539" class="pill" text-anchor="middle" style="font-size:13px">8</text>
+  <path d="M692,582.0 L713,582.0" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="716" y="532" width="196" height="100" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="814.0" y="567.98" class="t" text-anchor="middle" style="font-size:14px">VALIDATE</text>
+  <text x="814.0" y="586.75" class="s" text-anchor="middle" style="font-size:12.5px">nginx + every</text>
+  <text x="814.0" y="605.25" class="s" text-anchor="middle" style="font-size:12.5px">baseline item match</text>
+  <circle cx="720" cy="534" r="14" fill="#0f172a"/>
+  <text x="720" y="539" class="pill" text-anchor="middle" style="font-size:13px">9</text>
+  <path d="M1036,464 L1036,496 L148,496 L148,529" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M914,582 L935,582" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="938" y="532" width="196" height="100" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="1036.0" y="568.3" class="t" text-anchor="middle" style="font-size:15px">RESULT</text>
+  <text x="1036.0" y="587.25" class="s" text-anchor="middle" style="font-size:12.5px">byte-identical copy,</text>
+  <text x="1036.0" y="605.75" class="s" text-anchor="middle" style="font-size:12.5px">source not altered</text>
+  <rect x="1065" y="522" width="59" height="20" rx="10.0" fill="#15803d"/>
+  <text x="1094.5" y="535.96" class="pill" text-anchor="middle" style="font-size:11px">PROVEN</text>
+  <text x="600" y="674" class="sub" text-anchor="middle" style="font-weight:600">Same hash three times = the copy is correct AND copying did not change the source.</text>
+  <rect x="30" y="722" width="360" height="96" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="210.0" y="769.6" class="t" text-anchor="middle" style="font-size:30px">~10.5 min</text>
+  <text x="210.0" y="792.48" class="s" text-anchor="middle" style="font-size:14px">measured service downtime</text>
+  <rect x="420" y="722" width="360" height="96" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="600.0" y="769.6" class="t" text-anchor="middle" style="font-size:30px">40 GiB</text>
+  <text x="600.0" y="792.48" class="s" text-anchor="middle" style="font-size:14px">source disk (flat extent)</text>
+  <rect x="810" y="722" width="360" height="96" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="990.0" y="769.6" class="t" text-anchor="middle" style="font-size:30px">~148 MiB/s</text>
+  <text x="990.0" y="792.48" class="s" text-anchor="middle" style="font-size:14px">measured copy speed (276 s)</text>
+  <rect x="468.0" y="834" width="264" height="21" rx="10.5" fill="#334155"/>
+  <text x="600.0" y="848.82" class="pill" text-anchor="middle" style="font-size:12px">LAB OBSERVATIONS, NOT BENCHMARKS</text>
+</svg>
