@@ -235,6 +235,13 @@ The two ports serve different purposes (clarified 2026-09-30, review R4):
 
 See section 29.4.
 
+**What 10.0.2.0/24 is, and what it is not** (clarified 2026-09-30):
+
+- 10.0.2.0/24 is the masquerade binding's **guest-side network**, inside the VM's own virt-launcher pod. The binding puts the gateway 10.0.2.1 in the pod and hands the guest 10.0.2.2 by DHCP; traffic leaves the pod only after NAT to the pod IP (CURRENT UPSTREAM DOCUMENTATION [E20, E21]).
+- It is **not** an AWS VPC subnet, not a Kubernetes pod or Service range, and not a network that VMs share. Nothing outside the pod routes to 10.0.2.2.
+- "Guest = 10.0.2.2/24" therefore does **not** mean that all VMs in the cluster sit on one global L2 segment and compete for one global 10.0.2.2. With several VMs, each has its own 10.0.2.0/24 inside its own pod, so each guest can be 10.0.2.2 without conflict. Clients and other VMs reach a VM through its pod IP or a Service, never through 10.0.2.2. (ENGINEERING INFERENCE from the documented per-pod masquerade design and the Kubernetes pod network model; to be observed when more than one VM runs.)
+- 10.0.2.2 is the address the guest sees, not a cluster-wide identity. A VM is identified by its VMI and pod, not by 10.0.2.2.
+
 Traffic paths (INFERRED from [E20, E21]; to be observed on the node):
 
 - **Outbound:** guest 10.0.2.2 -> virt-launcher pod (SNAT to the pod IP, flannel range) -> node (flannel masquerade to the node's VPC private IP) -> internet gateway (public IPv4). DNS: the virt-launcher DHCP response is expected to carry the pod's resolver, which is cluster DNS (CoreDNS). INFERRED.
@@ -305,7 +312,7 @@ Recorded in [ADR 009](../adr/009-kubevirt-storage-model.md).
 | Disk bus | `virtio` (proven in Stage 1G; KubeVirt's standard bus) | [E23] |
 | Size | 40 GiB, exactly the source's virtual size (42,949,672,960 bytes). Never smaller. Keeping it equal avoids CDI growing the virtual disk on import [E15] | Stage 1G |
 | Import mechanism | CDI upload DataVolume (`source: upload`), filled by `virtctl image-upload` | [E14, E16] |
-| Lifecycle | A standalone DataVolume/PVC referenced by the VM, not a `dataVolumeTemplate`, so deleting the VM does not delete the migrated disk. Deleting the disk is therefore an explicit teardown step, and the EBS volume behind it is outside the Terraform state (added 2026-09-30, review R1; section 29.1) | [E23] |
+| Lifecycle | A standalone DataVolume, not a `dataVolumeTemplate`. CDI creates the PVC for it and manages it through the DataVolume [E55]; the VM only references that PVC, so deleting the VM does not delete the migrated disk. Deleting the disk is therefore a deliberate teardown step: delete the DataVolume, then verify that the PVC, the PV and the EBS volume are gone. The EBS volume is outside the Terraform state (added 2026-09-30, review R1; clarified 2026-09-30; section 29.1) | [E23, E55] |
 | CRI setting | `device_ownership_from_security_context = true` in CRI-O, required for CDI on block PVCs | [E18] |
 
 **Cold versus live migration.** Live migration needs a shared ReadWriteMany volume and rules out pod-network bridge binding [E22]. The first migration is a cold copy of a powered-off disk into a new VM, so it needs neither shared storage nor live migration. The design is deliberately not shaped around live migration. RWX storage (EFS, or a clustered block solution) is DEFERRED.
@@ -355,8 +362,8 @@ Design, in order. Nothing was run.
    - Any route must meet the mandatory constraints of section 29.6 (added 2026-09-30, review R6).
    - Inbound transfer into AWS carries no data-transfer charge (INFERRED from AWS pricing practice; not priced here).
 4. **Upload** on the node, so the upload proxy is never exposed: `kubectl port-forward -n cdi service/cdi-uploadproxy 8443:443` [E16], then `virtctl image-upload dv legacy-source-vm-disk --size=40Gi --volume-mode=block --access-mode=ReadWriteOnce --storage-class=<gp3 class> --image-path=<qcow2> --uploadproxy-url=https://127.0.0.1:8443 --insecure --force-bind` (flags from the v1.9.0 source [E49]; `--force-bind` avoids waiting for a consumer under `WaitForFirstConsumer`).
-5. **CDI processing**: an upload server receives the qcow2 into Filesystem scratch space, `qemu-img` converts it to raw onto the Block PVC, and the scratch PVC is removed [E17]. Confirm that the scratch PVC is actually gone (added 2026-09-30, review R1).
-6. **Verify**: DataVolume phase `Succeeded`, PVC `Bound`, size 40Gi, `volumeMode: Block`.
+5. **CDI processing**: an upload server receives the qcow2 into Filesystem scratch space, `qemu-img` converts it to raw onto the Block PVC, and the scratch PVC is removed [E17]. Confirm that the scratch PVC is actually gone (added 2026-09-30, review R1). If a scratch volume is created, record its EBS volume ID from its PV while it exists (clarified 2026-09-30; section 29.1).
+6. **Verify**: DataVolume phase `Succeeded`, PVC `Bound`, size 40Gi, `volumeMode: Block`. Record the EBS volume ID of the migrated disk from its PV (clarified 2026-09-30; section 29.1).
    - `Succeeded` proves that CDI finished writing. It does **not** prove that the right image was imported, or that the guest workload is correct (clarified 2026-09-30).
    - That proof comes from two further checks:
      - the artifact check before upload: the file's sha256 equals the preparation record;
@@ -364,6 +371,7 @@ Design, in order. Nothing was run.
 7. **VM**: a `VirtualMachine` referencing the PVC with `bus: virtio`, EFI with `secureBoot: false`, 2 vCPU / 4096 Mi (from the `.vmx`, not the virt-v2v defaults), one masquerade interface, `runStrategy: Manual` so start and stop are explicit.
    - Machine type, CPU model and EFI variable-store persistence are left at KubeVirt's defaults.
    - The values actually applied are **recorded at runtime**, not treated as fixed design values (clarified 2026-09-30).
+   - **Disk lifecycle** (clarified 2026-09-30). The chain is: `VirtualMachine` -> references the standalone PVC -> the PVC is managed by the standalone DataVolume from step 4 -> the EBS volume behind its PV. The VM does **not** own the migrated disk's lifecycle; the standalone DataVolume is the lifecycle object for the migration disk. CDI's completed-DataVolume garbage-collection setting was removed in v1.62 [E56], so the DataVolume is expected to remain after `Succeeded` (ENGINEERING INFERENCE; to be observed). The disk is removed only by deliberately deleting the DataVolume in teardown, followed by verification that the PVC, the PV and the EBS volume are gone (section 29.1).
 8. **Runtime**: virt-launcher pod -> libvirt -> QEMU with `/dev/kvm` -> Ubuntu -> nginx.
 9. **Evidence and teardown** (added 2026-09-30, review R1): capture the evidence, delete the qcow2 from the node, and tear down in the order of section 29.1.
 
@@ -486,7 +494,7 @@ A 4-hour working session costs about USD 0.96, plus the scratch volume for under
 | Instance metadata | IMDSv2 only; hop limit 2 is needed by the EBS CSI driver [E40], which also lets any pod read the instance role. Mitigation: the role holds only the EBS CSI policy, and the node runs only our workloads |
 | RBAC | kubeadm admin kubeconfig kept on the workstation outside Git; no extra users. KubeVirt's default roles unchanged |
 | Network exposure | Only 22 (node sshd) and 30080 (HTTP validation) from one /32. The upload proxy is used through `port-forward` on the node and never exposed. Guest management goes through the Kubernetes API, never through a Service (clarified 2026-09-30, review R4) |
-| Storage permissions | The EBS CSI policy is scoped to volumes tagged `ebs.csi.aws.com/cluster: true` [E40]. Corrected 2026-09-30 (review R1): the original text said that `reclaimPolicy: Delete` removes the volumes together with the cluster, which is inaccurate. `reclaimPolicy: Delete` acts only when a PVC is deleted while the CSI driver still runs. Terminating the instance leaves CSI-created volumes behind as billed, `available` volumes, outside the Terraform state. They are deleted explicitly and checked for by that tag (section 29.1) |
+| Storage permissions | The EBS CSI policy is scoped to volumes tagged `ebs.csi.aws.com/cluster: true` [E40]. Corrected 2026-09-30 (review R1): the original text said that `reclaimPolicy: Delete` removes the volumes together with the cluster, which is inaccurate. `reclaimPolicy: Delete` acts only when a PVC is deleted while the CSI driver still runs. Terminating the instance leaves CSI-created volumes behind as billed, `available` volumes, outside the Terraform state. They are deleted through their DataVolume before the destroy and verified gone by their recorded volume IDs. After the destroy, that tag is used for detection only: an unrecognized volume is never deleted automatically, because the tag is not unique to this project (clarified 2026-09-30; section 29.1) |
 | Encryption at rest | Root volume and all CSI-created volumes encrypted (added 2026-09-30, review R7; section 29.7) |
 | Disk artifacts | Every copy of the guest disk (VMDK, qcow2, EBS volume) is sensitive data: it contains SSH host private keys, password hashes, machine identity, logs and application data. Handling rules in section 29.7 (added 2026-09-30, review R7) |
 | Secrets | No Kubernetes Secrets with cloud credentials. Kubeconfig, SSH private key and Terraform state stay outside Git (`.gitignore`) |
@@ -630,7 +638,7 @@ The original record said that Terraform destroys the instance "and its volumes",
 | Domain | Resources | Created by | Removed by | Basis |
 |---|---|---|---|---|
 | **Terraform-managed AWS infrastructure** | VPC, subnet, internet gateway, route table, security group, IAM role and instance profile, the EC2 instance and its root volume | `terraform apply` (ADR 002) | `terraform destroy`, which only knows what is in its state | PROPOSED DESIGN (ADR 002) |
-| **Kubernetes / EBS CSI-provisioned storage** | The 40 GiB VM disk volume; the roughly 40 GiB CDI scratch volume (normally removed by CDI after the import) | The EBS CSI driver, when a PVC is bound. It tags the volume `ebs.csi.aws.com/cluster = true`; the IAM policy only lets it manage volumes with that tag (or with `kubernetes.io/created-for/pvc/name`) [E40, E51] | Deleting the PVC while the driver still runs (`reclaimPolicy: Delete`); otherwise only an explicit volume deletion | CURRENT UPSTREAM DOCUMENTATION [E51]; ENGINEERING INFERENCE |
+| **Kubernetes / EBS CSI-provisioned storage** | The 40 GiB VM disk volume; the roughly 40 GiB CDI scratch volume (normally removed by CDI after the import) | The EBS CSI driver, when a PVC is bound. It tags the volume `ebs.csi.aws.com/cluster = true`; the IAM policy only lets it manage volumes with that tag (or with `kubernetes.io/created-for/pvc/name`) [E40, E51] | Deleting the standalone DataVolume, which removes its PVC, while the driver still runs (`reclaimPolicy: Delete`); otherwise only an explicit deletion of a volume positively identified as this session's | CURRENT UPSTREAM DOCUMENTATION [E51, E55]; ENGINEERING INFERENCE |
 
 Why this matters (ENGINEERING INFERENCE):
 
@@ -638,24 +646,48 @@ Why this matters (ENGINEERING INFERENCE):
 - Terminating the instance detaches them.
 - EBS volumes are not VPC resources, so nothing blocks the destroy: it completes and the volumes remain, billed as `available`.
 - Each leftover holds a copy of the guest disk, which is sensitive data (section 29.7).
+- The CSI tags are generic (clarified 2026-09-30). Every EBS CSI driver in the same AWS account and Region applies them, so a tag match alone does not show that a volume belongs to this migration session. Cleanup therefore works from the exact volume IDs recorded during the session, not from a tag scan.
+
+**Session volume record** (PROPOSED DESIGN; clarified 2026-09-30). During the migration session, record the exact EBS volume IDs created for:
+
+- the migrated VM disk, from its PV once the DataVolume has succeeded (section 18, step 6);
+- the CDI scratch volume, if one is present, from its PV while it exists (section 18, step 5).
+
+No volume ID exists yet, and none is invented here.
+
+**Disk lifecycle** (clarified 2026-09-30). The `VirtualMachine` references the standalone PVC, and the PVC is managed by the standalone DataVolume. The VM does not own the migrated disk's lifecycle: the DataVolume is the lifecycle object. The normal workflow is to delete the DataVolume deliberately, then verify that the PVC and PV are gone, then verify that the underlying EBS volume is deleted. Deleting the PVC directly is not part of the normal workflow (step 3).
 
 **Teardown sequence** (PROPOSED DESIGN; not executed; performed by the operator, and needs the AWS credentials that are still BLOCKED, U15):
 
 1. **Capture validation evidence.** Record, as text:
    - the 12 check results and the recorded KubeVirt runtime defaults;
    - VMI status and conditions, and events;
-   - DataVolume, PVC and PV descriptions, including the EBS volume ID.
+   - DataVolume, PVC and PV descriptions, including the recorded session volume IDs.
 
    Never capture disk content.
-2. **Stop and delete the KubeVirt workload.** Stop the VM, then delete the `VirtualMachine` and the validation Service.
-3. **Delete the storage objects.** Delete the DataVolume (which deletes its PVC) or the PVC, as applicable.
-4. **Verify that the PV and EBS volume are gone.** The PV is removed, the recorded EBS volume ID is reported deleted, and no scratch PVC or PV remains.
+2. **Stop and delete the KubeVirt workload.** Stop the VM, then delete the `VirtualMachine` and the validation Service. This does not delete the migrated disk, because the VM does not own it.
+3. **Delete the migration disk through its DataVolume.**
+   - Deliberately delete the standalone DataVolume. Its PVC is removed with it, and with `reclaimPolicy: Delete` the EBS CSI driver then deletes the PV and the EBS volume (ENGINEERING INFERENCE from [E55] and the StorageClass design; verified in step 4).
+   - If the PVC is still present after the DataVolume is gone, record that as a finding, then delete the PVC deliberately. This is an exception path, not an equivalent alternative.
+4. **Verify that the PVC, the PV and the known EBS volumes are gone** (mandatory before step 5):
+   - the migration PVC no longer exists;
+   - its PV no longer exists;
+   - each recorded session volume ID (VM disk, and scratch if recorded) is reported deleted by AWS;
+   - no scratch PVC or PV remains.
+
+   Do not run the Terraform destroy until all of these hold.
 5. **Run the Terraform destroy** for the infrastructure.
-6. **Run the post-destroy EBS check.** List volumes in the account and Region tagged `ebs.csi.aws.com/cluster = true` or `kubernetes.io/created-for/pvc/name`. Also confirm that the root volume went with the instance. Expected result: none.
-7. **Handle any orphaned CSI-created volume explicitly.**
-   - Record its ID, size and tags (no content).
-   - Delete it and confirm the deletion.
-   - Never attach it to another instance to inspect it.
+6. **Run the post-destroy EBS check** (mandatory; **detection only**):
+   - List volumes in the account and Region tagged `ebs.csi.aws.com/cluster = true` or `kubernetes.io/created-for/pvc/name`.
+   - Confirm that none of the recorded session volume IDs still exists.
+   - Confirm that the root volume went with the instance.
+
+   This step deletes nothing. Expected result: no volume belonging to this session.
+7. **Handle a detected volume only after positive identification.**
+   - Record its ID, size, creation time and tags (no content).
+   - Delete it only if it is **positively identified as belonging to this migration session**: its ID is one of the recorded session volume IDs, or the recorded evidence otherwise ties it unambiguously to this session. Record the basis for the identification, delete it, and confirm the deletion.
+   - **An unknown or unrecognized EBS volume is NOT deleted automatically**, and not by this procedure at all. It may belong to another cluster in the same account and Region. Record it and stop for a human decision.
+   - Never attach a volume to another instance to inspect it.
 8. **Delete the temporary qcow2 from the AWS node.**
    - Normally this is already done right after a successful import (section 29.6, item 9).
    - If not, do it before step 5, because after the destroy the node no longer exists. At that point this step reduces to confirming that the encrypted root volume was deleted with the instance.
@@ -663,6 +695,8 @@ Why this matters (ENGINEERING INFERENCE):
    - text evidence kept outside Git, or redacted per the standing repository rules;
    - no disk content left in AWS;
    - the authoritative disk copies stay in the lab (the golden VMDK, and the prepared qcow2 on `conversion-host-01`).
+
+The goal is unchanged: no orphaned storage and no storage deliberately left billed. The post-destroy verification remains mandatory; it detects, and deletion is limited to volumes positively identified as this session's.
 
 ### 29.2 Review R2: guest identity and intended changes
 
@@ -710,7 +744,21 @@ Runtime state written after the guest boots (logs, journal, timestamps) is not a
 
 ### 29.3 Review R3: address plan
 
-All ranges must be pairwise non-overlapping. Status meanings:
+**The AWS subnet is intentionally contained within the VPC**: 10.40.1.0/24 lies inside 10.40.0.0/16. That containment is required, not an overlap to avoid (clarified 2026-09-30).
+
+The **independent address domains** must not overlap:
+
+- VPC/subnet address space versus Pod CIDR;
+- VPC/subnet address space versus Service CIDR;
+- VPC/subnet address space versus the KubeVirt masquerade CIDR;
+- Pod CIDR versus Service CIDR;
+- Pod CIDR versus the KubeVirt masquerade CIDR;
+- Service CIDR versus the KubeVirt masquerade CIDR;
+- each of these versus CRI-O's default bridge network.
+
+The masquerade CIDR is a per-VM, guest-side network inside each virt-launcher pod, not a shared subnet (section 13).
+
+Status meanings:
 
 - **default**: an upstream default value;
 - **selected for the lab**: this design's choice;
@@ -719,16 +767,16 @@ All ranges must be pairwise non-overlapping. Status meanings:
 
 | Network | Value | Status | Basis |
 |---|---|---|---|
-| AWS VPC CIDR | 10.40.0.0/16 | Proposed; selected for the lab | PROPOSED DESIGN, chosen to stay clear of every range below |
+| AWS VPC CIDR | 10.40.0.0/16 | Proposed; selected for the lab | PROPOSED DESIGN, chosen to stay clear of every independent domain below (the subnet is carved from it) |
 | AWS subnet CIDR (one public subnet, one AZ) | 10.40.1.0/24 | Proposed; selected for the lab | PROPOSED DESIGN |
 | Kubernetes Pod CIDR | 10.244.0.0/16 | Default (flannel v0.28.9 `net-conf.json`, VXLAN backend); selected for the lab. kubeadm must be given the same value | CURRENT UPSTREAM DOCUMENTATION [E52] |
 | Kubernetes Service CIDR | 10.96.0.0/12 (10.96.0.0 to 10.111.255.255); cluster DNS 10.96.0.10 | Default (kubeadm); selected for the lab | CURRENT UPSTREAM DOCUMENTATION [E53] |
-| KubeVirt masquerade `vmNetworkCIDR` | 10.0.2.0/24: gateway 10.0.2.1, guest 10.0.2.2 | Default; selected for the lab; unchanged from the 2026-09-28 design | CURRENT UPSTREAM DOCUMENTATION [E21] |
+| KubeVirt masquerade `vmNetworkCIDR` | 10.0.2.0/24: gateway 10.0.2.1, guest 10.0.2.2, inside each VM's virt-launcher pod (section 13) | Default; selected for the lab; unchanged from the 2026-09-28 design | CURRENT UPSTREAM DOCUMENTATION [E21] |
 | Kept clear of | CRI-O's default bridge network 10.85.0.0/16 [E54]; the lab network 192.168.50.0/24, which is not routed to AWS and is avoided so records stay unambiguous | Constraint | CURRENT UPSTREAM DOCUMENTATION [E54]; PROJECT-DERIVED FACT |
 
 Overlap check (ENGINEERING INFERENCE, by arithmetic):
 
-- 10.0.2.0/24, 10.40.0.0/16, 10.85.0.0/16, 10.96.0.0/12 (up to 10.111.255.255) and 10.244.0.0/16 are disjoint.
+- The independent domains share no addresses: VPC/subnet 10.40.0.0/16 (containing the subnet 10.40.1.0/24), Pod 10.244.0.0/16, Service 10.96.0.0/12 (up to 10.111.255.255), masquerade 10.0.2.0/24, and CRI-O's bridge 10.85.0.0/16.
 - None of them contains 192.168.50.0/24.
 
 Why it matters (ENGINEERING INFERENCE):
@@ -899,7 +947,7 @@ Consequences (ENGINEERING INFERENCE):
 
 ## Sources
 
-E1 to E49 retrieved on **2026-09-28**. E50 to E54 retrieved on **2026-09-30** for the post-review corrections (section 29). Local evidence (outside Git): `C:\VMs\conversion-host-01\stage-1h\H1.txt` and `h1.ps1`.
+E1 to E49 retrieved on **2026-09-28**. E50 to E56 retrieved on **2026-09-30** for the post-review corrections (section 29). Local evidence (outside Git): `C:\VMs\conversion-host-01\stage-1h\H1.txt` and `h1.ps1`.
 
 | # | Source (URL) | Title | Exact requirement or fact | Implication |
 |---|---|---|---|---|
@@ -957,3 +1005,5 @@ E1 to E49 retrieved on **2026-09-28**. E50 to E54 retrieved on **2026-09-30** fo
 | E52 | https://github.com/flannel-io/flannel/releases/download/v0.28.9/kube-flannel.yml | flannel v0.28.9 deployment manifest | `net-conf.json`: `"Network": "10.244.0.0/16"`, backend `vxlan` | Pod CIDR (section 29.3) |
 | E53 | https://github.com/kubernetes/kubernetes/blob/release-1.36/cmd/kubeadm/app/apis/kubeadm/v1beta4/defaults.go | kubeadm v1beta4 defaults (release-1.36) | `DefaultServicesSubnet = "10.96.0.0/12"`, `DefaultClusterDNSIP = "10.96.0.10"` | Service CIDR (section 29.3) |
 | E54 | https://github.com/cri-o/cri-o/blob/release-1.36/contrib/cni/11-crio-ipv4-bridge.conflist | CRI-O release-1.36 default bridge CNI configuration | Bridge network `crio` with subnet `10.85.0.0/16` | Range kept clear (section 29.3) |
+| E55 | https://github.com/kubevirt/containerized-data-importer/blob/v1.66.1/doc/datavolumes.md | Data Volumes - CDI v1.66.1 documentation | "Data Volumes(DV) are an abstraction on top of Persistent Volume Claims(PVC)"; the DV "will monitor and orchestrate the import/upload/clone of the data into the PVC"; the `pvc` and `storage` sections both "result in CDI creating a PVC resource" | The standalone DataVolume is the migration disk's lifecycle object (sections 16, 18, 29.1) |
+| E56 | https://github.com/kubevirt/containerized-data-importer/blob/v1.66.1/staging/src/kubevirt.io/containerized-data-importer-api/pkg/apis/core/v1beta1/types.go | CDI v1.66.1 API types | `DataVolumeTTLSeconds`: "the time in seconds after DataVolume completion it can be garbage collected"; "Deprecated: Removed in v1.62" | The DataVolume is expected to remain after `Succeeded` (INFERRED; section 18) |

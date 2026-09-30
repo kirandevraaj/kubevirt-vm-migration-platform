@@ -3,7 +3,8 @@
 - **Status:** Accepted (Stage 1H, 2026-09-28). Design decision; nothing has been deployed.
 - **Amended:** 2026-09-30, documentation only, from the [Stage 1H architecture review](../stage-1/stage-1h-architecture-review.md):
   - review R3: address plan;
-  - review R4: guest management path.
+  - review R4: guest management path;
+  - clarifications of the address-plan overlap rule and of what the masquerade 10.0.2.0/24 is.
 
   Nothing was deployed or tested for this amendment.
 
@@ -17,15 +18,17 @@ The source VM serves nginx on a static 192.168.50.31 on VMnet8, a VMware Worksta
    - Port 80 serves the HTTP validation path.
    - Port 22 is declared only for guest management over the Kubernetes API (`virtctl ssh` or `virtctl port-forward`), inside KubeVirt's guest networking model. No Service exposes it, and the AWS security group does not open it (clarified 2026-09-30, review R4).
 2. The guest gets its address from KubeVirt's DHCP: **10.0.2.2/24, gateway 10.0.2.1** (default `vmNetworkCIDR` 10.0.2.0/24) [E21]. Egress is source-NATed to the pod IP, then to the node's VPC address.
+   - 10.0.2.0/24 is the masquerade binding's guest-side network inside the VM's own virt-launcher pod. It is not a VPC subnet and not a network that VMs share (clarified 2026-09-30).
+   - Several VMs do not share one L2 segment or compete for one global 10.0.2.2: each can be 10.0.2.2 inside its own pod, and is reached through its pod IP or a Service. See the [Stage 1H record, section 13](../stage-1/stage-1h-kubevirt-target-feasibility.md#13-network-architecture).
 3. **No Multus** and no NetworkAttachmentDefinitions: this model does not need them.
 4. **192.168.50.31 is not preserved.** Continuity is provided by a Kubernetes **Service** (NodePort 30080, reachable only from the operator's /32 for validation). Workload identity is proven by content (page sha256), not by address.
 5. **NodePort 30080 is external HTTP validation only. It is not a guest management path** (added 2026-09-30, review R4). The operator reaches the guest through the Kubernetes API over the node SSH tunnel: `virtctl console`, `virtctl vnc` where applicable, and `virtctl ssh` or `virtctl port-forward`. See the [Stage 1H record, section 29.4](../stage-1/stage-1h-kubevirt-target-feasibility.md#294-review-r4-guest-management-path).
-6. **The address ranges must not overlap** (added 2026-09-30, review R3). The masquerade `vmNetworkCIDR` stays at its default 10.0.2.0/24. The other ranges are proposed as:
+6. **The independent address domains must not overlap** (added 2026-09-30, review R3; wording clarified 2026-09-30). The masquerade `vmNetworkCIDR` stays at its default 10.0.2.0/24. The other ranges are proposed as:
    - VPC 10.40.0.0/16 and subnet 10.40.1.0/24 (proposed design);
    - pod CIDR 10.244.0.0/16 (flannel default);
    - Service CIDR 10.96.0.0/12 (kubeadm default).
 
-   None of these is runtime-confirmed. See the [Stage 1H record, section 29.3](../stage-1/stage-1h-kubevirt-target-feasibility.md#293-review-r3-address-plan).
+   The subnet is intentionally contained within the VPC. The domains that must not overlap one another are the VPC/subnet address space, the pod CIDR, the Service CIDR and the masquerade CIDR, and each of them must also stay clear of CRI-O's default bridge network 10.85.0.0/16. None of these values is runtime-confirmed. See the [Stage 1H record, section 29.3](../stage-1/stage-1h-kubevirt-target-feasibility.md#293-review-r3-address-plan).
 
 ## Why
 
