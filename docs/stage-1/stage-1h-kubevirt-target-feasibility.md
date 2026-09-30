@@ -8,8 +8,14 @@
 | Approval | Explicitly approved by the user as **design, feasibility and architecture only**: research current KubeVirt, CDI, Kubernetes and AWS requirements; compare EKS with self-managed Kubernetes; design the network, storage, guest-remediation and guest-agent model; write ADRs and diagrams; make one evidence-based target-platform decision. Not approved: any AWS resource, EC2 instance, EKS or kubeadm cluster, Kubernetes/KubeVirt/CDI installation, Multus, NetworkAttachmentDefinition, StorageClass, PVC, DataVolume or VM; any change to `legacy-source-vm`, the Stage 1E golden artifact or the Stage 1G images; Stage 1I. |
 | Result | **Success (H1 to H10 PASS).** Chosen target for the first KubeVirt migration: a **single-node, self-managed kubeadm cluster on one EC2 instance with nested virtualization** (`m8i.xlarge`, ap-south-1), running **CentOS Stream 9 + CRI-O 1.36 + Kubernetes 1.36 + KubeVirt v1.9.0 + CDI v1.66.1** on x86_64 with KVM. The VM uses the **pod network with masquerade binding** (no Multus) and gets its address by DHCP; **192.168.50.31 does not survive** and is replaced by a Kubernetes Service. Storage is **EBS gp3 through the EBS CSI driver, Block volume mode, ReadWriteOnce**; the disk travels as **qcow2** and CDI stores it as **raw** on the PVC. qemu-guest-agent is **installed offline at conversion time**, not at first boot. Nothing was created, installed or migrated. |
 | Related | [ADR 007](../adr/007-kubevirt-target-platform.md) (platform), [ADR 008](../adr/008-kubevirt-network-model.md) (network), [ADR 009](../adr/009-kubevirt-storage-model.md) (storage and disk format), [ADR 010](../adr/010-migration-network-remediation.md) (guest network remediation), [Stage 1G record](stage-1g-controlled-conversion.md), [Stage 0 feasibility](../stage-0/feasibility.md), [Stage 1 index](README.md) |
+| Post-review corrections | 2026-09-30. The [Stage 1H architecture review](stage-1h-architecture-review.md) (verdict: REQUIRES ARCHITECTURAL CORRECTIONS) required eight documentation corrections, review R1 to R8. With the user's approval they are applied to this record and to ADRs 008, 009 and 010 as **documentation only**. The details are in [section 29](#29-post-review-corrections-review-r1-to-r8). No AWS action, cluster, conversion, boot or other runtime experiment was performed for them. The 2026-09-28 findings, gates H1 to H10 and sources E1 to E49 are kept as recorded. Statements changed by the review are marked "(corrected 2026-09-30, review Rn)" or "(added 2026-09-30, review Rn)". Review R1 to R8 are the review's correction numbers and are unrelated to the risk IDs R1 to R13 in section 27. |
 
-Labels: **OBSERVED** = seen in this lab by a command we ran. **DOCUMENTED** = stated by an official source listed in [Sources](#sources) (retrieved 2026-09-28). **INFERRED** = reasoned from observations or documentation, not tested. **NOT TESTED** = deliberately not done. Decision states: **DECIDED**, **DEFERRED**, **UNKNOWN**, **BLOCKED**.
+Labels: **OBSERVED** = seen in this lab by a command we ran. **DOCUMENTED** = stated by an official source listed in [Sources](#sources) (retrieved 2026-09-28, or 2026-09-30 where stated). **INFERRED** = reasoned from observations or documentation, not tested. **NOT TESTED** = deliberately not done. Decision states: **DECIDED**, **DEFERRED**, **UNKNOWN**, **BLOCKED**. Section 29 uses the review's four labels:
+
+- **PROJECT-DERIVED FACT** corresponds to OBSERVED, or to an earlier stage's record.
+- **CURRENT UPSTREAM DOCUMENTATION** corresponds to DOCUMENTED.
+- **ENGINEERING INFERENCE** corresponds to INFERRED.
+- **PROPOSED DESIGN** is a design value that has not been observed at runtime.
 
 Source references such as [E5] point to the numbered table in [Sources](#sources), which records URL, title, retrieval date, the exact requirement and its implication.
 
@@ -176,7 +182,7 @@ The question was not "does EC2 support KVM" but whether an EKS worker architectu
 | Networking | flannel, as in KubeVirt CI [E9]; pod network plus masquerade needs nothing else | Met |
 | Storage | EBS CSI driver self-installed, IAM through an instance profile (no static keys) [E40] | Met |
 | Observability | kubectl, virtctl, node journal, VMI status; no monitoring stack needed for the first migration | Sufficient |
-| Teardown | One instance, its volumes, one security group, one instance profile; destroyed with the Terraform state | Simple |
+| Teardown | Two ownership domains (corrected 2026-09-30, review R1). **Terraform-managed AWS infrastructure** (VPC, subnet, internet gateway, route table, security group, instance profile, the instance and its root volume) is destroyed through the Terraform state. **EBS volumes created by the EBS CSI driver** (the VM disk, the CDI scratch volume) are **not** in the Terraform state; they are deleted through Kubernetes before the destroy and checked for afterwards. Ordered sequence: section 29.1 | Simple, but ordered |
 | Terraform suitability | All resources are plain EC2/VPC/IAM resources; nested virtualization is a launch CPU option | Suitable (ADR 002 requires Terraform) |
 
 **Conclusion.** Self-managed kubeadm on EC2 meets every requirement in section 9 that can be settled on paper. It reproduces the exact platform KubeVirt tests on, and its only unproven element, `/dev/kvm` through nested virtualization, is shared with EKS.
@@ -222,11 +228,18 @@ Analysis of every current binding [E20, E21, E22, E10]. "Static guest IP" means 
 
 **Decision ([ADR 008](../adr/008-kubevirt-network-model.md)): pod network + masquerade, one interface, `model: virtio`, with an explicit port list (80, 22).** No Multus is installed because this model does not need it.
 
+The two ports serve different purposes (clarified 2026-09-30, review R4):
+
+- **Port 80** is reached externally through the NodePort Service (30080) for HTTP validation.
+- **Port 22** is declared only so that guest management over the Kubernetes API path (`virtctl ssh` or `virtctl port-forward`) can reach the guest's sshd inside the pod. No Service exposes it, and the AWS security group does not open it.
+
+See section 29.4.
+
 Traffic paths (INFERRED from [E20, E21]; to be observed on the node):
 
 - **Outbound:** guest 10.0.2.2 -> virt-launcher pod (SNAT to the pod IP, flannel range) -> node (flannel masquerade to the node's VPC private IP) -> internet gateway (public IPv4). DNS: the virt-launcher DHCP response is expected to carry the pod's resolver, which is cluster DNS (CoreDNS). INFERRED.
 - **Inbound HTTP validation:** operator workstation -> node public IPv4 on a fixed NodePort (30080), allowed only from the operator's /32 -> Service -> pod IP:80 -> DNAT -> guest 10.0.2.2:80.
-- **Management:** SSH to the node from the operator /32; the Kubernetes API through an SSH tunnel; the guest console through `virtctl console`/`vnc` over the API.
+- **Management:** SSH to the node from the operator /32; the Kubernetes API through an SSH tunnel; the guest through `virtctl console`, `virtctl vnc`, and `virtctl ssh` or `virtctl port-forward`, all over the API. Guest management never uses the NodePort (section 29.4).
 
 ## 14. Network IP continuity decision
 
@@ -235,7 +248,7 @@ Traffic paths (INFERRED from [E20, E21]; to be observed on the node):
 1. **Different network.** .31 lives on VMnet8, a NAT network inside VMware Workstation on the laptop. Nothing in AWS can route to it or extend it.
 2. **The binding assigns the address.** Masquerade hands the guest 10.0.2.2 by DHCP; a static .31 in the guest would not match the pod's NAT and would be unreachable [E20, E21].
 3. **The VPC rejects foreign addresses.** An ENI carries only addresses from its subnet range, and source/destination checking drops traffic for other addresses [E46]. Carrying .31 would need a purpose-built 192.168.50.0/24 VPC, secondary ENI addresses and Multus bridging: all artifice, and still not the same network.
-4. **The source keeps running.** The first migration is a cold copy with the source left on as the reference and rollback. The same address on both would be a conflict, even in theory.
+4. **The source keeps running.** The first migration is a cold copy with the source left on as the reference and rollback. The same address on both would be a conflict, even in theory. More precisely (added 2026-09-30, review R8), it is a cold, point-in-time migration of the Stage 1E copy, with no cutover (section 29.8).
 
 **What replaces IP continuity:**
 
@@ -243,7 +256,7 @@ Traffic paths (INFERRED from [E20, E21]; to be observed on the node):
 |---|---|
 | Service address | A Kubernetes Service (ClusterIP inside the cluster, NodePort 30080 for the validation client) survives VM restarts and pod IP changes [E20] |
 | Client-facing name | DEFERRED: no DNS name in the first migration. The validation client uses node-public-IP:30080 |
-| Workload identity | Proven by content, not by address: filesystem UUIDs, nginx package/config hashes, HTTP 200, page sha256 `b9826e18...0046` |
+| Workload identity | Proven by content, not by address: filesystem UUIDs, nginx package/config hashes, HTTP 200, page sha256 `b9826e18...0046`. The guest is unchanged except for the enumerated migration and preparation changes (corrected 2026-09-30, review R2; section 29.2) |
 | Guest address | Changes from 192.168.50.31 (static) to 10.0.2.2 (DHCP, inside the pod). Recorded as an **infrastructure identity** change |
 
 ## 15. Guest network remediation design
@@ -274,7 +287,7 @@ network:
 | No VMware naming | No name match, no `set-name`, no MAC match (the MAC changes unless set) |
 | Chosen network model | DHCP, as masquerade expects [E20] |
 
-How and where it is applied (a future, separately approved stage): offline with guestfish or virt-customize, on a **new disposable copy** of the virt-v2v output, on `conversion-host-01`. Never on the golden artifact, the working copy or the kept Stage 1G images. Known limits: with more than one virtio NIC the match would configure all of them (fine for the single-NIC design). The inert `ens192` in `/etc/cloud/cloud.cfg.d/90-installer-network.cfg` is left alone because cloud-init is disabled.
+How and where it is applied (a future, separately approved stage): offline with guestfish or virt-customize, on a **new disposable copy** of the virt-v2v output, on `conversion-host-01`. Never on the golden artifact, the working copy or the kept Stage 1G images. The prepared image must pass the pre-transfer boot test on `conversion-host-01` before it leaves the lab (added 2026-09-30, review R5; section 29.5). Known limits: with more than one virtio NIC the match would configure all of them (fine for the single-NIC design). The inert `ens192` in `/etc/cloud/cloud.cfg.d/90-installer-network.cfg` is left alone because cloud-init is disabled.
 
 ## 16. Storage architecture
 
@@ -284,14 +297,15 @@ Recorded in [ADR 009](../adr/009-kubevirt-storage-model.md).
 |---|---|---|
 | Provisioner | AWS EBS CSI driver (`ebs.csi.aws.com`), installed by us on the self-managed cluster; IAM through the instance profile with `AmazonEBSCSIDriverPolicyV2`; IMDSv2 with hop limit 2 so the driver pods can reach instance metadata | [E40] |
 | Volume type | gp3: 3,000 IOPS and 125 MiB/s baseline included, 1 GiB to 64 TiB | [E41] |
-| StorageClass (design) | `type: gp3`, `volumeBindingMode: WaitForFirstConsumer`, `reclaimPolicy: Delete`, `allowVolumeExpansion: true` | INFERRED design |
+| StorageClass (design) | `type: gp3`, `encrypted: "true"` (added 2026-09-30, review R7), `volumeBindingMode: WaitForFirstConsumer`, `reclaimPolicy: Delete`, `allowVolumeExpansion: true` | INFERRED design; `encrypted` defaults to `false` in the driver [E50] |
+| Encryption at rest | Every CSI-created volume (VM disk and CDI scratch) is encrypted through the StorageClass parameter, not through an assumed default (added 2026-09-30, review R7; section 29.7) | [E50] |
 | Volume mode | **Block** for the VM disk: KubeVirt consumes the raw device directly, with no `disk.img` file or filesystem overhead [E23] | [E23, E40] |
 | Scratch space | CDI always requests scratch as **Filesystem, ReadWriteOnce**, and upload always needs scratch; the same gp3 class serves both modes | [E17] |
 | Access mode | ReadWriteOnce. EBS is RWO and AZ-scoped; the VM is therefore not live-migratable, which is accepted for a cold migration | [E22], ADR 002 |
 | Disk bus | `virtio` (proven in Stage 1G; KubeVirt's standard bus) | [E23] |
 | Size | 40 GiB, exactly the source's virtual size (42,949,672,960 bytes). Never smaller. Keeping it equal avoids CDI growing the virtual disk on import [E15] | Stage 1G |
 | Import mechanism | CDI upload DataVolume (`source: upload`), filled by `virtctl image-upload` | [E14, E16] |
-| Lifecycle | A standalone DataVolume/PVC referenced by the VM, not a `dataVolumeTemplate`, so deleting the VM does not delete the migrated disk | [E23] |
+| Lifecycle | A standalone DataVolume/PVC referenced by the VM, not a `dataVolumeTemplate`, so deleting the VM does not delete the migrated disk. Deleting the disk is therefore an explicit teardown step, and the EBS volume behind it is outside the Terraform state (added 2026-09-30, review R1; section 29.1) | [E23] |
 | CRI setting | `device_ownership_from_security_context = true` in CRI-O, required for CDI on block PVCs | [E18] |
 
 **Cold versus live migration.** Live migration needs a shared ReadWriteMany volume and rules out pod-network bridge binding [E22]. The first migration is a cold copy of a powered-off disk into a new VM, so it needs neither shared storage nor live migration. The design is deliberately not shaped around live migration. RWX storage (EFS, or a clustered block solution) is DEFERRED.
@@ -304,6 +318,20 @@ Recorded in [ADR 009](../adr/009-kubevirt-storage-model.md).
 | Conversion output / transfer format | **qcow2** (virt-v2v `-of qcow2`, then remediation and agent install on a copy) | Guest-aware conversion is required (netplan, VMware Tools, first-boot jobs). qcow2 carries only allocated data: about 2.7 GiB to move instead of 40 GiB. CDI accepts qcow2 for upload and import [E14] |
 | Target representation | **raw on a Block-mode PVC** | CDI converts every supported format to raw [E14, E15]; KubeVirt reads raw block devices directly [E23] |
 
+**What "raw at rest" means here** (clarified 2026-09-30):
+
+- On a Block PVC there is no raw file. CDI writes the guest disk bytes directly onto the EBS block device.
+- Along the path, only the **container** changes: VMDK, then qcow2, then no container at all.
+- The guest's partition table and filesystems (GPT, the vfat ESP, the ext4 root with the same UUIDs) travel as they are. **No guest filesystem is converted.**
+- The only guest-content changes are the enumerated ones in section 29.2.
+- EBS bills the provisioned 40 GiB whatever the guest has allocated. The thinness of qcow2 exists only in transit (INFERRED).
+
+**The uploaded qcow2 must be standalone** (added 2026-09-30):
+
+- It must have no backing file: `qemu-img info --backing-chain` must show exactly one image.
+- An overlay would carry only its own clusters.
+- Stage 1F recorded this check for the input VMDK (no backing file). The check has **not** yet been recorded for the virt-v2v output or for a prepared image, so that evidence is pending future image preparation (section 29.2).
+
 Not chosen:
 
 - **VMDK straight into CDI.** CDI accepts VMDK [E14], but a direct import would skip the guest adaptation that Stage 1G showed is required. The vmfs descriptor plus flat extent pair is also not a single upload file (NOT TESTED).
@@ -315,13 +343,29 @@ Not chosen:
 
 Design, in order. Nothing was run.
 
-1. **Prepare the image** (future stage, on `conversion-host-01`): copy the kept virt-v2v output, apply the section 15 netplan design and the section 19 agent install to the copy, run `qemu-img check`, sha256 it, make it read-only.
-2. **Transfer**: move the qcow2 (about 2.7 GiB) to the node over SSH and verify the sha256 on both ends. The route (directly from the conversion host, or through Windows with only about 5.8 GiB free) is a Stage 1I detail (DEFERRED). Inbound transfer into AWS carries no data-transfer charge (INFERRED from AWS pricing practice; not priced here).
-3. **Upload** on the node, so the upload proxy is never exposed: `kubectl port-forward -n cdi service/cdi-uploadproxy 8443:443` [E16], then `virtctl image-upload dv legacy-source-vm-disk --size=40Gi --volume-mode=block --access-mode=ReadWriteOnce --storage-class=<gp3 class> --image-path=<qcow2> --uploadproxy-url=https://127.0.0.1:8443 --insecure --force-bind` (flags from the v1.9.0 source [E49]; `--force-bind` avoids waiting for a consumer under `WaitForFirstConsumer`).
-4. **CDI processing**: an upload server receives the qcow2 into Filesystem scratch space, `qemu-img` converts it to raw onto the Block PVC, and the scratch PVC is removed [E17].
-5. **Verify**: DataVolume phase `Succeeded`, PVC `Bound`, size 40Gi, `volumeMode: Block`.
-6. **VM**: a `VirtualMachine` referencing the PVC with `bus: virtio`, EFI with `secureBoot: false`, 2 vCPU / 4096 Mi (from the `.vmx`, not the virt-v2v defaults), one masquerade interface, `runStrategy: Manual` so start and stop are explicit.
-7. **Runtime**: virt-launcher pod -> libvirt -> QEMU with `/dev/kvm` -> Ubuntu -> nginx.
+1. **Prepare the image** (future stage, on `conversion-host-01`):
+   - Copy the kept virt-v2v output.
+   - Apply the section 15 netplan design and the section 19 agent install to the copy.
+   - Run `qemu-img check`, sha256 the result and make it read-only.
+   - Confirm the result is a standalone qcow2 (section 17).
+   - Write the preparation record of section 29.2 (added 2026-09-30, review R2).
+2. **Pre-transfer boot test** (added 2026-09-30, review R5): a mandatory gate. Boot the exact prepared qcow2 once on `conversion-host-01` as defined in section 29.5, and transfer nothing until it passes.
+3. **Transfer**: move the qcow2 (about 2.7 GiB) to the node over SSH and verify the sha256 on both ends.
+   - The route (directly from the conversion host, or through Windows with only about 5.8 GiB free) is a Stage 1I detail (DEFERRED).
+   - Any route must meet the mandatory constraints of section 29.6 (added 2026-09-30, review R6).
+   - Inbound transfer into AWS carries no data-transfer charge (INFERRED from AWS pricing practice; not priced here).
+4. **Upload** on the node, so the upload proxy is never exposed: `kubectl port-forward -n cdi service/cdi-uploadproxy 8443:443` [E16], then `virtctl image-upload dv legacy-source-vm-disk --size=40Gi --volume-mode=block --access-mode=ReadWriteOnce --storage-class=<gp3 class> --image-path=<qcow2> --uploadproxy-url=https://127.0.0.1:8443 --insecure --force-bind` (flags from the v1.9.0 source [E49]; `--force-bind` avoids waiting for a consumer under `WaitForFirstConsumer`).
+5. **CDI processing**: an upload server receives the qcow2 into Filesystem scratch space, `qemu-img` converts it to raw onto the Block PVC, and the scratch PVC is removed [E17]. Confirm that the scratch PVC is actually gone (added 2026-09-30, review R1).
+6. **Verify**: DataVolume phase `Succeeded`, PVC `Bound`, size 40Gi, `volumeMode: Block`.
+   - `Succeeded` proves that CDI finished writing. It does **not** prove that the right image was imported, or that the guest workload is correct (clarified 2026-09-30).
+   - That proof comes from two further checks:
+     - the artifact check before upload: the file's sha256 equals the preparation record;
+     - the guest-level checks of section 21, run after boot.
+7. **VM**: a `VirtualMachine` referencing the PVC with `bus: virtio`, EFI with `secureBoot: false`, 2 vCPU / 4096 Mi (from the `.vmx`, not the virt-v2v defaults), one masquerade interface, `runStrategy: Manual` so start and stop are explicit.
+   - Machine type, CPU model and EFI variable-store persistence are left at KubeVirt's defaults.
+   - The values actually applied are **recorded at runtime**, not treated as fixed design values (clarified 2026-09-30).
+8. **Runtime**: virt-launcher pod -> libvirt -> QEMU with `/dev/kvm` -> Ubuntu -> nginx.
+9. **Evidence and teardown** (added 2026-09-30, review R1): capture the evidence, delete the qcow2 from the node, and tear down in the order of section 29.1.
 
 ## 19. Guest-agent strategy
 
@@ -331,23 +375,42 @@ Design, in order. Nothing was run.
 | What it adds | The VMI condition `AgentConnected`, guest OS info and guest-reported interfaces in `status`, and the `guestosinfo`, `userlist` and `filesystemlist` subresources [E24] |
 | Needed for the first migration? | No. It is an extra, non-blocking observation. The pass/fail checks (section 21) do not depend on it |
 | Offline install without internet on first boot? | Yes, by design: install it before import |
-| Install during conversion? | Yes: on a disposable copy of the virt-v2v output. Fetch `qemu-guest-agent` and any missing dependencies as `.deb` files on `conversion-host-01` (the same Ubuntu 24.04 release) with `apt-get download`, upload them into the image, and run `dpkg -i` offline with virt-customize (guestfs-tools 1.52.0 is installed, ADR 006). Then delete the virt-v2v `guestfs-firstboot` scripts that run `apt-get update`/install and start the agent, so first boot never touches the network for packages |
+| Install during conversion? | Yes: on a disposable copy of the virt-v2v output. Fetch `qemu-guest-agent` and any missing dependencies as `.deb` files on `conversion-host-01` (the same Ubuntu 24.04 release) with `apt-get download`, upload them into the image, and run `dpkg -i` offline with virt-customize (guestfs-tools 1.52.0 is installed, ADR 006). Then delete the virt-v2v `guestfs-firstboot` scripts that run `apt-get update`/install and start the agent, so first boot never touches the network for packages. Refined 2026-09-30 (review R2): see the notes below this table |
 | Install offline before import? | Yes, that is the same step: the image leaves the conversion host with the agent installed and no pending first-boot package work |
 | How KubeVirt detects and uses it | Through the QEMU guest-agent virtio-serial channel (virt-v2v's own XML also declares `org.qemu.guest_agent.0`); presence is reported as `AgentConnected` [E24]. That the channel is added automatically is INFERRED |
 
 Rule kept: no agent installation depends on uncontrolled internet access at first boot, and nothing is installed into the source VM or the kept Stage 1G images.
 
+**Refinements to the install step** (added 2026-09-30, review R2):
+
+- **Remove all five first-boot scripts** named in the Stage 1G record (section 14): `5000-0001-wait-online`, `5000-0002-setenforce-0`, `5000-0003-install-qga`, `5000-0004-setenforce-restore`, `5000-0005-start-qga`. Removing only the apt scripts would leave the 30-second wait-online script.
+- **Also remove the `guestfs-firstboot` service** with its enablement links, and `firstboot.sh`. All of these were added by virt-v2v, and none exists in the source.
+- **"Offline" refers to the guest only.** The guest never needs network access for this install; `conversion-host-01` does need access to the Ubuntu archive for `apt-get download`.
+- **Stop rule.** Record the dependency set after a dry run against the guest's own package state (U8). If installing it would upgrade packages already installed in the guest, stop for a human decision rather than silently widening the guest change.
+- The installed package set is an intended guest change recorded in the preparation record (section 29.2).
+
 ## 20. First-migration architecture
 
 End to end (see [stage-1h-migration-data-path.svg](../diagrams/stage-1h-migration-data-path.svg) and [stage-1h-target-platform.svg](../diagrams/stage-1h-target-platform.svg)):
 
-ESXi `legacy-source-vm` -> cold acquisition (Stage 1E, done) -> golden VMDK on Windows (read only) -> working copy on `conversion-host-01` (immutable) -> virt-v2v guest-aware conversion to qcow2 (Stage 1G, done) -> disposable copy with netplan remediation and offline guest agent (future) -> transfer to the EC2 node -> CDI upload DataVolume -> raw Block PVC on EBS gp3 -> `VirtualMachine` -> virt-launcher pod -> QEMU/KVM on `/dev/kvm` (nested virtualization) -> Ubuntu 24.04 -> nginx.
+ESXi `legacy-source-vm` -> cold acquisition (Stage 1E, done) -> golden VMDK on Windows (read only) -> working copy on `conversion-host-01` (immutable) -> virt-v2v guest-aware conversion to qcow2 (Stage 1G, done) -> disposable copy with netplan remediation and offline guest agent (future) -> pre-transfer boot test on `conversion-host-01` (future gate, section 29.5) -> transfer to the EC2 node -> CDI upload DataVolume -> raw Block PVC on EBS gp3 -> `VirtualMachine` -> virt-launcher pod -> QEMU/KVM on `/dev/kvm` (nested virtualization) -> Ubuntu 24.04 -> nginx.
 
 Network path (see [stage-1h-network-model.svg](../diagrams/stage-1h-network-model.svg)): guest virtio NIC (DHCP 10.0.2.2) -> masquerade binding in the virt-launcher pod (**NAT here**) -> pod network (flannel) -> node ENI (VPC private IP) -> public IPv4. The original VMware IP 192.168.50.31 stays on VMnet8 with the running source. **IP continuity: none, by design.** DNS: cluster DNS for the guest (INFERRED), no public name (DEFERRED). **External HTTP validation point:** node public IPv4, NodePort 30080, from the operator /32.
 
+**Migration semantics** (added 2026-09-30, review R8):
+
+- This is a **cold, point-in-time migration demonstration** of the Stage 1E copy.
+- The source VM has kept running since that copy, and nothing it wrote afterwards is carried.
+- There is **no cutover**. The source continues to run independently at 192.168.50.31. Details are in section 29.8.
+
 ## 21. Application validation model
 
-The same 12 checks used since Stage 1C, adapted to KubeVirt. Access: `virtctl console`/`vnc` (serial or VNC through the API), `virtctl ssh` or SSH through the Service, `curl` from outside.
+The same 12 checks used since Stage 1C, adapted to KubeVirt. Access (corrected 2026-09-30, review R4):
+
+- **Guest shell for checks 1 to 8:** through the Kubernetes API (over the node SSH tunnel), using `virtctl console` (serial), `virtctl vnc`, or `virtctl ssh` / `virtctl port-forward` to the guest's port 22.
+- **External HTTP checks:** `curl` from outside to the NodePort.
+
+There is no guest SSH Service: NodePort 30080 is HTTP validation only (section 29.4).
 
 | # | Check | How on KubeVirt | Pass condition |
 |---|---|---|---|
@@ -368,7 +431,18 @@ Extra, non-blocking observations: `AgentConnected`, `guestosinfo`, `systemctl is
 
 **Infrastructure identity (expected to change, recorded not failed):** hypervisor and Vmid (ESXi Vmid 2 -> KubeVirt VMI UID), MAC (`00:0c:29:0f:3d:15` -> KubeVirt-generated), disk (PVSCSI `sda` -> virtio `vda`, VMDK -> raw PVC), interface name (`ens192` -> a virtio name), SMBIOS/firmware IDs and NVRAM, IP (192.168.50.31 -> 10.0.2.2 behind the pod IP).
 
-**Workload identity (must not change):** Ubuntu root filesystem content and UUIDs, nginx package and configuration, the validation page and its hash, application state. machine-id, SSH host keys and hostname also stay the same; this is acceptable because the source and target never share a network.
+**Workload identity: unchanged except for the explicitly enumerated migration and preparation changes** (corrected 2026-09-30, review R2).
+
+- **Must stay unchanged:**
+  - filesystem UUIDs;
+  - nginx package and configuration;
+  - the validation page and its hash;
+  - application state.
+- **Also unchanged:** machine-id, SSH host keys and hostname. This is acceptable because the source and target never share a network.
+- **The root filesystem is not byte-for-byte unchanged, by design.** virt-v2v and image preparation change it in the ways enumerated in section 29.2, and only in those ways.
+- **Any difference outside that list is a finding, not an expected change.**
+
+The original 2026-09-28 wording, which listed the Ubuntu root filesystem content among the things that stay the same, contradicted the design's own guest changes and is superseded.
 
 ## 22. AWS resource model
 
@@ -376,14 +450,14 @@ Designed, not provisioned. Region **ap-south-1 (Asia Pacific, Mumbai)**, on-dema
 
 | Resource | Design |
 |---|---|
-| Network | One VPC, one public subnet in one AZ, internet gateway, route table. No NAT gateway |
-| Security group | Inbound only from the operator's /32: TCP 22 (SSH) and TCP 30080 (validation NodePort). The API (6443) is reached through the SSH tunnel. Outbound: all |
+| Network | One VPC, one public subnet in one AZ, internet gateway, route table. No NAT gateway. Proposed ranges: VPC 10.40.0.0/16, subnet 10.40.1.0/24 (added 2026-09-30, review R3; address plan in section 29.3) |
+| Security group | Inbound only from the operator's /32: TCP 22 (SSH to the **node's** own sshd, not to the guest) and TCP 30080 (HTTP validation NodePort). The API (6443) is reached through the SSH tunnel. Outbound: all. Guest port 22 is never opened here (clarified 2026-09-30, review R4) |
 | Instance | 1 x `m8i.xlarge` (4 vCPU, 16 GiB), `CpuOptions NestedVirtualization=enabled`, CentOS Stream 9 AMI, IMDSv2 required with hop limit 2 |
-| Root volume | 50 GiB gp3 (OS, container images, the uploaded qcow2) |
-| VM disk | 40 GiB gp3 (dynamic, from the EBS CSI driver), plus a temporary scratch volume of about 40 GiB during import |
+| Root volume | 50 GiB gp3, **encrypted** (added 2026-09-30, review R7) (OS, container images, the uploaded qcow2). Terraform-managed |
+| VM disk | 40 GiB gp3 (dynamic, from the EBS CSI driver), plus a temporary scratch volume of about 40 GiB during import. Both **encrypted** through the StorageClass (review R7). Both **outside the Terraform state** (review R1) |
 | IAM | Instance profile with `AmazonEBSCSIDriverPolicyV2` only [E40] |
 | Public IPv4 | One (auto-assigned) |
-| Lifecycle | Terraform apply for a session, destroy afterwards (ADR 002) |
+| Lifecycle | Terraform apply for a session, destroy afterwards (ADR 002), in the teardown order of section 29.1, which deletes the CSI-created volumes first and checks for leftovers after the destroy (corrected 2026-09-30, review R1) |
 
 Minimum footprint: 1 node, 4 vCPU, 16 GiB RAM, 90 GiB of gp3 steady state (plus about 40 GiB for the length of the import), nested virtualization (no extra charge [E32]), 1 public IPv4.
 
@@ -411,8 +485,10 @@ A 4-hour working session costs about USD 0.96, plus the scratch volume for under
 | AWS credentials | None in the repository, manifests or the node. Terraform runs with the operator's own credentials (still BLOCKED, see section 26). The node uses its instance profile only. The Docker volume `platform-aws-tools-aws` is untouched |
 | Instance metadata | IMDSv2 only; hop limit 2 is needed by the EBS CSI driver [E40], which also lets any pod read the instance role. Mitigation: the role holds only the EBS CSI policy, and the node runs only our workloads |
 | RBAC | kubeadm admin kubeconfig kept on the workstation outside Git; no extra users. KubeVirt's default roles unchanged |
-| Network exposure | Only 22 and 30080 from one /32. The upload proxy is used through `port-forward` on the node and never exposed |
-| Storage permissions | The EBS CSI policy is scoped to volumes tagged `ebs.csi.aws.com/cluster: true` [E40]; volumes are deleted with the cluster (`reclaimPolicy: Delete`) |
+| Network exposure | Only 22 (node sshd) and 30080 (HTTP validation) from one /32. The upload proxy is used through `port-forward` on the node and never exposed. Guest management goes through the Kubernetes API, never through a Service (clarified 2026-09-30, review R4) |
+| Storage permissions | The EBS CSI policy is scoped to volumes tagged `ebs.csi.aws.com/cluster: true` [E40]. Corrected 2026-09-30 (review R1): the original text said that `reclaimPolicy: Delete` removes the volumes together with the cluster, which is inaccurate. `reclaimPolicy: Delete` acts only when a PVC is deleted while the CSI driver still runs. Terminating the instance leaves CSI-created volumes behind as billed, `available` volumes, outside the Terraform state. They are deleted explicitly and checked for by that tag (section 29.1) |
+| Encryption at rest | Root volume and all CSI-created volumes encrypted (added 2026-09-30, review R7; section 29.7) |
+| Disk artifacts | Every copy of the guest disk (VMDK, qcow2, EBS volume) is sensitive data: it contains SSH host private keys, password hashes, machine identity, logs and application data. Handling rules in section 29.7 (added 2026-09-30, review R7) |
 | Secrets | No Kubernetes Secrets with cloud credentials. Kubeconfig, SSH private key and Terraform state stay outside Git (`.gitignore`) |
 | SELinux | Enforcing (as in KubeVirt CI [E9]). Any denial is recorded, and the stage stops rather than silently switching to permissive |
 | Feature gates | v1.9 enables all Beta gates by default [E11]. Accepted for a disposable lab; disabling unused ones is DEFERRED hardening |
@@ -455,7 +531,7 @@ A 4-hour working session costs about USD 0.96, plus the scratch volume for under
 | CentOS Stream 10 nodes | When KubeVirt's default userland moves to CS10 |
 | MAC preservation, cloud-init enablement, instancetypes/preferences | Not needed |
 | Snapshots, backup, Beta-gate hardening, monitoring stack | After the first migration works |
-| The route for moving the qcow2 to AWS | Stage 1I detail (section 18) |
+| The route for moving the qcow2 to AWS | Stage 1I detail (section 18). Any route must meet the mandatory constraints of section 29.6 (added 2026-09-30, review R6). S3 staging is not part of this design |
 | Terraform code, GitOps, the custom controller (ADR 005), warm migration (ADR 003) | Later stages |
 | Production design | Out of scope. Not a claim about production suitability |
 
@@ -471,7 +547,7 @@ A 4-hour working session costs about USD 0.96, plus the scratch volume for under
 | U6 | This guest's EFI boot with KubeVirt's OVMF build and fallback loader (proven only with Ubuntu's OVMF) | First boot |
 | U7 | The virtio NIC name inside the KubeVirt guest | Irrelevant with the driver match; observe |
 | U8 | The offline dependency set of `qemu-guest-agent` for the guest's package state | `apt-get download` plus a dry run on the conversion host |
-| U9 | Whether virt-v2v's first-boot scripts skip the agent install when it is already present | Inspect the scripts on the copy; remove them regardless |
+| U9 | Whether virt-v2v's first-boot scripts skip the agent install when it is already present | Inspect the scripts on the copy; remove them regardless. 2026-09-30: moot for the design. The Stage 1G record shows all five scripts serve the agent install, and the design now removes all five plus the service (section 29.2) |
 | U10 | CDI upload under `WaitForFirstConsumer` on a single node with `--force-bind` | First upload |
 | U11 | EBS CSI metadata access through flannel with hop limit 2 | Driver logs |
 | U12 | Formal KubeVirt-to-CDI compatibility | Not published; the runtime gate decides |
@@ -491,7 +567,7 @@ A 4-hour working session costs about USD 0.96, plus the scratch volume for under
 | R6 | Public exposure of SSH and the NodePort | Operator /32 only; teardown after the session |
 | R7 | The guest boots unreachable if DHCP or the netplan design fails | `virtctl console`/`vnc` for diagnosis; the design was proven in principle in Stage 1G |
 | R8 | CDI scratch space temporarily doubles storage | Budgeted (section 22) |
-| R9 | Forgotten teardown leaks about USD 174 per month | Session checklist; Terraform destroy |
+| R9 | Forgotten teardown leaks about USD 174 per month | Session checklist; Terraform destroy. Corrected 2026-09-30 (review R1): also the post-destroy check for CSI-created volumes (section 29.1), because the destroy alone does not remove them |
 | R10 | SELinux enforcing blocks a component | Record AVC, stop, decide explicitly |
 | R11 | All Beta feature gates on by default | Accepted for a lab; hardening deferred |
 | R12 | Duplicate guest identity (machine-id, host keys, hostname) | The source and target never share a network |
@@ -523,6 +599,289 @@ Stage 1I is not defined or started here. Status at the end of Stage 1H:
 
 Stage 1I also requires the user's explicit approval, with objective, scope and change boundary written down, and working AWS credentials (U15).
 
+**Added 2026-09-30.** The [Stage 1H architecture review](stage-1h-architecture-review.md) found that the "Met" statuses above were not sufficient on their own, and required corrections review R1 to R8. They are now documented in section 29:
+
+| Criterion (review) | Status |
+|---|---|
+| Teardown and EBS lifecycle defined (R1) | Defined: section 29.1 (not executed) |
+| Guest identity and intended changes defined (R2) | Defined: section 29.2; preparation evidence pending future image preparation |
+| Address plan defined (R3) | Defined as proposed design: section 29.3; nothing runtime-confirmed |
+| Guest management path defined (R4) | Defined: section 29.4 |
+| Pre-transfer boot test gate defined (R5) | Defined: section 29.5 (not executed) |
+| Transfer constraints defined (R6) | Defined: section 29.6; route still deferred |
+| Encryption and artifact handling defined (R7) | Defined: section 29.7 |
+| Point-in-time, no-cutover semantics stated (R8) | Stated: section 29.8 |
+
+Stage 1I remains **not started**. Whether the corrected design is ready for approval is a **human decision**. Documenting these corrections does not approve Stage 1I.
+
+## 29. Post-review corrections (review R1 to R8)
+
+Added 2026-09-30 from the [Stage 1H architecture review](stage-1h-architecture-review.md), section 15, with the user's approval.
+
+- These are documentation corrections. **Nothing in this section was executed.**
+- Every sequence, check and value here is a PROPOSED DESIGN for a future, separately approved stage, unless it is labelled otherwise.
+- **No value in this section is runtime-confirmed.**
+- Labels are as defined at the top of this record.
+
+### 29.1 Review R1: teardown and EBS lifecycle
+
+The original record said that Terraform destroys the instance "and its volumes", and that `reclaimPolicy: Delete` removes the volumes with the cluster. That conflated two different ownership domains.
+
+| Domain | Resources | Created by | Removed by | Basis |
+|---|---|---|---|---|
+| **Terraform-managed AWS infrastructure** | VPC, subnet, internet gateway, route table, security group, IAM role and instance profile, the EC2 instance and its root volume | `terraform apply` (ADR 002) | `terraform destroy`, which only knows what is in its state | PROPOSED DESIGN (ADR 002) |
+| **Kubernetes / EBS CSI-provisioned storage** | The 40 GiB VM disk volume; the roughly 40 GiB CDI scratch volume (normally removed by CDI after the import) | The EBS CSI driver, when a PVC is bound. It tags the volume `ebs.csi.aws.com/cluster = true`; the IAM policy only lets it manage volumes with that tag (or with `kubernetes.io/created-for/pvc/name`) [E40, E51] | Deleting the PVC while the driver still runs (`reclaimPolicy: Delete`); otherwise only an explicit volume deletion | CURRENT UPSTREAM DOCUMENTATION [E51]; ENGINEERING INFERENCE |
+
+Why this matters (ENGINEERING INFERENCE):
+
+- CSI-created volumes are not in the Terraform state, so a destroy neither deletes nor lists them.
+- Terminating the instance detaches them.
+- EBS volumes are not VPC resources, so nothing blocks the destroy: it completes and the volumes remain, billed as `available`.
+- Each leftover holds a copy of the guest disk, which is sensitive data (section 29.7).
+
+**Teardown sequence** (PROPOSED DESIGN; not executed; performed by the operator, and needs the AWS credentials that are still BLOCKED, U15):
+
+1. **Capture validation evidence.** Record, as text:
+   - the 12 check results and the recorded KubeVirt runtime defaults;
+   - VMI status and conditions, and events;
+   - DataVolume, PVC and PV descriptions, including the EBS volume ID.
+
+   Never capture disk content.
+2. **Stop and delete the KubeVirt workload.** Stop the VM, then delete the `VirtualMachine` and the validation Service.
+3. **Delete the storage objects.** Delete the DataVolume (which deletes its PVC) or the PVC, as applicable.
+4. **Verify that the PV and EBS volume are gone.** The PV is removed, the recorded EBS volume ID is reported deleted, and no scratch PVC or PV remains.
+5. **Run the Terraform destroy** for the infrastructure.
+6. **Run the post-destroy EBS check.** List volumes in the account and Region tagged `ebs.csi.aws.com/cluster = true` or `kubernetes.io/created-for/pvc/name`. Also confirm that the root volume went with the instance. Expected result: none.
+7. **Handle any orphaned CSI-created volume explicitly.**
+   - Record its ID, size and tags (no content).
+   - Delete it and confirm the deletion.
+   - Never attach it to another instance to inspect it.
+8. **Delete the temporary qcow2 from the AWS node.**
+   - Normally this is already done right after a successful import (section 29.6, item 9).
+   - If not, do it before step 5, because after the destroy the node no longer exists. At that point this step reduces to confirming that the encrypted root volume was deleted with the instance.
+9. **Retain only intentionally preserved evidence:**
+   - text evidence kept outside Git, or redacted per the standing repository rules;
+   - no disk content left in AWS;
+   - the authoritative disk copies stay in the lab (the golden VMDK, and the prepared qcow2 on `conversion-host-01`).
+
+### 29.2 Review R2: guest identity and intended changes
+
+**Definition:** the migrated guest is **unchanged except for the explicitly enumerated migration and preparation changes** below. Anything else that differs is a finding.
+
+| # | Intended change | Introduced by | Evidence status |
+|---|---|---|---|
+| C1 | open-vm-tools purged: binaries, libraries, plugins, `/etc/vmware-tools/`, `/etc/pam.d/vmtoolsd`, units, rc links, udev rules `60-open-vm-tools.rules` and `99-vmware-scsi-udev.rules` | virt-v2v | PROJECT-DERIVED FACT ([Stage 1G](stage-1g-controlled-conversion.md) section 14, `virt-diff`) |
+| C2 | `/etc/initramfs-tools/modules` gains the virt-v2v comment and `bochs`; the initramfs for `6.8.0-142-generic` is rebuilt; the old one is kept as `/boot/initrd.img-6.8.0-142-generic.pre-v2v` | virt-v2v | PROJECT-DERIVED FACT (Stage 1G section 14) |
+| C3 | New `/etc/modprobe.d/virt-v2v-added.conf`: `alias scsi_hostadapter virtio_blk` | virt-v2v | PROJECT-DERIVED FACT (Stage 1G section 14) |
+| C4 | `/var/lib/dpkg/status` rewritten by the purge. Incidental: `/etc/ld.so.cache`, `/run/blkid`, `/run/needrestart` | virt-v2v | PROJECT-DERIVED FACT (Stage 1G section 14) |
+| C5 | The first-boot mechanism that virt-v2v added is removed again: `/usr/lib/systemd/system/guestfs-firstboot.service` with its SysV links, `/usr/lib/virt-sysprep/firstboot.sh`, and its five scripts `5000-0001-wait-online`, `5000-0002-setenforce-0`, `5000-0003-install-qga`, `5000-0004-setenforce-restore`, `5000-0005-start-qga`. **Net effect after preparation: none of these present** | virt-v2v adds; preparation removes | Addition: PROJECT-DERIVED FACT (Stage 1G section 14). Removal: PROPOSED DESIGN; the exact removed-file list is pending future image preparation |
+| C6 | `/etc/netplan/50-cloud-init.yaml` replaced with the section 15 content, owner root:root, mode 0600 | Preparation (ADR 010) | Content: PROPOSED DESIGN (section 15). File hash: pending future image preparation |
+| C7 | `qemu-guest-agent` and its exact dependency set installed: the files owned by those packages (including their systemd and udev units), plus the dpkg database and dpkg log entries the install causes | Preparation (section 19) | Package names, versions and hashes: **pending future image preparation** (U8). None are invented here |
+
+**Explicitly not intended to change** (PROJECT-DERIVED FACT: checksum-identical after virt-v2v in Stage 1G section 14):
+
+- `/etc/fstab`;
+- the GRUB configuration and the ESP loaders;
+- `/etc/machine-id`;
+- the SSH host keys;
+- the hostname;
+- the nginx package and configuration;
+- `/var/www/html/index.html`;
+- the cloud-init disabled marker.
+
+Runtime state written after the guest boots (logs, journal, timestamps) is not an identity change (ENGINEERING INFERENCE).
+
+**Preparation record** (PROPOSED DESIGN; written during future image preparation; **no hash below exists yet, and none is invented**):
+
+- **Input image:** path and sha256 of the virt-v2v output used as input. It must match the kept output's recorded hash `94bc1cd6...91c6` (PROJECT-DERIVED FACT, Stage 1G) before the copy.
+- **Output image:**
+  - sha256 of the prepared qcow2;
+  - the `qemu-img check` result;
+  - `qemu-img info --backing-chain` showing exactly one image (standalone, section 17).
+- **Netplan:** exact content, sha256, owner and mode of the file placed in the guest.
+- **Guest agent:**
+  - name, version and sha256 of every `.deb`;
+  - the dry-run result against the guest's package state;
+  - the dpkg state of those packages afterwards;
+  - the stop-rule outcome (section 19).
+- **First boot:** the list of removed files as found in the image, and confirmation that none remain.
+- **Offline difference:** an offline comparison (for example `virt-diff`, as in Stage 1G) of the virt-v2v output against the prepared image, showing only C5 to C7.
+- **Boot test:** the result of the pre-transfer boot test (section 29.5).
+
+### 29.3 Review R3: address plan
+
+All ranges must be pairwise non-overlapping. Status meanings:
+
+- **default**: an upstream default value;
+- **selected for the lab**: this design's choice;
+- **proposed**: not yet built;
+- **runtime-confirmed**: observed on a running system. **Nothing in this table is runtime-confirmed.**
+
+| Network | Value | Status | Basis |
+|---|---|---|---|
+| AWS VPC CIDR | 10.40.0.0/16 | Proposed; selected for the lab | PROPOSED DESIGN, chosen to stay clear of every range below |
+| AWS subnet CIDR (one public subnet, one AZ) | 10.40.1.0/24 | Proposed; selected for the lab | PROPOSED DESIGN |
+| Kubernetes Pod CIDR | 10.244.0.0/16 | Default (flannel v0.28.9 `net-conf.json`, VXLAN backend); selected for the lab. kubeadm must be given the same value | CURRENT UPSTREAM DOCUMENTATION [E52] |
+| Kubernetes Service CIDR | 10.96.0.0/12 (10.96.0.0 to 10.111.255.255); cluster DNS 10.96.0.10 | Default (kubeadm); selected for the lab | CURRENT UPSTREAM DOCUMENTATION [E53] |
+| KubeVirt masquerade `vmNetworkCIDR` | 10.0.2.0/24: gateway 10.0.2.1, guest 10.0.2.2 | Default; selected for the lab; unchanged from the 2026-09-28 design | CURRENT UPSTREAM DOCUMENTATION [E21] |
+| Kept clear of | CRI-O's default bridge network 10.85.0.0/16 [E54]; the lab network 192.168.50.0/24, which is not routed to AWS and is avoided so records stay unambiguous | Constraint | CURRENT UPSTREAM DOCUMENTATION [E54]; PROJECT-DERIVED FACT |
+
+Overlap check (ENGINEERING INFERENCE, by arithmetic):
+
+- 10.0.2.0/24, 10.40.0.0/16, 10.85.0.0/16, 10.96.0.0/12 (up to 10.111.255.255) and 10.244.0.0/16 are disjoint.
+- None of them contains 192.168.50.0/24.
+
+Why it matters (ENGINEERING INFERENCE):
+
+- The guest treats 10.0.2.0/24 as on-link. If the node's subnet were, for example, 10.0.2.0/24, the guest could not reach the node's own subnet.
+- Pod and Service ranges that overlap the VPC break routing on the node.
+
+**Future pre-flight checklist.** CNI prerequisites and the pod and Service CIDR selections belong in the future implementation pre-flight checklist, which is **not written in this task**. That checklist includes:
+
+- passing the pod CIDR (and, if not the default, the Service CIDR) to kubeadm;
+- flannel's configured network matching the pod CIDR;
+- `br_netfilter` loaded and IPv4 forwarding enabled;
+- confirming which CNI configuration CRI-O actually uses once flannel is installed.
+
+### 29.4 Review R4: guest management path
+
+The original access line in section 21 offered guest SSH via the Service as an alternative to `virtctl ssh`. That was inaccurate: the design has one Service, and it exposes HTTP on NodePort 30080 only.
+
+| Path | Purpose | Transport | Opened in the AWS security group? |
+|---|---|---|---|
+| Node SSH, TCP 22 on the node's public IPv4 | Node administration, the API tunnel, the transfer target (section 29.6) | SSH to the node's own sshd | Yes, from the operator /32 only |
+| Kubernetes API, TCP 6443 | `kubectl`, `virtctl` | Through the node SSH tunnel | No |
+| `virtctl console` | Serial console of the guest | Kubernetes API, then KubeVirt to the virt-launcher pod | No |
+| `virtctl vnc` | Graphical console, where applicable | Kubernetes API | No |
+| `virtctl ssh` or `virtctl port-forward` to guest port 22 | Guest shell over SSH | Kubernetes API forwarding into the virt-launcher pod, then to the guest's port 22 | No |
+| **NodePort 30080** | **External HTTP validation only** | Node public IPv4, then Service, then pod port 80, then masquerade DNAT to guest port 80 | Yes, from the operator /32 only |
+
+- Guest port 22 is declared in the masquerade `ports` list so that the API-path forwarding can reach the guest's sshd. That port is **inside KubeVirt's guest networking model**: it is not exposed by the AWS security group and has no Service. That the forwarding needs the port to be declared is ENGINEERING INFERENCE from the documented masquerade behaviour [E20], to be observed at runtime.
+- **NodePort 30080 is HTTP validation. It is not guest management SSH.**
+- Guest login uses the source guest's own accounts, whose credentials stay outside Git. This design creates no credentials.
+
+### 29.5 Review R5: pre-transfer boot test (mandatory gate)
+
+**This test proves the exact prepared artifact before paid-cloud transfer.** It is a mandatory gate between image preparation and transfer (section 18, step 2). It is **documented only and was not performed**.
+
+| Element | Requirement |
+|---|---|
+| Where | `conversion-host-01` (ADR 006) |
+| What | The exact prepared qcow2 whose sha256 is in the preparation record (section 29.2). It is opened read-only as the backing file of a disposable overlay, as in Stage 1G section 9, so its bytes cannot change. Its sha256 is re-verified after the test and must still equal the record. Any test-harness instrumentation (such as Stage 1G's serial autologin) lives only in the overlay, never in the prepared image |
+| Hypervisor | QEMU/KVM, as in Stage 1G |
+| Firmware | UEFI with OVMF, Secure Boot off, a fresh copy of the variable-store template for this boot, as in Stage 1G section 7 |
+| Disk | virtio-blk |
+| Network | virtio-net on QEMU user-mode networking, isolated (`restrict=on`, as in Stage 1G), using its built-in DHCP server; host port forwards for HTTP (and SSH, if used) |
+| Guest agent | A virtio-serial port named `org.qemu.guest_agent.0`, the channel name KubeVirt uses |
+
+Pass conditions (all required):
+
+1. The guest reaches the multi-user target.
+2. **DHCP netplan works.** The NIC matched by driver `virtio_net` obtains a DHCP lease from the user-mode network and has a default route. The address itself is QEMU's, not the KubeVirt 10.0.2.2, and is not a pass condition.
+3. `systemctl is-system-running` reports `running`: no pending first-boot job and no failed unit.
+4. **The guest agent responds** on the virtio-serial channel (for example, to a ping command of the agent protocol).
+5. nginx answers through the host port forward with HTTP 200.
+6. **The page sha256 equals** `b9826e18...0046`.
+7. Identity spot checks match the baseline: filesystem UUIDs, machine-id, SSH host key fingerprints. None of the removed first-boot files is present.
+
+Not proven by this test:
+
+- DNS and outbound access (the network is isolated);
+- KubeVirt's OVMF build (U6);
+- masquerade specifics;
+- performance.
+
+On failure:
+
+- Transfer nothing.
+- Fix the problem in a new preparation cycle, starting again from the virt-v2v output.
+- Never patch the prepared image in place.
+
+Cleanup:
+
+- Delete the overlay, the variable-store copy, and the QEMU sockets and pid files.
+- Confirm that no QEMU process remains.
+- Record the deletion list.
+- The prepared image stays read-only and re-verified.
+- Evidence is kept as text outside Git, as in Stage 1G.
+
+### 29.6 Review R6: transfer constraints
+
+The route remains **DEFERRED** to Stage 1I: directly from `conversion-host-01`, or through Windows. **S3 is not part of this design.** Whatever the route, the transfer must satisfy all of the following (PROPOSED DESIGN):
+
+1. **Outbound-only initiation** from the lab side. There is no inbound connection into the laptop, VMnet8 or the lab VMs.
+2. **SSH transport** to the node's own sshd (for example `scp` or `rsync` over SSH). There is no public upload endpoint and no exposed CDI upload proxy.
+3. **Build-time node key, never committed.**
+   - The node holds only the public key.
+   - If the transfer starts from a host other than the operator workstation (for example `conversion-host-01`), where any copy of the private key lives is recorded, and that copy is removed at the end of the session.
+4. **Operator /32 restriction.** The security group admits only the transfer's source address. Through Workstation NAT, that is normally the operator's public address (ENGINEERING INFERENCE). It is never widened.
+5. **SHA-256 verification at both ends.** The hash is taken on the source side (in the preparation record) and recomputed on the node. They must match before any upload.
+6. **The authoritative artifact stays on the controlled source side** (read-only on `conversion-host-01`). The transfer never moves or deletes it.
+7. **A partial or corrupt destination file is discarded.** A file that is partial or has a mismatched hash is deleted and the transfer repeated. It is never uploaded.
+8. **AWS-side handling is explicit.**
+   - The qcow2 sits in one recorded path on the encrypted root volume, readable only by the administrative user.
+   - No private key is placed on the node.
+9. **Deletion after import.** After a successful import (DataVolume `Succeeded`), the qcow2 is deleted from the node, unless it is explicitly retained as evidence (for example, until the guest checks pass). A retained copy is deleted in teardown step 8 (section 29.1) and never outlives the session.
+
+### 29.7 Review R7: encryption and artifact sensitivity
+
+**Encryption at rest** (PROPOSED DESIGN):
+
+- **EC2 root volume:** encrypted at launch.
+- **EBS CSI volumes** (VM disk and CDI scratch): encrypted through the StorageClass parameter `encrypted: "true"`.
+  - The driver's default is `false` [E50], so the design never relies on the default.
+  - With `kmsKeyId` unset, AWS uses the Region's default EBS KMS key [E50].
+  - A customer-managed key would need extra KMS permissions for the instance role (ENGINEERING INFERENCE). It is deferred.
+- **Account-level EBS encryption by default:** may be enabled as defence in depth, but the design does not depend on it. Its state in the account is unknown and cannot be checked without credentials (U15).
+
+**Disk artifacts are sensitive data** (ENGINEERING INFERENCE from the guest's contents; PROJECT-DERIVED FACT that host keys and machine-id are preserved, Stage 1G). Every VMDK, qcow2 and EBS copy of this guest may contain:
+
+- SSH host private keys (anyone holding a copy can impersonate the server);
+- `/etc/shadow` password hashes;
+- machine identity (`/etc/machine-id`, hostname);
+- logs;
+- application data.
+
+Handling requirements:
+
+- Never commit to Git. This is already a standing repository rule; the repository holds no disk, ISO or log artifacts.
+- Never place in public or shared artifact storage.
+- Restrict access to the operator and the lab hosts that need the copy.
+- Verify hashes at every copy (sections 29.2 and 29.6).
+- Delete temporary copies deliberately and record the deletion (sections 29.1, 29.5 and 29.6).
+- Encrypt cloud storage at rest (above).
+- Introduce no credentials. This design introduces none.
+
+### 29.8 Review R8: point-in-time and no-cutover semantics
+
+PROJECT-DERIVED FACT (Stage 1E, Stage 1H H1):
+
+- **The migration source artifact is the Stage 1E point-in-time copy.** It was taken after one graceful guest shutdown, then the VM was powered on again ([Stage 1E record](stage-1e-cold-acquisition.md)).
+- **The source VM has kept running since**, and has legitimately written to its disk again. It is still serving 192.168.50.31.
+
+Consequences (ENGINEERING INFERENCE):
+
+- **Nothing written to the source after Stage 1E is included** in the migrated VM.
+- **There is no cutover** in this first migration:
+  - no address moves;
+  - no DNS or client traffic is switched;
+  - the source is not stopped;
+  - the source is not decommissioned.
+- **The source continues to run independently** as the reference and rollback. The migrated VM and the source never share a network (section 23).
+- The first migration is therefore a **cold, point-in-time migration demonstration**: a persistent KubeVirt VM created from the Stage 1E copy. It is not a production cutover and not a synchronized migration.
+- The validation page hash remains a meaningful check for this static page: the hash was re-verified on the running source at H1 and has not changed since Stage 1C.
+- A real cutover would need either a fresh cold acquisition at cutover time, or warm migration. **Warm migration is deferred** (ADR 003).
+
+### 29.9 Related clarifications applied with these corrections
+
+- **CDI `Succeeded` is not proof of a correct guest.** It is not by itself proof that the guest workload image is correct; artifact-level and guest-level validation are still required (section 18, step 6).
+- **"Raw at rest" does not mean guest filesystem conversion** (section 17).
+- **The uploaded qcow2 must be standalone**, with no backing file (section 17). The evidence is pending future image preparation.
+- **"Offline guest preparation" refers to the guest only.** The conversion host needs Ubuntu archive access (section 19).
+- **The five virt-v2v first-boot scripts** are named from the Stage 1G record (section 19 and C5 above).
+- **KubeVirt defaults are recorded, not fixed.** Machine type, CPU model and EFI variable-store persistence are recorded at runtime, not treated as fixed (section 18, step 7).
+- **The pre-flight checklist is future work.** CNI prerequisites and the pod and Service CIDR selections belong in the future implementation pre-flight checklist (section 29.3), which is not written here.
+
 ## Gates
 
 | Gate | Evidence | Result |
@@ -540,7 +899,7 @@ Stage 1I also requires the user's explicit approval, with objective, scope and c
 
 ## Sources
 
-All retrieved on **2026-09-28**. Local evidence (outside Git): `C:\VMs\conversion-host-01\stage-1h\H1.txt` and `h1.ps1`.
+E1 to E49 retrieved on **2026-09-28**. E50 to E54 retrieved on **2026-09-30** for the post-review corrections (section 29). Local evidence (outside Git): `C:\VMs\conversion-host-01\stage-1h\H1.txt` and `h1.ps1`.
 
 | # | Source (URL) | Title | Exact requirement or fact | Implication |
 |---|---|---|---|---|
@@ -593,3 +952,8 @@ All retrieved on **2026-09-28**. Local evidence (outside Git): `C:\VMs\conversio
 | E47 | https://github.com/flannel-io/flannel/releases | Releases - flannel-io/flannel | v0.28.9 on 2026-08-07 | CNI version |
 | E48 | https://github.com/kubernetes/kubernetes/blob/release-1.36/cmd/kubeadm/app/phases/controlplane/manifests.go | kubeadm control-plane manifests (release-1.36) | `{Name: "allow-privileged", Value: "true"}` | Privileged API server by default |
 | E49 | https://github.com/kubevirt/kubevirt/blob/v1.9.0/pkg/virtctl/imageupload/imageupload.go | virtctl image-upload (v1.9.0) | Flags `--volume-mode`, `--access-mode`, `--storage-class`, `--uploadproxy-url`, `--insecure`, `--force-bind`, `--size` | Upload command design |
+| E50 | https://github.com/kubernetes-sigs/aws-ebs-csi-driver/blob/v1.66.0/docs/parameters.md | AWS EBS CSI driver v1.66.0 StorageClass parameters | `encrypted`: `true`/`false`, default `false`; `kmsKeyId`: if not specified, AWS uses the default KMS key for the Region | Explicit `encrypted: "true"` (section 29.7) |
+| E51 | https://docs.aws.amazon.com/aws-managed-policy/latest/reference/AmazonEBSCSIDriverPolicyV2.html | AmazonEBSCSIDriverPolicyV2 (AWS managed policy) | Create, modify and delete limited to volumes tagged `ebs.csi.aws.com/cluster = true` (or `kubernetes.io/created-for/pvc/name` for migrated volumes) | Post-destroy orphan check by tag (section 29.1) |
+| E52 | https://github.com/flannel-io/flannel/releases/download/v0.28.9/kube-flannel.yml | flannel v0.28.9 deployment manifest | `net-conf.json`: `"Network": "10.244.0.0/16"`, backend `vxlan` | Pod CIDR (section 29.3) |
+| E53 | https://github.com/kubernetes/kubernetes/blob/release-1.36/cmd/kubeadm/app/apis/kubeadm/v1beta4/defaults.go | kubeadm v1beta4 defaults (release-1.36) | `DefaultServicesSubnet = "10.96.0.0/12"`, `DefaultClusterDNSIP = "10.96.0.10"` | Service CIDR (section 29.3) |
+| E54 | https://github.com/cri-o/cri-o/blob/release-1.36/contrib/cni/11-crio-ipv4-bridge.conflist | CRI-O release-1.36 default bridge CNI configuration | Bridge network `crio` with subnet `10.85.0.0/16` | Range kept clear (section 29.3) |

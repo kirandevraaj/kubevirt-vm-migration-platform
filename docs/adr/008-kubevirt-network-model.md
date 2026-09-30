@@ -1,6 +1,11 @@
 # ADR 008: Pod network with masquerade binding; the VMware IP is not preserved
 
 - **Status:** Accepted (Stage 1H, 2026-09-28). Design decision; nothing has been deployed.
+- **Amended:** 2026-09-30, documentation only, from the [Stage 1H architecture review](../stage-1/stage-1h-architecture-review.md):
+  - review R3: address plan;
+  - review R4: guest management path.
+
+  Nothing was deployed or tested for this amendment.
 
 ## Context
 
@@ -9,9 +14,18 @@ The source VM serves nginx on a static 192.168.50.31 on VMnet8, a VMware Worksta
 ## Decision
 
 1. The VM has **one interface on the pod network with the `masquerade` binding**, `model: virtio`, and an explicit port list (80, 22).
+   - Port 80 serves the HTTP validation path.
+   - Port 22 is declared only for guest management over the Kubernetes API (`virtctl ssh` or `virtctl port-forward`), inside KubeVirt's guest networking model. No Service exposes it, and the AWS security group does not open it (clarified 2026-09-30, review R4).
 2. The guest gets its address from KubeVirt's DHCP: **10.0.2.2/24, gateway 10.0.2.1** (default `vmNetworkCIDR` 10.0.2.0/24) [E21]. Egress is source-NATed to the pod IP, then to the node's VPC address.
 3. **No Multus** and no NetworkAttachmentDefinitions: this model does not need them.
 4. **192.168.50.31 is not preserved.** Continuity is provided by a Kubernetes **Service** (NodePort 30080, reachable only from the operator's /32 for validation). Workload identity is proven by content (page sha256), not by address.
+5. **NodePort 30080 is external HTTP validation only. It is not a guest management path** (added 2026-09-30, review R4). The operator reaches the guest through the Kubernetes API over the node SSH tunnel: `virtctl console`, `virtctl vnc` where applicable, and `virtctl ssh` or `virtctl port-forward`. See the [Stage 1H record, section 29.4](../stage-1/stage-1h-kubevirt-target-feasibility.md#294-review-r4-guest-management-path).
+6. **The address ranges must not overlap** (added 2026-09-30, review R3). The masquerade `vmNetworkCIDR` stays at its default 10.0.2.0/24. The other ranges are proposed as:
+   - VPC 10.40.0.0/16 and subnet 10.40.1.0/24 (proposed design);
+   - pod CIDR 10.244.0.0/16 (flannel default);
+   - Service CIDR 10.96.0.0/12 (kubeadm default).
+
+   None of these is runtime-confirmed. See the [Stage 1H record, section 29.3](../stage-1/stage-1h-kubevirt-target-feasibility.md#293-review-r3-address-plan).
 
 ## Why
 
@@ -34,4 +48,4 @@ The VMware IP cannot survive for four independent reasons: VMnet8 is not reachab
 
 ## Evidence
 
-[Stage 1H record](../stage-1/stage-1h-kubevirt-target-feasibility.md), sections 13, 14 and 20, sources E10, E11, E20 to E22, E46.
+[Stage 1H record](../stage-1/stage-1h-kubevirt-target-feasibility.md), sections 13, 14, 20 and 29, sources E10, E11, E20 to E22, E46, E52 to E54; [Stage 1H architecture review](../stage-1/stage-1h-architecture-review.md), section 8.

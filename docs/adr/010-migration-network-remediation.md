@@ -1,6 +1,12 @@
 # ADR 010: Guest network remediation by netplan driver match and DHCP, applied offline at conversion time
 
 - **Status:** Accepted (Stage 1H, 2026-09-28). Design decision; not applied to any disk.
+- **Amended:** 2026-09-30, documentation only, from the [Stage 1H architecture review](../stage-1/stage-1h-architecture-review.md):
+  - review R2: intended guest changes and the preparation record;
+  - review R5: pre-transfer boot test gate;
+  - the meaning of "offline".
+
+  Not applied to any disk, and no boot test was performed.
 
 ## Context
 
@@ -13,6 +19,14 @@ This deserves its own record because it is a policy for changing the guest durin
 1. Replace the content of the guest's only netplan file, `/etc/netplan/50-cloud-init.yaml` (root:root, 0600), with one ethernet `primary` that uses **`match: driver: virtio_net`**, **`dhcp4: true`** and `dhcp6: false`. There is no name match, MAC match, static address, route or nameserver. (The exact design text is in section 15 of the Stage 1H record.)
 2. Apply it **offline** (guestfish or virt-customize) on a **new disposable copy** of the virt-v2v output on `conversion-host-01`, together with the offline guest-agent install. Hash the result and make it read-only.
 3. Never apply it to the source VM, the golden artifact, the working copy or the kept Stage 1G images.
+4. **"Offline" refers to the guest** (clarified 2026-09-30). The guest never needs network access for this change or for the agent install. `conversion-host-01` does need Ubuntu archive access to download the agent packages.
+5. **The netplan replacement is an enumerated, intended guest change** (added 2026-09-30, review R2). The others are:
+   - the virt-v2v changes recorded in Stage 1G;
+   - the qemu-guest-agent install with its exact dependency set;
+   - removal of all five virt-v2v first-boot scripts and their service.
+
+   They are recorded, with hashes, in a preparation record. The guest is otherwise unchanged. See the [Stage 1H record, section 29.2](../stage-1/stage-1h-kubevirt-target-feasibility.md#292-review-r2-guest-identity-and-intended-changes). The file hash and package evidence are pending future image preparation.
+6. **The prepared image must pass the pre-transfer boot test** on `conversion-host-01` before it is transferred (added 2026-09-30, review R5). The test boots it under QEMU/KVM with OVMF (Secure Boot off), virtio disk and NIC, user-mode DHCP and the guest-agent channel, through a disposable overlay. It checks that DHCP works, `systemctl is-system-running`, the agent, and the nginx page hash. See the [Stage 1H record, section 29.5](../stage-1/stage-1h-kubevirt-target-feasibility.md#295-review-r5-pre-transfer-boot-test-mandatory-gate). Stage 1G proved only a static test address, so this gate is the first test of the DHCP design.
 
 ## Alternatives
 
@@ -33,4 +47,4 @@ This deserves its own record because it is a policy for changing the guest durin
 
 ## Evidence
 
-[Stage 1G record](../stage-1/stage-1g-controlled-conversion.md), sections 13, 17 and 20 (driver match proven); [Stage 1H record](../stage-1/stage-1h-kubevirt-target-feasibility.md), sections 14 and 15.
+[Stage 1G record](../stage-1/stage-1g-controlled-conversion.md), sections 13, 14, 17 and 20 (driver match proven; virt-v2v changes and first-boot scripts recorded); [Stage 1H record](../stage-1/stage-1h-kubevirt-target-feasibility.md), sections 14, 15 and 29; [Stage 1H architecture review](../stage-1/stage-1h-architecture-review.md), section 9.
