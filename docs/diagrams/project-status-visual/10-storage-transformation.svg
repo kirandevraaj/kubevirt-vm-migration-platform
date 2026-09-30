@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">Storage transformation</title>
+  <desc id="desc">Three columns. VMware: VMDK descriptor plus flat extent, cold copy, golden artifact. KVM workbench: working VMDK, qemu-img or virt-v2v, qcow2. KubeVirt design: qcow2, CDI upload, DataVolume, PVC, raw disk on a Block PVC. Raw on PVC is design only.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker><marker id="ma16207" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#a16207"/></marker></defs>
+  <rect width="1200" height="900" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">How the disk storage changes</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">Only the disk bytes travel. The format changes on the way.</text>
+  <text x="210" y="116" class="t" text-anchor="middle" style="font-size:18px">VMWARE</text>
+  <rect x="180.5" y="126" width="59" height="20" rx="10.0" fill="#15803d"/>
+  <text x="210.0" y="139.96" class="pill" text-anchor="middle" style="font-size:11px">PROVEN</text>
+  <rect x="40" y="166" width="340" height="72" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="210.0" y="188.94" class="t" text-anchor="middle" style="font-size:17px">VMDK</text>
+  <text x="210.0" y="208.25" class="s" text-anchor="middle" style="font-size:12.5px">descriptor + flat extent</text>
+  <text x="210.0" y="226.75" class="s" text-anchor="middle" style="font-size:12.5px">40 GiB thin, locked while on</text>
+  <rect x="40" y="336" width="340" height="72" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="210.0" y="368.19" class="t" text-anchor="middle" style="font-size:17px">cold copy</text>
+  <text x="210.0" y="387.5" class="s" text-anchor="middle" style="font-size:12.5px">Stage 1E, scp, sha256</text>
+  <path d="M210,240 L210,333" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="40" y="506" width="340" height="72" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="210.0" y="538.19" class="t" text-anchor="middle" style="font-size:17px">golden artifact</text>
+  <text x="210.0" y="557.5" class="s" text-anchor="middle" style="font-size:12.5px">Windows, read-only</text>
+  <path d="M210,410 L210,503" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="600" y="116" class="t" text-anchor="middle" style="font-size:18px">KVM WORKBENCH</text>
+  <rect x="570.5" y="126" width="59" height="20" rx="10.0" fill="#15803d"/>
+  <text x="600.0" y="139.96" class="pill" text-anchor="middle" style="font-size:11px">PROVEN</text>
+  <rect x="430" y="166" width="340" height="72" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="600.0" y="198.19" class="t" text-anchor="middle" style="font-size:17px">working VMDK</text>
+  <text x="600.0" y="217.5" class="s" text-anchor="middle" style="font-size:12.5px">conversion-host-01, immutable</text>
+  <rect x="430" y="336" width="340" height="72" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="600.0" y="368.19" class="t" text-anchor="middle" style="font-size:17px">qemu-img / virt-v2v</text>
+  <text x="600.0" y="387.5" class="s" text-anchor="middle" style="font-size:12.5px">Stage 1G</text>
+  <path d="M600,240 L600,333" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="430" y="506" width="340" height="72" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="600.0" y="538.19" class="t" text-anchor="middle" style="font-size:17px">QCOW2</text>
+  <text x="600.0" y="557.5" class="s" text-anchor="middle" style="font-size:12.5px">2.7 to 3.2 GiB, sparse</text>
+  <path d="M600,410 L600,503" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="990" y="116" class="t" text-anchor="middle" style="font-size:18px">KUBEVIRT DESIGN</text>
+  <rect x="953.5" y="126" width="73" height="20" rx="10.0" fill="#a16207"/>
+  <text x="990.0" y="139.96" class="pill" text-anchor="middle" style="font-size:11px">DESIGNED</text>
+  <rect x="820" y="166" width="340" height="72" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="990.0" y="198.19" class="t" text-anchor="middle" style="font-size:17px">QCOW2</text>
+  <text x="990.0" y="217.5" class="s" text-anchor="middle" style="font-size:12.5px">new prepared copy</text>
+  <rect x="820" y="272" width="340" height="72" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="990.0" y="304.19" class="t" text-anchor="middle" style="font-size:17px">CDI upload</text>
+  <text x="990.0" y="323.5" class="s" text-anchor="middle" style="font-size:12.5px">virtctl image-upload</text>
+  <path d="M990,240 L990,269" fill="none" stroke="#475569" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m475569)"/>
+  <rect x="820" y="378" width="340" height="72" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="990.0" y="410.19" class="t" text-anchor="middle" style="font-size:17px">DataVolume</text>
+  <text x="990.0" y="429.5" class="s" text-anchor="middle" style="font-size:12.5px">standalone, survives VM delete</text>
+  <path d="M990,346 L990,375" fill="none" stroke="#475569" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m475569)"/>
+  <rect x="820" y="484" width="340" height="72" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="990.0" y="516.19" class="t" text-anchor="middle" style="font-size:17px">PVC</text>
+  <text x="990.0" y="535.5" class="s" text-anchor="middle" style="font-size:12.5px">EBS gp3, 40 GiB, RWO</text>
+  <path d="M990,452 L990,481" fill="none" stroke="#475569" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m475569)"/>
+  <rect x="820" y="590" width="340" height="72" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="990.0" y="622.19" class="t" text-anchor="middle" style="font-size:17px">RAW disk on Block PVC</text>
+  <text x="990.0" y="641.5" class="s" text-anchor="middle" style="font-size:12.5px">what KubeVirt reads</text>
+  <path d="M990,558 L990,587" fill="none" stroke="#475569" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m475569)"/>
+  <path d="M382,540 L428,540" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="405" y="530" class="xs halo" text-anchor="middle" style="font-weight:600">scp</text>
+  <path d="M772,540 L818,202" fill="none" stroke="#a16207" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#ma16207)"/>
+  <text x="800" y="390" class="xs halo" text-anchor="middle" style="fill:#a16207;font-weight:700">future</text>
+  <rect x="30" y="740" width="1140" height="74" rx="12" fill="#fffbeb" stroke="#a16207" stroke-width="2"/>
+  <text x="600.0" y="772" class="t" text-anchor="middle" style="font-size:20px;fill:#a16207">RAW ON PVC IS DESIGN ONLY.</text>
+  <text x="600.0" y="796" class="s" text-anchor="middle" style="font-size:14px;fill:#334155">qcow2 in transit, raw at rest (ADR 009). No PVC or DataVolume has been created.</text>
+  <rect x="350.4" y="860" width="34" height="20" rx="5" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <rect x="392.4" y="860" width="59" height="20" rx="10.0" fill="#15803d"/>
+  <text x="421.9" y="873.96" class="pill" text-anchor="middle" style="font-size:11px">PROVEN</text>
+  <text x="459.4" y="875" class="xs" text-anchor="start">observed in our lab</text>
+  <rect x="605.0" y="860" width="34" height="20" rx="5" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <rect x="647.0" y="860" width="73" height="20" rx="10.0" fill="#a16207"/>
+  <text x="683.5" y="873.96" class="pill" text-anchor="middle" style="font-size:11px">DESIGNED</text>
+  <text x="728.0" y="875" class="xs" text-anchor="start">on paper (Stage 1H)</text>
+</svg>

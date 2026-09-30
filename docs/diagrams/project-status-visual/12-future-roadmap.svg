@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="960" viewBox="0 0 1200 960" role="img" aria-labelledby="title desc">
+  <title id="title">Proposed future roadmap</title>
+  <desc id="desc">Current: Stage 1H review. Everything after it is proposed and not official: define and approve Stage 1I, build the target platform, runtime validation, first KubeVirt boot, first actual VM migration, migration workflow, custom migration CRD and controller, failure and recovery, GitOps, observability, security, modernization, portfolio.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m7c3aed" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#7c3aed"/></marker></defs>
+  <rect width="1200" height="960" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">Where we could go from here</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">Only Stage 1H and the name Stage 1I are official. Everything else is a proposal.</text>
+  <rect x="420" y="96" width="360" height="70" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="3.5"/>
+  <text x="600.0" y="127.19" class="t" text-anchor="middle" style="font-size:17px">CURRENT: Stage 1H review</text>
+  <text x="600.0" y="146.5" class="s" text-anchor="middle" style="font-size:12.5px">KubeVirt target design, awaiting your review</text>
+  <rect x="704" y="86" width="66" height="20" rx="10.0" fill="#1d4ed8"/>
+  <text x="737.0" y="99.96" class="pill" text-anchor="middle" style="font-size:11px">CURRENT</text>
+  <rect x="40" y="196" width="1120" height="668" rx="14" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <text x="56" y="222" class="lab" text-anchor="start">PROPOSED - NOT OFFICIAL</text>
+  <text x="56" y="242" class="xs" text-anchor="start">No stage numbers beyond 1I. Order follows the documented architecture.</text>
+  <path d="M500,168 L500,249" fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m7c3aed)"/>
+  <rect x="80" y="252" width="460" height="62" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2.6" stroke-dasharray="3 4"/>
+  <text x="310.0" y="278.87" class="t" text-anchor="middle" style="font-size:16px">Define / approve Stage 1I</text>
+  <text x="310.0" y="298.0" class="s" text-anchor="middle" style="font-size:12.5px">objective, scope, change boundary + AWS credentials</text>
+  <rect x="80" y="348" width="460" height="62" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="310.0" y="374.87" class="t" text-anchor="middle" style="font-size:16px">Build target platform</text>
+  <text x="310.0" y="394.0" class="s" text-anchor="middle" style="font-size:12.5px">Terraform, one EC2 node, kubeadm (ADR 007)</text>
+  <path d="M310.0,316 L310.0,345" fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m7c3aed)"/>
+  <rect x="80" y="444" width="460" height="62" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="310.0" y="470.87" class="t" text-anchor="middle" style="font-size:16px">Runtime validation</text>
+  <text x="310.0" y="490.0" class="s" text-anchor="middle" style="font-size:12.5px">KubeVirt/CDI gate G1-G7, host checks</text>
+  <path d="M310.0,412 L310.0,441" fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m7c3aed)"/>
+  <rect x="80" y="540" width="460" height="62" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="310.0" y="566.87" class="t" text-anchor="middle" style="font-size:16px">First KubeVirt boot</text>
+  <text x="310.0" y="586.0" class="s" text-anchor="middle" style="font-size:12.5px">prepared image -&gt; CDI -&gt; PVC -&gt; VM</text>
+  <path d="M310.0,508 L310.0,537" fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m7c3aed)"/>
+  <rect x="80" y="636" width="460" height="62" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="310.0" y="662.87" class="t" text-anchor="middle" style="font-size:16px">First actual VM migration</text>
+  <text x="310.0" y="682.0" class="s" text-anchor="middle" style="font-size:12.5px">12 checks, same page hash via Service</text>
+  <path d="M310.0,604 L310.0,633" fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m7c3aed)"/>
+  <rect x="80" y="732" width="460" height="62" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="310.0" y="758.87" class="t" text-anchor="middle" style="font-size:16px">Migration workflow</text>
+  <text x="310.0" y="778.0" class="s" text-anchor="middle" style="font-size:12.5px">inventory, mapping, validation, cutover</text>
+  <path d="M310.0,700 L310.0,729" fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m7c3aed)"/>
+  <rect x="92" y="242" width="108" height="20" rx="10.0" fill="#6d28d9"/>
+  <text x="146.0" y="255.96" class="pill" text-anchor="middle" style="font-size:11px">PROPOSED NEXT</text>
+  <rect x="660" y="252" width="460" height="62" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="890.0" y="278.87" class="t" text-anchor="middle" style="font-size:16px">Custom migration CRD / controller</text>
+  <text x="890.0" y="298.0" class="s" text-anchor="middle" style="font-size:12.5px">VirtualMachineMigration (ADR 005)</text>
+  <rect x="660" y="336" width="460" height="62" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="890.0" y="362.87" class="t" text-anchor="middle" style="font-size:16px">Failure / recovery</text>
+  <text x="890.0" y="382.0" class="s" text-anchor="middle" style="font-size:12.5px">retryable vs manual, idempotent steps</text>
+  <path d="M890.0,316 L890.0,333" fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m7c3aed)"/>
+  <rect x="660" y="420" width="460" height="62" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="890.0" y="446.87" class="t" text-anchor="middle" style="font-size:16px">GitOps</text>
+  <text x="890.0" y="466.0" class="s" text-anchor="middle" style="font-size:12.5px">Git-managed definitions</text>
+  <path d="M890.0,400 L890.0,417" fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m7c3aed)"/>
+  <rect x="660" y="504" width="460" height="62" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="890.0" y="530.87" class="t" text-anchor="middle" style="font-size:16px">Observability</text>
+  <text x="890.0" y="550.0" class="s" text-anchor="middle" style="font-size:12.5px">metrics, logs, phase timings</text>
+  <path d="M890.0,484 L890.0,501" fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m7c3aed)"/>
+  <rect x="660" y="588" width="460" height="62" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="890.0" y="614.87" class="t" text-anchor="middle" style="font-size:16px">Security</text>
+  <text x="890.0" y="634.0" class="s" text-anchor="middle" style="font-size:12.5px">hardening deferred in 1H</text>
+  <path d="M890.0,568 L890.0,585" fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m7c3aed)"/>
+  <rect x="660" y="672" width="460" height="62" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="890.0" y="698.87" class="t" text-anchor="middle" style="font-size:16px">Modernization</text>
+  <text x="890.0" y="718.0" class="s" text-anchor="middle" style="font-size:12.5px">nginx content as a container</text>
+  <path d="M890.0,652 L890.0,669" fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m7c3aed)"/>
+  <rect x="660" y="756" width="460" height="62" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="890.0" y="782.87" class="t" text-anchor="middle" style="font-size:16px">Portfolio</text>
+  <text x="890.0" y="802.0" class="s" text-anchor="middle" style="font-size:12.5px">story, evidence, interview notes</text>
+  <path d="M890.0,736 L890.0,753" fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m7c3aed)"/>
+  <path d="M542,763.0 L600,763.0 L600,283 L658,283" fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m7c3aed)"/>
+  <text x="600" y="900" class="t" text-anchor="middle" style="font-size:16px;fill:#6d28d9">Stage 1I is not yet defined. What it contains is your decision.</text>
+  <rect x="353.29999999999995" y="918" width="34" height="20" rx="5" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <rect x="395.29999999999995" y="918" width="66" height="20" rx="10.0" fill="#1d4ed8"/>
+  <text x="428.29999999999995" y="931.96" class="pill" text-anchor="middle" style="font-size:11px">CURRENT</text>
+  <text x="469.29999999999995" y="933" class="xs" text-anchor="start">where we are</text>
+  <rect x="570.0999999999999" y="918" width="34" height="20" rx="5" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <rect x="612.0999999999999" y="918" width="73" height="20" rx="10.0" fill="#6d28d9"/>
+  <text x="648.5999999999999" y="931.96" class="pill" text-anchor="middle" style="font-size:11px">PROPOSED</text>
+  <text x="693.0999999999999" y="933" class="xs" text-anchor="start">suggestion, not official</text>
+</svg>

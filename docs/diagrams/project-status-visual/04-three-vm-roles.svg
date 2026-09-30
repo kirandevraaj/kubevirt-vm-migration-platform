@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">Three VM roles</title>
+  <desc id="desc">Three cards. kvm-learning-01: LEARN (KVM, QEMU, libvirt, VirtIO, nested virtualization). legacy-source-vm: MIGRATE THIS (Ubuntu, nginx, PVSCSI, VMXNET3, static IP). conversion-host-01: CONVERT / INSPECT (qemu-img, libguestfs, guestfish, virt-v2v, QEMU/KVM testing). These are three different roles, not three copies of the same VM.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs></defs>
+  <rect width="1200" height="760" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">Three VMs, three different jobs</text>
+  <rect x="40" y="100" width="360" height="540" rx="18" fill="#f1f5f9" stroke="#64748b" stroke-width="2.6" stroke-dasharray="3 4"/>
+  <rect x="40" y="100" width="360" height="88" rx="18" fill="#475569" stroke="#475569" stroke-width="1.6"/>
+  <rect x="40" y="160" width="360" height="28" rx="0" fill="#475569" stroke="#475569" stroke-width="1.6"/>
+  <text x="220" y="158" class="t" text-anchor="middle" style="font-size:26px;fill:#ffffff;font-weight:800">LEARN</text>
+  <text x="220" y="226" class="t" text-anchor="middle" style="font-size:20px">kvm-learning-01</text>
+  <text x="220" y="252" class="xs" text-anchor="middle">Stage 1B  |  powered off</text>
+  <text x="70" y="298" class="lab" text-anchor="start">Used for:</text>
+  <path d="M78,336 L83.33333333333333,341.6 L94,329.6" fill="none" stroke="#475569" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="110" y="342" class="s" text-anchor="start" style="font-size:18px">KVM</text>
+  <path d="M78,386 L83.33333333333333,391.6 L94,379.6" fill="none" stroke="#475569" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="110" y="392" class="s" text-anchor="start" style="font-size:18px">QEMU</text>
+  <path d="M78,436 L83.33333333333333,441.6 L94,429.6" fill="none" stroke="#475569" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="110" y="442" class="s" text-anchor="start" style="font-size:18px">libvirt</text>
+  <path d="M78,486 L83.33333333333333,491.6 L94,479.6" fill="none" stroke="#475569" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="110" y="492" class="s" text-anchor="start" style="font-size:18px">VirtIO</text>
+  <path d="M78,536 L83.33333333333333,541.6 L94,529.6" fill="none" stroke="#475569" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="110" y="542" class="s" text-anchor="start" style="font-size:18px">nested virtualization</text>
+  <rect x="420" y="100" width="360" height="540" rx="18" fill="#dbeafe" stroke="#1d4ed8" stroke-width="2.6"/>
+  <rect x="420" y="100" width="360" height="88" rx="18" fill="#1d4ed8" stroke="#1d4ed8" stroke-width="1.6"/>
+  <rect x="420" y="160" width="360" height="28" rx="0" fill="#1d4ed8" stroke="#1d4ed8" stroke-width="1.6"/>
+  <text x="600" y="158" class="t" text-anchor="middle" style="font-size:26px;fill:#ffffff;font-weight:800">MIGRATE THIS</text>
+  <text x="600" y="226" class="t" text-anchor="middle" style="font-size:20px">legacy-source-vm</text>
+  <text x="600" y="252" class="xs" text-anchor="middle">Stage 1C  |  powered on, unchanged</text>
+  <text x="450" y="298" class="lab" text-anchor="start">What it has:</text>
+  <path d="M458,336 L463.3333333333333,341.6 L474,329.6" fill="none" stroke="#1d4ed8" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="490" y="342" class="s" text-anchor="start" style="font-size:18px">Ubuntu 24.04.5</text>
+  <path d="M458,386 L463.3333333333333,391.6 L474,379.6" fill="none" stroke="#1d4ed8" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="490" y="392" class="s" text-anchor="start" style="font-size:18px">nginx (the test app)</text>
+  <path d="M458,436 L463.3333333333333,441.6 L474,429.6" fill="none" stroke="#1d4ed8" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="490" y="442" class="s" text-anchor="start" style="font-size:18px">PVSCSI disk</text>
+  <path d="M458,486 L463.3333333333333,491.6 L474,479.6" fill="none" stroke="#1d4ed8" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="490" y="492" class="s" text-anchor="start" style="font-size:18px">VMXNET3 NIC</text>
+  <path d="M458,536 L463.3333333333333,541.6 L474,529.6" fill="none" stroke="#1d4ed8" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="490" y="542" class="s" text-anchor="start" style="font-size:18px">static IP 192.168.50.31</text>
+  <rect x="800" y="100" width="360" height="540" rx="18" fill="#fef3c7" stroke="#b45309" stroke-width="2.6"/>
+  <rect x="800" y="100" width="360" height="88" rx="18" fill="#b45309" stroke="#b45309" stroke-width="1.6"/>
+  <rect x="800" y="160" width="360" height="28" rx="0" fill="#b45309" stroke="#b45309" stroke-width="1.6"/>
+  <text x="980" y="158" class="t" text-anchor="middle" style="font-size:26px;fill:#ffffff;font-weight:800">CONVERT / INSPECT</text>
+  <text x="980" y="226" class="t" text-anchor="middle" style="font-size:20px">conversion-host-01</text>
+  <text x="980" y="252" class="xs" text-anchor="middle">Stage 1F / 1G  |  powered on</text>
+  <text x="830" y="298" class="lab" text-anchor="start">Used for:</text>
+  <path d="M838,336 L843.3333333333334,341.6 L854,329.6" fill="none" stroke="#b45309" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="870" y="342" class="s" text-anchor="start" style="font-size:18px">qemu-img</text>
+  <path d="M838,386 L843.3333333333334,391.6 L854,379.6" fill="none" stroke="#b45309" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="870" y="392" class="s" text-anchor="start" style="font-size:18px">libguestfs</text>
+  <path d="M838,436 L843.3333333333334,441.6 L854,429.6" fill="none" stroke="#b45309" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="870" y="442" class="s" text-anchor="start" style="font-size:18px">guestfish</text>
+  <path d="M838,486 L843.3333333333334,491.6 L854,479.6" fill="none" stroke="#b45309" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="870" y="492" class="s" text-anchor="start" style="font-size:18px">virt-v2v</text>
+  <path d="M838,536 L843.3333333333334,541.6 L854,529.6" fill="none" stroke="#b45309" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="870" y="542" class="s" text-anchor="start" style="font-size:18px">QEMU/KVM test boots</text>
+  <rect x="30" y="670" width="1140" height="74" rx="12" fill="#f8fafc" stroke="#0f172a" stroke-width="2"/>
+  <text x="600.0" y="702" class="t" text-anchor="middle" style="font-size:20px;fill:#0f172a">These are three different roles, not three copies of the same VM.</text>
+  <text x="600.0" y="726" class="s" text-anchor="middle" style="font-size:14px;fill:#334155">The converted disks were booted only as temporary test guests inside conversion-host-01.</text>
+</svg>

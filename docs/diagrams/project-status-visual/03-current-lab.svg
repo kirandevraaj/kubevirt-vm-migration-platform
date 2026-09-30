@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="920" viewBox="0 0 1200 920" role="img" aria-labelledby="title desc">
+  <title id="title">Our current lab</title>
+  <desc id="desc">Windows 11 runs VMware Workstation, which runs nested ESXi 8.0.3 at 192.168.50.11. On ESXi: legacy-source-vm (Vmid 2, 192.168.50.31, Ubuntu and nginx, PVSCSI, VMXNET3, the SOURCE), conversion-host-01 (Vmid 3, 192.168.50.32, qemu-img, libguestfs, virt-v2v, the CONVERSION host) and kvm-learning-01 (Vmid 1, powered off, LEARNING only).</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker></defs>
+  <rect width="1200" height="920" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">Our current lab</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">Everything runs on one laptop. Power states as recorded after Stage 1H.</text>
+  <rect x="380" y="100" width="440" height="58" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="600.0" y="124.55" class="t" text-anchor="middle" style="font-size:15px">Windows 11 laptop</text>
+  <text x="600.0" y="143.5" class="s" text-anchor="middle" style="font-size:12.5px">Windows hypervisor off (so nested ESXi can use VT-x)</text>
+  <path d="M600,160 L600,188" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="380" y="190" width="440" height="58" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="600.0" y="214.55" class="t" text-anchor="middle" style="font-size:15px">VMware Workstation 17.6.4</text>
+  <text x="600.0" y="233.5" class="s" text-anchor="middle" style="font-size:12.5px">VMnet8 NAT network 192.168.50.0/24</text>
+  <path d="M600,250 L600,278" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="340" y="280" width="520" height="70" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="600.0" y="311.19" class="t" text-anchor="middle" style="font-size:17px">Nested ESXi 8.0.3  (esxi-8-lab)</text>
+  <text x="600.0" y="330.5" class="s" text-anchor="middle" style="font-size:12.5px">192.168.50.11  |  migration-datastore (VMFS-6)  |  no snapshots</text>
+  <path d="M600,352 L600,390 M200,390 L1000,390" stroke="#475569" stroke-width="2.4" fill="none"/>
+  <path d="M200,390 L200,424" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M600,390 L600,424" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M1000,390 L1000,424" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="40" y="426" width="320" height="250" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="2.4"/>
+  <rect x="54" y="416" width="66" height="22" rx="11.0" fill="#1d4ed8"/>
+  <text x="87.0" y="431.68" class="pill" text-anchor="middle" style="font-size:13px">SOURCE</text>
+  <rect x="259" y="416" width="87" height="20" rx="10.0" fill="#15803d"/>
+  <text x="302.5" y="429.96" class="pill" text-anchor="middle" style="font-size:11px">POWERED ON</text>
+  <text x="200" y="468" class="t" text-anchor="middle" style="font-size:20px">legacy-source-vm</text>
+  <text x="200" y="506" class="s" text-anchor="middle" style="font-size:14.5px">Vmid 2   |   192.168.50.31</text>
+  <text x="200" y="536" class="s" text-anchor="middle" style="font-size:14.5px">Ubuntu 24.04.5 + nginx</text>
+  <text x="200" y="566" class="s" text-anchor="middle" style="font-size:14.5px">2 vCPU, 4096 MB, 40 GB thin, UEFI</text>
+  <text x="200" y="596" class="s" text-anchor="middle" style="font-size:14.5px">PVSCSI disk, VMXNET3 NIC</text>
+  <text x="200" y="626" class="s" text-anchor="middle" style="font-size:14.5px">static IP (netplan on ens192)</text>
+  <rect x="440" y="426" width="320" height="250" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="2.4"/>
+  <rect x="454" y="416" width="100" height="22" rx="11.0" fill="#b45309"/>
+  <text x="504.0" y="431.68" class="pill" text-anchor="middle" style="font-size:13px">CONVERSION</text>
+  <rect x="659" y="416" width="87" height="20" rx="10.0" fill="#15803d"/>
+  <text x="702.5" y="429.96" class="pill" text-anchor="middle" style="font-size:11px">POWERED ON</text>
+  <text x="600" y="468" class="t" text-anchor="middle" style="font-size:20px">conversion-host-01</text>
+  <text x="600" y="506" class="s" text-anchor="middle" style="font-size:14.5px">Vmid 3   |   192.168.50.32</text>
+  <text x="600" y="536" class="s" text-anchor="middle" style="font-size:14.5px">Ubuntu 24.04.5, 4 vCPU, 8 GB</text>
+  <text x="600" y="566" class="s" text-anchor="middle" style="font-size:14.5px">qemu-img 8.2.2</text>
+  <text x="600" y="596" class="s" text-anchor="middle" style="font-size:14.5px">libguestfs / guestfish 1.52.0</text>
+  <text x="600" y="626" class="s" text-anchor="middle" style="font-size:14.5px">virt-v2v 2.4.0, QEMU + OVMF</text>
+  <rect x="840" y="426" width="320" height="250" rx="10" fill="#f1f5f9" stroke="#64748b" stroke-width="2.4" stroke-dasharray="3 4"/>
+  <rect x="854" y="416" width="83" height="22" rx="11.0" fill="#475569"/>
+  <text x="895.5" y="431.68" class="pill" text-anchor="middle" style="font-size:13px">LEARNING</text>
+  <rect x="1052" y="416" width="94" height="20" rx="10.0" fill="#475569"/>
+  <text x="1099.0" y="429.96" class="pill" text-anchor="middle" style="font-size:11px">POWERED OFF</text>
+  <text x="1000" y="468" class="t" text-anchor="middle" style="font-size:20px">kvm-learning-01</text>
+  <text x="1000" y="506" class="s" text-anchor="middle" style="font-size:14.5px">Vmid 1   |   .30 when running</text>
+  <text x="1000" y="536" class="s" text-anchor="middle" style="font-size:14.5px">Ubuntu 24.04.4</text>
+  <text x="1000" y="566" class="s" text-anchor="middle" style="font-size:14.5px">KVM, QEMU 8.2.2, libvirt 10.0.0</text>
+  <text x="1000" y="596" class="s" text-anchor="middle" style="font-size:14.5px">VirtIO, nested virtualization</text>
+  <text x="1000" y="626" class="s" text-anchor="middle" style="font-size:14.5px">KVM learning only (Stage 1B)</text>
+  <rect x="40" y="712" width="520" height="118" rx="10" fill="#f1f5f9" stroke="#64748b" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="300.0" y="746.12" class="t" text-anchor="middle" style="font-size:16px">What is NOT in this lab</text>
+  <text x="300.0" y="766.48" class="s" text-anchor="middle" style="font-size:14px">No Kubernetes, no KubeVirt, no CDI.</text>
+  <text x="300.0" y="786.48" class="s" text-anchor="middle" style="font-size:14px">No AWS resource. The target exists only as a design.</text>
+  <text x="300.0" y="806.48" class="s" text-anchor="middle" style="font-size:14px">No converted VM running anywhere.</text>
+  <rect x="640" y="712" width="520" height="118" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="900.0" y="746.12" class="t" text-anchor="middle" style="font-size:16px">Where the disks are</text>
+  <text x="900.0" y="766.48" class="s" text-anchor="middle" style="font-size:14px">Golden copy: Windows, C:\VMs\legacy-source-vm\stage-1e\</text>
+  <text x="900.0" y="786.48" class="s" text-anchor="middle" style="font-size:14px">Working + converted copies: on conversion-host-01</text>
+  <text x="900.0" y="806.48" class="s" text-anchor="middle" style="font-size:14px">Nothing of this is in Git.</text>
+  <text x="600" y="880" class="t" text-anchor="middle" style="font-size:15px">Three roles on one ESXi host: migrate this, convert/inspect here, learn there.</text>
+</svg>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">Network transformation</title>
+  <desc id="desc">Three columns. VMware: VMXNET3, ens192, netplan, static 192.168.50.31. KVM (Stage 1G): virtio-net, enp0s3, old netplan still matching ens192, no network until remediation. KubeVirt design: virtio-net, masquerade binding, DHCP, guest address 10.0.2.2, Kubernetes Service NodePort 30080. Network migration is a mapping plus guest-remediation problem.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker><marker id="ma16207" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#a16207"/></marker></defs>
+  <rect width="1200" height="900" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">How the network changes</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">Same guest, three different networks</text>
+  <text x="210" y="116" class="t" text-anchor="middle" style="font-size:17px">VMWARE (today)</text>
+  <rect x="180.5" y="126" width="59" height="20" rx="10.0" fill="#15803d"/>
+  <text x="210.0" y="139.96" class="pill" text-anchor="middle" style="font-size:11px">PROVEN</text>
+  <rect x="40" y="166" width="340" height="70" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="210.0" y="197.19" class="t" text-anchor="middle" style="font-size:17px">VMXNET3</text>
+  <text x="210.0" y="216.5" class="s" text-anchor="middle" style="font-size:12.5px">VMware NIC</text>
+  <rect x="40" y="272" width="340" height="70" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="210.0" y="303.19" class="t" text-anchor="middle" style="font-size:17px">ens192</text>
+  <text x="210.0" y="322.5" class="s" text-anchor="middle" style="font-size:12.5px">interface name</text>
+  <path d="M210,238 L210,269" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="40" y="378" width="340" height="70" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="210.0" y="409.19" class="t" text-anchor="middle" style="font-size:17px">netplan</text>
+  <text x="210.0" y="428.5" class="s" text-anchor="middle" style="font-size:12.5px">matches name ens192</text>
+  <path d="M210,344 L210,375" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="40" y="484" width="340" height="70" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="210.0" y="515.19" class="t" text-anchor="middle" style="font-size:17px">192.168.50.31</text>
+  <text x="210.0" y="534.5" class="s" text-anchor="middle" style="font-size:12.5px">static IP, works</text>
+  <path d="M210,450 L210,481" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="600" y="116" class="t" text-anchor="middle" style="font-size:17px">KVM TEST (Stage 1G)</text>
+  <rect x="570.5" y="126" width="59" height="20" rx="10.0" fill="#15803d"/>
+  <text x="600.0" y="139.96" class="pill" text-anchor="middle" style="font-size:11px">PROVEN</text>
+  <rect x="430" y="166" width="340" height="70" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="600.0" y="197.19" class="t" text-anchor="middle" style="font-size:17px">VirtIO-Net</text>
+  <text x="600.0" y="216.5" class="s" text-anchor="middle" style="font-size:12.5px">new virtual NIC</text>
+  <rect x="430" y="272" width="340" height="70" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <text x="600.0" y="303.19" class="t" text-anchor="middle" style="font-size:17px">enp0s3</text>
+  <text x="600.0" y="322.5" class="s" text-anchor="middle" style="font-size:12.5px">new interface name</text>
+  <path d="M600,238 L600,269" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="430" y="378" width="340" height="70" rx="10" fill="#fee2e2" stroke="#b91c1c" stroke-width="1.8"/>
+  <text x="600.0" y="409.19" class="t" text-anchor="middle" style="font-size:17px">old netplan</text>
+  <text x="600.0" y="428.5" class="s" text-anchor="middle" style="font-size:12.5px">still looks for ens192</text>
+  <path d="M600,344 L600,375" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="430" y="484" width="340" height="70" rx="10" fill="#fee2e2" stroke="#b91c1c" stroke-width="1.8"/>
+  <text x="600.0" y="515.19" class="t" text-anchor="middle" style="font-size:17px">NO NETWORK</text>
+  <text x="600.0" y="534.5" class="s" text-anchor="middle" style="font-size:12.5px">until one netplan fix</text>
+  <path d="M600,450 L600,481" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="990" y="116" class="t" text-anchor="middle" style="font-size:17px">KUBEVIRT DESIGN (1H)</text>
+  <rect x="953.5" y="126" width="73" height="20" rx="10.0" fill="#a16207"/>
+  <text x="990.0" y="139.96" class="pill" text-anchor="middle" style="font-size:11px">DESIGNED</text>
+  <rect x="820" y="166" width="340" height="70" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="990.0" y="197.19" class="t" text-anchor="middle" style="font-size:17px">VirtIO-Net</text>
+  <text x="990.0" y="216.5" class="s" text-anchor="middle" style="font-size:12.5px">model: virtio</text>
+  <rect x="820" y="272" width="340" height="70" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="990.0" y="303.19" class="t" text-anchor="middle" style="font-size:17px">KubeVirt masquerade</text>
+  <text x="990.0" y="322.5" class="s" text-anchor="middle" style="font-size:12.5px">NAT inside the pod</text>
+  <path d="M990,238 L990,269" fill="none" stroke="#475569" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m475569)"/>
+  <rect x="820" y="378" width="340" height="70" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="990.0" y="409.19" class="t" text-anchor="middle" style="font-size:17px">DHCP</text>
+  <text x="990.0" y="428.5" class="s" text-anchor="middle" style="font-size:12.5px">netplan: driver virtio_net</text>
+  <path d="M990,344 L990,375" fill="none" stroke="#475569" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m475569)"/>
+  <rect x="820" y="484" width="340" height="70" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="990.0" y="515.19" class="t" text-anchor="middle" style="font-size:17px">guest 10.0.2.2</text>
+  <text x="990.0" y="534.5" class="s" text-anchor="middle" style="font-size:12.5px">behind the pod IP</text>
+  <path d="M990,450 L990,481" fill="none" stroke="#475569" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m475569)"/>
+  <rect x="820" y="590" width="340" height="70" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="990.0" y="621.19" class="t" text-anchor="middle" style="font-size:17px">Kubernetes Service</text>
+  <text x="990.0" y="640.5" class="s" text-anchor="middle" style="font-size:12.5px">NodePort 30080</text>
+  <path d="M990,556 L990,587" fill="none" stroke="#475569" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m475569)"/>
+  <path d="M450,507 L474,531 M474,507 L450,531" stroke="#b91c1c" stroke-width="6" stroke-linecap="round"/>
+  <text x="600" y="736" class="s" text-anchor="middle" style="font-size:14px">Stage 1G fix (test copy): match by driver virtio_net -&gt; routable, HTTP 200</text>
+  <path d="M420,710 L820,710" fill="none" stroke="#a16207" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#ma16207)"/>
+  <text x="620" y="700" class="xs halo" text-anchor="middle" style="font-weight:600">same fix, DHCP instead of static (ADR 010)</text>
+  <rect x="30" y="770" width="1140" height="74" rx="12" fill="#f8fafc" stroke="#0f172a" stroke-width="2"/>
+  <text x="600.0" y="802" class="t" text-anchor="middle" style="font-size:20px;fill:#0f172a">Network migration is a mapping + guest-remediation problem.</text>
+  <text x="600.0" y="826" class="s" text-anchor="middle" style="font-size:14px;fill:#334155">192.168.50.31 is not preserved; the Service address and the page hash prove continuity.</text>
+  <rect x="218.7" y="866" width="34" height="20" rx="5" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <rect x="260.7" y="866" width="59" height="20" rx="10.0" fill="#15803d"/>
+  <text x="290.2" y="879.96" class="pill" text-anchor="middle" style="font-size:11px">PROVEN</text>
+  <text x="327.7" y="881" class="xs" text-anchor="start">observed in our lab</text>
+  <rect x="473.3" y="866" width="34" height="20" rx="5" fill="#fee2e2" stroke="#b91c1c" stroke-width="1.8"/>
+  <rect x="515.3" y="866" width="87" height="20" rx="10.0" fill="#b91c1c"/>
+  <text x="558.8" y="879.96" class="pill" text-anchor="middle" style="font-size:11px">NO NETWORK</text>
+  <text x="610.3" y="881" class="xs" text-anchor="start">observed failure</text>
+  <rect x="736.7" y="866" width="34" height="20" rx="5" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <rect x="778.7" y="866" width="73" height="20" rx="10.0" fill="#a16207"/>
+  <text x="815.2" y="879.96" class="pill" text-anchor="middle" style="font-size:11px">DESIGNED</text>
+  <text x="859.7" y="881" class="xs" text-anchor="start">on paper (Stage 1H)</text>
+</svg>

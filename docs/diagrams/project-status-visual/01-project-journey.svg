@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1040" viewBox="0 0 1200 1040" role="img" aria-labelledby="title desc">
+  <title id="title">The entire project journey</title>
+  <desc id="desc">Official stages on the left: Stage 0 complete, Stages 1A to 1G complete and proven, Stage 1H KubeVirt target designed and awaiting review (you are here), Stage 1I not yet defined. On the right, a proposed and not official path: first KubeVirt VM, actual VM migration, migration workflow, custom controller and CRD, GitOps, observability and security, modernization, native Kubernetes workload.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker><marker id="m7c3aed" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#7c3aed"/></marker></defs>
+  <rect width="1200" height="1040" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">VM-to-Kubernetes Migration: the whole journey</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">Left: official stages from the repository.  Right: a proposed path, not official, no stage numbers.</text>
+  <rect x="40" y="96" width="540" height="860" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="56" y="122" class="lab" text-anchor="start">OFFICIAL STAGES (Stage 1 README)</text>
+  <rect x="620" y="96" width="540" height="860" rx="14" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <text x="636" y="122" class="lab" text-anchor="start">PROPOSED - NOT OFFICIAL</text>
+  <text x="636" y="142" class="xs" text-anchor="start">Drawn from Stage 0 / Stage 1H designs. No stage numbers.</text>
+  <rect x="90" y="140" width="440" height="70" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="310.0" y="171.19" class="t" text-anchor="middle" style="font-size:17px">VM-TO-KUBERNETES MIGRATION</text>
+  <text x="310.0" y="190.5" class="s" text-anchor="middle" style="font-size:12.5px">ESXi -&gt; KubeVirt migration and VM modernization</text>
+  <rect x="90" y="250" width="440" height="84" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="310.0" y="278.94" class="t" text-anchor="middle" style="font-size:17px">STAGE 0</text>
+  <text x="310.0" y="298.25" class="s" text-anchor="middle" style="font-size:12.5px">Architecture / theory / decisions</text>
+  <text x="310.0" y="316.75" class="s" text-anchor="middle" style="font-size:12.5px">ADRs 001 to 005. Nothing installed.</text>
+  <rect x="447" y="240" width="73" height="20" rx="10.0" fill="#15803d"/>
+  <text x="483.5" y="253.96" class="pill" text-anchor="middle" style="font-size:11px">COMPLETE</text>
+  <rect x="90" y="380" width="440" height="84" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="310.0" y="408.94" class="t" text-anchor="middle" style="font-size:17px">STAGE 1A -&gt; 1G</text>
+  <text x="310.0" y="428.25" class="s" text-anchor="middle" style="font-size:12.5px">Real VMware VM + cold disk copy + conversion</text>
+  <text x="310.0" y="446.75" class="s" text-anchor="middle" style="font-size:12.5px">qemu-img, virt-v2v, QEMU/KVM boot, nginx</text>
+  <rect x="461" y="370" width="59" height="20" rx="10.0" fill="#15803d"/>
+  <text x="490.5" y="383.96" class="pill" text-anchor="middle" style="font-size:11px">PROVEN</text>
+  <rect x="90" y="510" width="440" height="84" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="3"/>
+  <text x="310.0" y="538.94" class="t" text-anchor="middle" style="font-size:17px">STAGE 1H</text>
+  <text x="310.0" y="558.25" class="s" text-anchor="middle" style="font-size:12.5px">KubeVirt target DESIGN (ADRs 007 to 010)</text>
+  <text x="310.0" y="576.75" class="s" text-anchor="middle" style="font-size:12.5px">Nothing provisioned. Awaiting review.</text>
+  <rect x="447" y="500" width="73" height="20" rx="10.0" fill="#a16207"/>
+  <text x="483.5" y="513.96" class="pill" text-anchor="middle" style="font-size:11px">DESIGNED</text>
+  <rect x="102" y="500" width="66" height="20" rx="10.0" fill="#1d4ed8"/>
+  <text x="135.0" y="513.96" class="pill" text-anchor="middle" style="font-size:11px">CURRENT</text>
+  <rect x="90" y="720" width="440" height="84" rx="10" fill="#f1f5f9" stroke="#64748b" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="310.0" y="748.94" class="t" text-anchor="middle" style="font-size:17px">STAGE 1I</text>
+  <text x="310.0" y="768.25" class="s" text-anchor="middle" style="font-size:12.5px">NOT YET DEFINED - not started</text>
+  <text x="310.0" y="786.75" class="s" text-anchor="middle" style="font-size:12.5px">Needs your approval + AWS credentials</text>
+  <rect x="426" y="710" width="94" height="20" rx="10.0" fill="#475569"/>
+  <text x="473.0" y="723.96" class="pill" text-anchor="middle" style="font-size:11px">NOT DEFINED</text>
+  <path d="M310.0,210 L310.0,248" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M310.0,336 L310.0,378" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M310.0,466 L310.0,508" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M310.0,596 L310.0,716" fill="none" stroke="#475569" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m475569)"/>
+  <rect x="180.0" y="626" width="260" height="50" rx="23" fill="#1d4ed8" stroke="#1e3a8a" stroke-width="2"/>
+  <text x="310.0" y="658.0" class="t" text-anchor="middle" style="font-size:20px;fill:#ffffff;font-weight:800">YOU ARE HERE</text>
+  <text x="310.0" y="836" class="t" text-anchor="middle" style="font-size:15px;fill:#1d4ed8">KubeVirt target designed, but not deployed.</text>
+  <text x="310.0" y="862" class="s" text-anchor="middle" style="font-size:13.5px">No AWS, Kubernetes, KubeVirt or CDI resource exists.</text>
+  <rect x="670" y="160" width="440" height="64" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="890.0" y="187.55" class="t" text-anchor="middle" style="font-size:15px">Target platform build + first KubeVirt VM</text>
+  <text x="890.0" y="206.5" class="s" text-anchor="middle" style="font-size:12.5px">likely Stage 1I scope (not decided)</text>
+  <rect x="670" y="260" width="440" height="64" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="890.0" y="287.55" class="t" text-anchor="middle" style="font-size:15px">Actual VM migration</text>
+  <text x="890.0" y="306.5" class="s" text-anchor="middle" style="font-size:12.5px">legacy-source-vm running on KubeVirt</text>
+  <path d="M890.0,226 L890.0,257" fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m7c3aed)"/>
+  <rect x="670" y="360" width="440" height="64" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="890.0" y="387.55" class="t" text-anchor="middle" style="font-size:15px">Migration workflow</text>
+  <text x="890.0" y="406.5" class="s" text-anchor="middle" style="font-size:12.5px">inventory, mapping, validation, cutover</text>
+  <path d="M890.0,326 L890.0,357" fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m7c3aed)"/>
+  <rect x="670" y="460" width="440" height="64" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="890.0" y="487.55" class="t" text-anchor="middle" style="font-size:15px">Custom controller / CRD</text>
+  <text x="890.0" y="506.5" class="s" text-anchor="middle" style="font-size:12.5px">VirtualMachineMigration (ADR 005)</text>
+  <path d="M890.0,426 L890.0,457" fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m7c3aed)"/>
+  <rect x="670" y="560" width="440" height="64" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="890.0" y="587.55" class="t" text-anchor="middle" style="font-size:15px">GitOps</text>
+  <text x="890.0" y="606.5" class="s" text-anchor="middle" style="font-size:12.5px">Git-managed definitions (deferred)</text>
+  <path d="M890.0,526 L890.0,557" fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m7c3aed)"/>
+  <rect x="670" y="660" width="440" height="64" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="890.0" y="687.55" class="t" text-anchor="middle" style="font-size:15px">Observability / Security</text>
+  <text x="890.0" y="706.5" class="s" text-anchor="middle" style="font-size:12.5px">after the first migration works</text>
+  <path d="M890.0,626 L890.0,657" fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m7c3aed)"/>
+  <rect x="670" y="760" width="440" height="64" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="890.0" y="787.55" class="t" text-anchor="middle" style="font-size:15px">Modernization</text>
+  <text x="890.0" y="806.5" class="s" text-anchor="middle" style="font-size:12.5px">same nginx content as a container</text>
+  <path d="M890.0,726 L890.0,757" fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m7c3aed)"/>
+  <rect x="670" y="860" width="440" height="64" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="890.0" y="887.55" class="t" text-anchor="middle" style="font-size:15px">Native K8s workload</text>
+  <text x="890.0" y="906.5" class="s" text-anchor="middle" style="font-size:12.5px">Deployment + Service, no guest OS</text>
+  <path d="M890.0,826 L890.0,857" fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m7c3aed)"/>
+  <path d="M532,762 L600,762 L600,192 L667,192" fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m7c3aed)"/>
+  <rect x="83.79999999999995" y="984" width="34" height="20" rx="5" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <rect x="125.79999999999995" y="984" width="73" height="20" rx="10.0" fill="#15803d"/>
+  <text x="162.29999999999995" y="997.96" class="pill" text-anchor="middle" style="font-size:11px">COMPLETE</text>
+  <text x="206.79999999999995" y="999" class="xs" text-anchor="start">proven in the lab</text>
+  <rect x="339.59999999999997" y="984" width="34" height="20" rx="5" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <rect x="381.59999999999997" y="984" width="66" height="20" rx="10.0" fill="#1d4ed8"/>
+  <text x="414.59999999999997" y="997.96" class="pill" text-anchor="middle" style="font-size:11px">CURRENT</text>
+  <text x="455.59999999999997" y="999" class="xs" text-anchor="start">where we are</text>
+  <rect x="556.4" y="984" width="34" height="20" rx="5" fill="#f1f5f9" stroke="#64748b" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <rect x="598.4" y="984" width="94" height="20" rx="10.0" fill="#475569"/>
+  <text x="645.4" y="997.96" class="pill" text-anchor="middle" style="font-size:11px">NOT DEFINED</text>
+  <text x="700.4" y="999" class="xs" text-anchor="start">official name only</text>
+  <rect x="839.5999999999999" y="984" width="34" height="20" rx="5" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <rect x="881.5999999999999" y="984" width="73" height="20" rx="10.0" fill="#6d28d9"/>
+  <text x="918.0999999999999" y="997.96" class="pill" text-anchor="middle" style="font-size:11px">PROPOSED</text>
+  <text x="962.5999999999999" y="999" class="xs" text-anchor="start">suggestion, not official</text>
+</svg>

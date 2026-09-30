@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1060" viewBox="0 0 1200 1060" role="img" aria-labelledby="title desc">
+  <title id="title">The Stage 1H KubeVirt target</title>
+  <desc id="desc">Designed stack: AWS ap-south-1, EC2 m8i.xlarge with nested virtualization, CentOS Stream 9, Kubernetes 1.36 (kubeadm, single node), CRI-O 1.36, flannel, KubeVirt v1.9.0, CDI v1.66.1, VirtualMachine, virt-launcher pod, QEMU, KVM, Ubuntu 24.04.5, nginx. Storage: qcow2, CDI upload, PVC (gp3 Block RWO 40 GiB), VM. Network: masquerade, DHCP 10.0.2.2, Service NodePort 30080. Designed, not deployed.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="ma16207" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#a16207"/></marker></defs>
+  <rect width="1200" height="1060" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">The Stage 1H target (ADRs 007 to 010)</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">Exact design values. Nothing here has been created.</text>
+  <rect x="360" y="100" width="480" height="44" rx="8" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="376" y="128" class="t" text-anchor="start" style="font-size:16px">AWS</text>
+  <text x="824" y="128" class="s" text-anchor="end" style="font-size:13px">ap-south-1, one VPC, one public subnet</text>
+  <rect x="360" y="162" width="480" height="44" rx="8" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="376" y="190" class="t" text-anchor="start" style="font-size:16px">EC2 m8i.xlarge</text>
+  <text x="824" y="190" class="s" text-anchor="end" style="font-size:13px">4 vCPU, 16 GiB, nested virtualization</text>
+  <path d="M600.0,145 L600.0,160" fill="none" stroke="#a16207" stroke-width="2.2" marker-end="url(#ma16207)"/>
+  <rect x="360" y="224" width="480" height="44" rx="8" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="376" y="252" class="t" text-anchor="start" style="font-size:16px">CentOS Stream 9</text>
+  <text x="824" y="252" class="s" text-anchor="end" style="font-size:13px">node OS (EL9 kernel)</text>
+  <path d="M600.0,207 L600.0,222" fill="none" stroke="#a16207" stroke-width="2.2" marker-end="url(#ma16207)"/>
+  <rect x="360" y="286" width="480" height="44" rx="8" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="376" y="314" class="t" text-anchor="start" style="font-size:16px">Kubernetes 1.36</text>
+  <text x="824" y="314" class="s" text-anchor="end" style="font-size:13px">kubeadm, single node</text>
+  <path d="M600.0,269 L600.0,284" fill="none" stroke="#a16207" stroke-width="2.2" marker-end="url(#ma16207)"/>
+  <rect x="360" y="348" width="480" height="44" rx="8" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="376" y="376" class="t" text-anchor="start" style="font-size:16px">CRI-O 1.36</text>
+  <text x="824" y="376" class="s" text-anchor="end" style="font-size:13px">container runtime</text>
+  <path d="M600.0,331 L600.0,346" fill="none" stroke="#a16207" stroke-width="2.2" marker-end="url(#ma16207)"/>
+  <rect x="360" y="410" width="480" height="44" rx="8" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="376" y="438" class="t" text-anchor="start" style="font-size:16px">flannel</text>
+  <text x="824" y="438" class="s" text-anchor="end" style="font-size:13px">pod network (CNI)</text>
+  <path d="M600.0,393 L600.0,408" fill="none" stroke="#a16207" stroke-width="2.2" marker-end="url(#ma16207)"/>
+  <rect x="360" y="472" width="480" height="44" rx="8" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="376" y="500" class="t" text-anchor="start" style="font-size:16px">KubeVirt v1.9.0</text>
+  <text x="824" y="500" class="s" text-anchor="end" style="font-size:13px">VM operator</text>
+  <path d="M600.0,455 L600.0,470" fill="none" stroke="#a16207" stroke-width="2.2" marker-end="url(#ma16207)"/>
+  <rect x="360" y="534" width="480" height="44" rx="8" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="376" y="562" class="t" text-anchor="start" style="font-size:16px">CDI v1.66.1</text>
+  <text x="824" y="562" class="s" text-anchor="end" style="font-size:13px">disk importer (candidate)</text>
+  <path d="M600.0,517 L600.0,532" fill="none" stroke="#a16207" stroke-width="2.2" marker-end="url(#ma16207)"/>
+  <rect x="360" y="596" width="480" height="44" rx="8" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="376" y="624" class="t" text-anchor="start" style="font-size:16px">VirtualMachine</text>
+  <text x="824" y="624" class="s" text-anchor="end" style="font-size:13px">2 vCPU, 4096 Mi, EFI SB off</text>
+  <path d="M600.0,579 L600.0,594" fill="none" stroke="#a16207" stroke-width="2.2" marker-end="url(#ma16207)"/>
+  <rect x="360" y="658" width="480" height="44" rx="8" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="376" y="686" class="t" text-anchor="start" style="font-size:16px">virt-launcher pod</text>
+  <text x="824" y="686" class="s" text-anchor="end" style="font-size:13px">one per running VM</text>
+  <path d="M600.0,641 L600.0,656" fill="none" stroke="#a16207" stroke-width="2.2" marker-end="url(#ma16207)"/>
+  <rect x="360" y="720" width="480" height="44" rx="8" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="376" y="748" class="t" text-anchor="start" style="font-size:16px">QEMU</text>
+  <text x="824" y="748" class="s" text-anchor="end" style="font-size:13px">VM process</text>
+  <path d="M600.0,703 L600.0,718" fill="none" stroke="#a16207" stroke-width="2.2" marker-end="url(#ma16207)"/>
+  <rect x="360" y="782" width="480" height="44" rx="8" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="376" y="810" class="t" text-anchor="start" style="font-size:16px">KVM</text>
+  <text x="824" y="810" class="s" text-anchor="end" style="font-size:13px">/dev/kvm on the node</text>
+  <path d="M600.0,765 L600.0,780" fill="none" stroke="#a16207" stroke-width="2.2" marker-end="url(#ma16207)"/>
+  <rect x="360" y="844" width="480" height="44" rx="8" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="376" y="872" class="t" text-anchor="start" style="font-size:16px">Ubuntu 24.04.5</text>
+  <text x="824" y="872" class="s" text-anchor="end" style="font-size:13px">the migrated guest</text>
+  <path d="M600.0,827 L600.0,842" fill="none" stroke="#a16207" stroke-width="2.2" marker-end="url(#ma16207)"/>
+  <rect x="360" y="906" width="480" height="44" rx="8" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="376" y="934" class="t" text-anchor="start" style="font-size:16px">nginx</text>
+  <text x="824" y="934" class="s" text-anchor="end" style="font-size:13px">same page, same hash</text>
+  <path d="M600.0,889 L600.0,904" fill="none" stroke="#a16207" stroke-width="2.2" marker-end="url(#ma16207)"/>
+  <rect x="40" y="520" width="280" height="360" rx="14" fill="#fffbeb" stroke="#a16207" stroke-width="1.5" stroke-dasharray="9 5"/>
+  <text x="56" y="546" class="lab" text-anchor="start">STORAGE SIDE (ADR 009)</text>
+  <rect x="64" y="572" width="232" height="52" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="180.0" y="593.8" class="t" text-anchor="middle" style="font-size:15px">QCOW2</text>
+  <text x="180.0" y="612.34" class="s" text-anchor="middle" style="font-size:12px">about 2.7 GiB</text>
+  <rect x="64" y="648" width="232" height="52" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="180.0" y="669.8" class="t" text-anchor="middle" style="font-size:15px">CDI upload</text>
+  <text x="180.0" y="688.34" class="s" text-anchor="middle" style="font-size:12px">DataVolume</text>
+  <path d="M180,626 L180,645" fill="none" stroke="#a16207" stroke-width="2.2" marker-end="url(#ma16207)"/>
+  <rect x="64" y="724" width="232" height="52" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="180.0" y="745.8" class="t" text-anchor="middle" style="font-size:15px">PVC</text>
+  <text x="180.0" y="764.34" class="s" text-anchor="middle" style="font-size:12px">gp3, Block, RWO, 40 GiB</text>
+  <path d="M180,702 L180,721" fill="none" stroke="#a16207" stroke-width="2.2" marker-end="url(#ma16207)"/>
+  <rect x="64" y="800" width="232" height="52" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="180.0" y="821.8" class="t" text-anchor="middle" style="font-size:15px">VM disk</text>
+  <text x="180.0" y="840.34" class="s" text-anchor="middle" style="font-size:12px">raw, bus virtio</text>
+  <path d="M180,778 L180,797" fill="none" stroke="#a16207" stroke-width="2.2" marker-end="url(#ma16207)"/>
+  <path d="M298,826 L358,640" fill="none" stroke="#a16207" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#ma16207)"/>
+  <rect x="880" y="520" width="280" height="360" rx="14" fill="#fffbeb" stroke="#a16207" stroke-width="1.5" stroke-dasharray="9 5"/>
+  <text x="896" y="546" class="lab" text-anchor="start">NETWORK SIDE (ADR 008, 010)</text>
+  <rect x="904" y="572" width="232" height="52" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="1020.0" y="593.8" class="t" text-anchor="middle" style="font-size:15px">masquerade</text>
+  <text x="1020.0" y="612.34" class="s" text-anchor="middle" style="font-size:12px">NAT in the pod</text>
+  <rect x="904" y="648" width="232" height="52" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="1020.0" y="669.8" class="t" text-anchor="middle" style="font-size:15px">DHCP</text>
+  <text x="1020.0" y="688.34" class="s" text-anchor="middle" style="font-size:12px">guest gets 10.0.2.2</text>
+  <path d="M1020,626 L1020,645" fill="none" stroke="#a16207" stroke-width="2.2" marker-end="url(#ma16207)"/>
+  <rect x="904" y="724" width="232" height="52" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="1020.0" y="745.8" class="t" text-anchor="middle" style="font-size:15px">Service</text>
+  <text x="1020.0" y="764.34" class="s" text-anchor="middle" style="font-size:12px">NodePort 30080</text>
+  <path d="M1020,702 L1020,721" fill="none" stroke="#a16207" stroke-width="2.2" marker-end="url(#ma16207)"/>
+  <rect x="904" y="800" width="232" height="52" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="1020.0" y="821.8" class="t" text-anchor="middle" style="font-size:15px">operator /32</text>
+  <text x="1020.0" y="840.34" class="s" text-anchor="middle" style="font-size:12px">external HTTP check</text>
+  <path d="M1020,778 L1020,797" fill="none" stroke="#a16207" stroke-width="2.2" marker-end="url(#ma16207)"/>
+  <path d="M842,640 L902,598" fill="none" stroke="#a16207" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#ma16207)"/>
+  <g transform="translate(188,300) rotate(-12)"><rect x="-150" y="-92" width="300" height="184" rx="18" fill="#fff1f2" stroke="#b91c1c" stroke-width="5" stroke-dasharray="14 8"/><text x="0" y="-18" text-anchor="middle" style="font-size:42px;font-weight:800;fill:#b91c1c;letter-spacing:2px">DESIGNED</text><text x="0" y="30" text-anchor="middle" style="font-size:30px;font-weight:800;fill:#b91c1c;letter-spacing:3px">NOT</text><text x="0" y="68" text-anchor="middle" style="font-size:30px;font-weight:800;fill:#b91c1c;letter-spacing:3px">DEPLOYED</text></g>
+  <g transform="translate(1012,300) rotate(12)"><rect x="-150" y="-92" width="300" height="184" rx="18" fill="#fff1f2" stroke="#b91c1c" stroke-width="5" stroke-dasharray="14 8"/><text x="0" y="-18" text-anchor="middle" style="font-size:42px;font-weight:800;fill:#b91c1c;letter-spacing:2px">DESIGNED</text><text x="0" y="30" text-anchor="middle" style="font-size:30px;font-weight:800;fill:#b91c1c;letter-spacing:3px">NOT</text><text x="0" y="68" text-anchor="middle" style="font-size:30px;font-weight:800;fill:#b91c1c;letter-spacing:3px">DEPLOYED</text></g>
+  <text x="600" y="1000" class="s" text-anchor="middle" style="font-size:14px">About USD 0.24 per hour while running; Terraform apply and destroy per session (ADR 002). EKS deferred, not rejected.</text>
+  <text x="600" y="1026" class="xs" text-anchor="middle">192.168.50.31 is not preserved. Continuity = same nginx page hash through the Service.</text>
+</svg>

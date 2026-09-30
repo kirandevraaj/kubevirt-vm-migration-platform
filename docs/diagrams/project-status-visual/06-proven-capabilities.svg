@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">What has actually been proven</title>
+  <desc id="desc">Checklist by area. Source: ESXi reboot, real VMware VM, cold disk acquisition, byte-identical golden copy. KVM: nested KVM, QEMU, VirtIO, UEFI, KVM-accelerated boot. Conversion: qemu-img, virt-v2v, guest inspection, guest adaptation. Application: Ubuntu boots, nginx works, same validation-page hash. Network: initial failure understood, netplan remediation proven. KubeVirt: target architecture designed only. Proven is not designed.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs></defs>
+  <rect width="1200" height="900" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">What we have actually proven</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">Every green tick was observed in our lab in a PASS stage (1A to 1G)</text>
+  <rect x="40" y="100" width="360" height="300" rx="14" fill="#dcfce7" stroke="#15803d" stroke-width="2.2"/>
+  <text x="58" y="134" class="lab" text-anchor="start" style="font-size:16px">SOURCE</text>
+  <path d="M63,173 L69.0,179.3 L81,165.8" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="96" y="178" class="s" text-anchor="start" style="font-size:15.5px">ESXi reboot persistence (1A)</text>
+  <path d="M63,217 L69.0,223.3 L81,209.8" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="96" y="222" class="s" text-anchor="start" style="font-size:15.5px">real VMware VM (1C)</text>
+  <path d="M63,261 L69.0,267.3 L81,253.8" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="96" y="266" class="s" text-anchor="start" style="font-size:15.5px">cold disk acquisition (1E)</text>
+  <path d="M63,305 L69.0,311.3 L81,297.8" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="96" y="310" class="s" text-anchor="start" style="font-size:15.5px">byte-identical golden copy (1E)</text>
+  <rect x="420" y="100" width="360" height="300" rx="14" fill="#dcfce7" stroke="#15803d" stroke-width="2.2"/>
+  <text x="438" y="134" class="lab" text-anchor="start" style="font-size:16px">KVM</text>
+  <path d="M443,173 L449.0,179.3 L461,165.8" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="476" y="178" class="s" text-anchor="start" style="font-size:15.5px">nested KVM (1B, 1F)</text>
+  <path d="M443,217 L449.0,223.3 L461,209.8" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="476" y="222" class="s" text-anchor="start" style="font-size:15.5px">QEMU (1B, 1G)</text>
+  <path d="M443,261 L449.0,267.3 L461,253.8" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="476" y="266" class="s" text-anchor="start" style="font-size:15.5px">VirtIO disk and NIC (1B, 1G)</text>
+  <path d="M443,305 L449.0,311.3 L461,297.8" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="476" y="310" class="s" text-anchor="start" style="font-size:15.5px">UEFI boot, Secure Boot off (1G)</text>
+  <path d="M443,349 L449.0,355.3 L461,341.8" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="476" y="354" class="s" text-anchor="start" style="font-size:15.5px">KVM-accelerated boot (1G)</text>
+  <rect x="800" y="100" width="360" height="300" rx="14" fill="#dcfce7" stroke="#15803d" stroke-width="2.2"/>
+  <text x="818" y="134" class="lab" text-anchor="start" style="font-size:16px">CONVERSION</text>
+  <path d="M823,173 L829.0,179.3 L841,165.8" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="856" y="178" class="s" text-anchor="start" style="font-size:15.5px">qemu-img VMDK -&gt; qcow2 (1G)</text>
+  <path d="M823,217 L829.0,223.3 L841,209.8" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="856" y="222" class="s" text-anchor="start" style="font-size:15.5px">virt-v2v conversion (1G)</text>
+  <path d="M823,261 L829.0,267.3 L841,253.8" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="856" y="266" class="s" text-anchor="start" style="font-size:15.5px">guest inspection, read-only (1F)</text>
+  <path d="M823,305 L829.0,311.3 L841,297.8" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="856" y="310" class="s" text-anchor="start" style="font-size:15.5px">guest adaptation by virt-v2v (1G)</text>
+  <rect x="40" y="424" width="360" height="300" rx="14" fill="#dcfce7" stroke="#15803d" stroke-width="2.2"/>
+  <text x="58" y="458" class="lab" text-anchor="start" style="font-size:16px">APPLICATION</text>
+  <path d="M63,497 L69.0,503.3 L81,489.8" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="96" y="502" class="s" text-anchor="start" style="font-size:15.5px">Ubuntu boots after conversion (1G)</text>
+  <path d="M63,541 L69.0,547.3 L81,533.8" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="96" y="546" class="s" text-anchor="start" style="font-size:15.5px">nginx works (1G)</text>
+  <path d="M63,585 L69.0,591.3 L81,577.8" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="96" y="590" class="s" text-anchor="start" style="font-size:15.5px">same validation-page hash (1G)</text>
+  <rect x="420" y="424" width="360" height="300" rx="14" fill="#dcfce7" stroke="#15803d" stroke-width="2.2"/>
+  <text x="438" y="458" class="lab" text-anchor="start" style="font-size:16px">NETWORK</text>
+  <path d="M443,497 L449.0,503.3 L461,489.8" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="476" y="502" class="s" text-anchor="start" style="font-size:15.5px">initial failure understood (1G)</text>
+  <path d="M443,541 L449.0,547.3 L461,533.8" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="476" y="546" class="s" text-anchor="start" style="font-size:15.5px">netplan remediation proven (1G)</text>
+  <text x="476" y="590" class="s" text-anchor="start" style="font-size:14px;fill:#475569">on an isolated test network;</text>
+  <text x="476" y="634" class="s" text-anchor="start" style="font-size:14px;fill:#475569">DNS not proven</text>
+  <rect x="800" y="424" width="360" height="300" rx="14" fill="#fef9c3" stroke="#a16207" stroke-width="2.2" stroke-dasharray="9 5"/>
+  <text x="818" y="458" class="lab" text-anchor="start" style="font-size:16px">KUBEVIRT</text>
+  <rect x="1038" y="440" width="108" height="20" rx="10.0" fill="#a16207"/>
+  <text x="1092.0" y="453.96" class="pill" text-anchor="middle" style="font-size:11px">DESIGNED ONLY</text>
+  <rect x="822" y="485" width="22" height="22" rx="4" fill="#fef9c3" stroke="#a16207" stroke-width="2" stroke-dasharray="4 3"/>
+  <text x="856" y="502" class="s" text-anchor="start" style="font-size:15.5px">target architecture (1H)</text>
+  <text x="856" y="546" class="s" text-anchor="start" style="font-size:14px;fill:#475569">no cluster, no import,</text>
+  <text x="856" y="590" class="s" text-anchor="start" style="font-size:14px;fill:#475569">no KubeVirt VM</text>
+  <rect x="30" y="760" width="1140" height="74" rx="12" fill="#f8fafc" stroke="#0f172a" stroke-width="2"/>
+  <text x="600.0" y="792" class="t" text-anchor="middle" style="font-size:20px;fill:#0f172a">Proven &#8800; designed.</text>
+  <text x="600.0" y="816" class="s" text-anchor="middle" style="font-size:14px;fill:#334155">KubeVirt, CDI and the AWS target exist only on paper. Nothing Kubernetes-side has run.</text>
+  <rect x="350.4" y="856" width="34" height="20" rx="5" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <rect x="392.4" y="856" width="59" height="20" rx="10.0" fill="#15803d"/>
+  <text x="421.9" y="869.96" class="pill" text-anchor="middle" style="font-size:11px">PROVEN</text>
+  <text x="459.4" y="871" class="xs" text-anchor="start">observed in our lab</text>
+  <rect x="605.0" y="856" width="34" height="20" rx="5" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <rect x="647.0" y="856" width="73" height="20" rx="10.0" fill="#a16207"/>
+  <text x="683.5" y="869.96" class="pill" text-anchor="middle" style="font-size:11px">DESIGNED</text>
+  <text x="728.0" y="871" class="xs" text-anchor="start">on paper (Stage 1H)</text>
+</svg>

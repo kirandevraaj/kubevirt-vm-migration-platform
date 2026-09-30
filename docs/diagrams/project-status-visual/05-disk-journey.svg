@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1060" viewBox="0 0 1200 1060" role="img" aria-labelledby="title desc">
+  <title id="title">The disk journey</title>
+  <desc id="desc">The source VMDK (descriptor plus flat extent) on ESXi was copied cold in Stage 1E to the Windows golden artifact, then by scp in Stage 1F to the working copy on conversion-host-01. qemu-img produced a qcow2; virt-v2v produced a qcow2 plus libvirt XML. Both were booted in temporary QEMU/KVM test guests, which were deleted. Future part, designed and not built: qcow2, CDI, PVC, KubeVirt VM.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker><marker id="ma16207" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#a16207"/></marker></defs>
+  <rect width="1200" height="1060" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">The disk journey</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">Where the migration disk actually is. Every copy is hashed; the original is never modified.</text>
+  <rect x="70" y="100" width="560" height="74" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="350.0" y="123.3" class="t" text-anchor="middle" style="font-size:15px">ESXi: legacy-source-vm</text>
+  <text x="350.0" y="142.25" class="s" text-anchor="middle" style="font-size:12.5px">/vmfs/volumes/migration-datastore/legacy-source-vm/</text>
+  <text x="350.0" y="160.75" class="s" text-anchor="middle" style="font-size:12.5px">VMDK = 541-byte descriptor + 40 GiB thin flat extent</text>
+  <rect x="561" y="90" width="59" height="20" rx="10.0" fill="#1d4ed8"/>
+  <text x="590.5" y="103.96" class="pill" text-anchor="middle" style="font-size:11px">SOURCE</text>
+  <path d="M350.0,176 L350.0,214" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="362.0" y="200" class="xs" text-anchor="start" style="font-weight:600">Stage 1E cold acquisition (graceful shutdown, scp, sha256)</text>
+  <rect x="70" y="216" width="560" height="74" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="350.0" y="239.3" class="t" text-anchor="middle" style="font-size:15px">WINDOWS GOLDEN ARTIFACT</text>
+  <text x="350.0" y="258.25" class="s" text-anchor="middle" style="font-size:12.5px">C:\VMs\legacy-source-vm\stage-1e\</text>
+  <text x="350.0" y="276.75" class="s" text-anchor="middle" style="font-size:12.5px">read-only, byte-identical (sha256 72ca45c7...c9e7)</text>
+  <rect x="561" y="206" width="59" height="20" rx="10.0" fill="#a16207"/>
+  <text x="590.5" y="219.96" class="pill" text-anchor="middle" style="font-size:11px">GOLDEN</text>
+  <path d="M92.8,244 L92.8,237.7 A7.2,7.2 0 0 1 107.2,237.7 L107.2,244" fill="none" stroke="#a16207" stroke-width="3.15"/>
+  <rect x="88.3" y="244" width="23.400000000000002" height="18.0" rx="2.7" fill="#a16207"/>
+  <circle cx="100" cy="252.1" r="2.7" fill="#ffffff"/>
+  <path d="M350.0,292 L350.0,330" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="362.0" y="316" class="xs" text-anchor="start" style="font-weight:600">Stage 1F scp, hash-verified</text>
+  <rect x="70" y="332" width="560" height="74" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="350.0" y="355.3" class="t" text-anchor="middle" style="font-size:15px">CONVERSION HOST WORKING COPY</text>
+  <text x="350.0" y="374.25" class="s" text-anchor="middle" style="font-size:12.5px">conversion-host-01: /srv/migration-lab/working/</text>
+  <text x="350.0" y="392.75" class="s" text-anchor="middle" style="font-size:12.5px">0444 + immutable; the only input any tool reads</text>
+  <rect x="554" y="322" width="66" height="20" rx="10.0" fill="#1d4ed8"/>
+  <text x="587.0" y="335.96" class="pill" text-anchor="middle" style="font-size:11px">WORKING</text>
+  <path d="M350.0,408 L350.0,432 M200,432 L500,432" stroke="#475569" stroke-width="2.2" fill="none"/>
+  <path d="M200,432 L200,462" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M500,432 L500,462" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="70" y="464" width="260" height="56" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="200.0" y="487.55" class="t" text-anchor="middle" style="font-size:15px">qemu-img</text>
+  <text x="200.0" y="506.5" class="s" text-anchor="middle" style="font-size:12.5px">Path A: container only</text>
+  <rect x="370" y="464" width="260" height="56" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="500.0" y="487.55" class="t" text-anchor="middle" style="font-size:15px">virt-v2v</text>
+  <text x="500.0" y="506.5" class="s" text-anchor="middle" style="font-size:12.5px">Path B: guest-aware</text>
+  <path d="M200,522 L200,548" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M500,522 L500,548" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="70" y="550" width="260" height="78" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="200.0" y="575.3" class="t" text-anchor="middle" style="font-size:15px">QCOW2</text>
+  <text x="200.0" y="594.25" class="s" text-anchor="middle" style="font-size:12.5px">stage-1g/qemu-img/</text>
+  <text x="200.0" y="612.75" class="s" text-anchor="middle" style="font-size:12.5px">legacy-source-vm.qcow2</text>
+  <rect x="240" y="540" width="80" height="20" rx="10.0" fill="#15803d"/>
+  <text x="280.0" y="553.96" class="pill" text-anchor="middle" style="font-size:11px">CONVERTED</text>
+  <rect x="370" y="550" width="260" height="78" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="500.0" y="575.3" class="t" text-anchor="middle" style="font-size:15px">QCOW2 + XML</text>
+  <text x="500.0" y="594.25" class="s" text-anchor="middle" style="font-size:12.5px">stage-1g/virt-v2v/local-out/</text>
+  <text x="500.0" y="612.75" class="s" text-anchor="middle" style="font-size:12.5px">+ remediated/ netfix copy</text>
+  <rect x="540" y="540" width="80" height="20" rx="10.0" fill="#15803d"/>
+  <text x="580.0" y="553.96" class="pill" text-anchor="middle" style="font-size:11px">CONVERTED</text>
+  <path d="M200,630 L200,656 L500,656 L500,630 M350.0,656 L350.0,664" stroke="#475569" stroke-width="2.2" fill="none"/>
+  <path d="M350.0,664 L350.0,690" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="130" y="692" width="440" height="74" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <text x="350.0" y="715.3" class="t" text-anchor="middle" style="font-size:15px">TEMPORARY QEMU/KVM TEST GUEST</text>
+  <text x="350.0" y="734.25" class="s" text-anchor="middle" style="font-size:12.5px">inside conversion-host-01, UEFI + virtio</text>
+  <text x="350.0" y="752.75" class="s" text-anchor="middle" style="font-size:12.5px">booted a disposable overlay; nginx HTTP 200</text>
+  <rect x="480" y="682" width="80" height="20" rx="10.0" fill="#b45309"/>
+  <text x="520.0" y="695.96" class="pill" text-anchor="middle" style="font-size:11px">TEMPORARY</text>
+  <path d="M350.0,768 L350.0,800" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="240" y="802" width="220" height="48" rx="10" fill="#f1f5f9" stroke="#64748b" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="350.0" y="830.48" class="t" text-anchor="middle" style="font-size:14px">deleted after each test</text>
+  <text x="350.0" y="884" class="t" text-anchor="middle" style="font-size:15px">All of these files live outside Git.</text>
+  <text x="350.0" y="908" class="xs" text-anchor="middle">Paths under /srv/migration-lab/ are on conversion-host-01.</text>
+  <rect x="720" y="440" width="440" height="510" rx="14" fill="#fffbeb" stroke="#a16207" stroke-width="1.5" stroke-dasharray="9 5"/>
+  <text x="736" y="466" class="lab" text-anchor="start">FUTURE</text>
+  <text x="736" y="486" class="xs" text-anchor="start">DESIGNED - NOT BUILT (Stage 1H)</text>
+  <rect x="760" y="520" width="360" height="70" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="940.0" y="541.3" class="t" text-anchor="middle" style="font-size:15px">QCOW2</text>
+  <text x="940.0" y="560.25" class="s" text-anchor="middle" style="font-size:12.5px">new copy: netplan DHCP +</text>
+  <text x="940.0" y="578.75" class="s" text-anchor="middle" style="font-size:12.5px">offline guest agent</text>
+  <rect x="760" y="624" width="360" height="70" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="940.0" y="654.55" class="t" text-anchor="middle" style="font-size:15px">CDI upload</text>
+  <text x="940.0" y="673.5" class="s" text-anchor="middle" style="font-size:12.5px">upload DataVolume</text>
+  <path d="M940.0,592 L940.0,621" fill="none" stroke="#a16207" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#ma16207)"/>
+  <rect x="760" y="728" width="360" height="70" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="940.0" y="758.55" class="t" text-anchor="middle" style="font-size:15px">PVC</text>
+  <text x="940.0" y="777.5" class="s" text-anchor="middle" style="font-size:12.5px">40 GiB gp3, Block, RWO, raw</text>
+  <path d="M940.0,696 L940.0,725" fill="none" stroke="#a16207" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#ma16207)"/>
+  <rect x="760" y="832" width="360" height="70" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="940.0" y="862.55" class="t" text-anchor="middle" style="font-size:15px">KubeVirt VM</text>
+  <text x="940.0" y="881.5" class="s" text-anchor="middle" style="font-size:12.5px">VirtualMachine -&gt; virt-launcher</text>
+  <path d="M940.0,800 L940.0,829" fill="none" stroke="#a16207" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#ma16207)"/>
+  <path d="M634,590 L740,590 L740,555 L757,555" fill="none" stroke="#a16207" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#ma16207)"/>
+  <text x="690" y="580" class="xs halo" text-anchor="middle" style="fill:#a16207;font-weight:700">later</text>
+  <rect x="190.2" y="1000" width="34" height="20" rx="5" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <rect x="232.2" y="1000" width="59" height="20" rx="10.0" fill="#15803d"/>
+  <text x="261.7" y="1013.96" class="pill" text-anchor="middle" style="font-size:11px">PROVEN</text>
+  <text x="299.2" y="1015" class="xs" text-anchor="start">observed in our lab</text>
+  <rect x="444.8" y="1000" width="34" height="20" rx="5" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <rect x="486.8" y="1000" width="80" height="20" rx="10.0" fill="#b45309"/>
+  <text x="526.8" y="1013.96" class="pill" text-anchor="middle" style="font-size:11px">TEMPORARY</text>
+  <text x="574.8" y="1015" class="xs" text-anchor="start">existed only during a test</text>
+  <rect x="765.2" y="1000" width="34" height="20" rx="5" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <rect x="807.2" y="1000" width="73" height="20" rx="10.0" fill="#a16207"/>
+  <text x="843.7" y="1013.96" class="pill" text-anchor="middle" style="font-size:11px">DESIGNED</text>
+  <text x="888.2" y="1015" class="xs" text-anchor="start">on paper (Stage 1H)</text>
+</svg>

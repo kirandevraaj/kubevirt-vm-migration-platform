@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project Status - VM-to-Kubernetes Migration Platform</title>
+<style>
+  :root {
+    --ink: #0f172a; --muted: #475569; --line: #cbd5e1; --bg: #f8fafc;
+    --green: #15803d; --blue: #1d4ed8; --yellow: #a16207; --gray: #475569; --red: #b91c1c; --purple: #6d28d9; --orange: #c2410c;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 110px; }
+  body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; color: var(--ink); background: var(--bg); line-height: 1.45; }
+  a { color: var(--blue); }
+  a:focus-visible, button:focus-visible { outline: 3px solid #2563eb; outline-offset: 2px; }
+  .skip { position: absolute; left: -999px; top: 0; background: #fff; padding: 8px 12px; z-index: 100; }
+  .skip:focus { left: 8px; top: 8px; }
+
+  header { position: sticky; top: 0; z-index: 20; background: #0f172a; color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,.25); }
+  .bar { max-width: 1240px; margin: 0 auto; padding: 8px 18px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+  .brand { font-weight: 700; font-size: 15px; white-space: nowrap; color: #fff; text-decoration: none; }
+  .brand small { display: block; font-weight: 400; font-size: 12px; color: #cbd5e1; }
+  .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-left: auto; }
+  nav { display: flex; flex-wrap: wrap; gap: 5px; flex: 1 1 100%; order: 3; }
+  nav a { font-size: 12px; font-weight: 700; letter-spacing: .5px; color: #fff; text-decoration: none; white-space: nowrap;
+    background: #1e293b; border: 1px solid #334155; border-radius: 999px; padding: 4px 11px; }
+  nav a:hover, nav a:focus-visible { background: #334155; outline: 2px solid #93c5fd; outline-offset: 1px; }
+  nav a.active { background: #1d4ed8; border-color: #1d4ed8; }
+  .ctl { font: inherit; font-size: 12.5px; font-weight: 800; letter-spacing: .5px; border-radius: 999px; padding: 6px 14px; cursor: pointer; white-space: nowrap;
+    color: #052e16; background: #22c55e; border: 1px solid #22c55e; }
+  .ctl:hover { background: #4ade80; }
+  .ctl:focus-visible { outline: 2px solid #93c5fd; outline-offset: 2px; }
+  .seg { display: inline-flex; border: 1px solid #475569; border-radius: 999px; overflow: hidden; }
+  .seg button { font: inherit; font-size: 12px; font-weight: 800; letter-spacing: .5px; color: #cbd5e1; background: #1e293b; border: 0; padding: 6px 12px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { color: #fff; background: #1d4ed8; }
+  .seg button:focus-visible { outline: 2px solid #93c5fd; outline-offset: -2px; }
+
+  main { max-width: 1240px; margin: 0 auto; padding: 18px; }
+  .hero { text-align: center; padding: 18px 10px 4px; }
+  .hero h1 { margin: 0; font-size: clamp(24px, 3.6vw, 42px); }
+  .hero .sub { margin: 6px 0 0; color: var(--muted); font-size: clamp(15px, 1.8vw, 19px); }
+
+  .here { max-width: 760px; margin: 18px auto 0; text-align: center; color: #fff; background: #1d4ed8; border-radius: 22px; padding: 18px 20px 20px;
+    box-shadow: 0 10px 30px rgba(29,78,216,.35); border: 4px solid #1e3a8a; }
+  .here .k { font-size: 14px; font-weight: 800; letter-spacing: 4px; color: #bfdbfe; }
+  .here .s { display: block; font-size: clamp(44px, 8vw, 76px); font-weight: 800; line-height: 1.05; margin-top: 4px; }
+  .here .d { display: block; font-size: clamp(18px, 2.6vw, 26px); font-weight: 700; margin-top: 4px; }
+  .here .r { display: inline-block; margin-top: 12px; font-size: 14px; font-weight: 800; letter-spacing: 2px; color: #1e3a8a; background: #fff; border-radius: 999px; padding: 5px 16px; }
+  .nextdef { max-width: 760px; margin: 12px auto 0; text-align: center; font-size: 16px; font-weight: 700; color: #334155;
+    background: #f1f5f9; border: 2px dotted #64748b; border-radius: 14px; padding: 10px 14px; }
+
+  .strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 20px 0 6px; }
+  .st { border-radius: 12px; padding: 10px 12px; border: 2px solid; background: #fff; }
+  .st .sn { display: block; font-size: 13px; color: var(--muted); font-weight: 600; }
+  .st b { font-size: 14px; letter-spacing: .4px; }
+  .st.complete { border-color: var(--green); background: #dcfce7; } .st.complete b { color: var(--green); }
+  .st.current { border-color: var(--blue); background: #dbeafe; } .st.current b { color: var(--blue); }
+  .st.notdef { border-color: #64748b; border-style: dotted; background: #f1f5f9; } .st.notdef b { color: #334155; }
+  .st.notdeployed { border-color: var(--red); background: #fee2e2; } .st.notdeployed b { color: var(--red); }
+
+  .tag { display: inline-block; font-size: 11.5px; font-weight: 800; letter-spacing: .6px; color: #fff; border-radius: 999px; padding: 3px 10px; white-space: nowrap; }
+  .tag.complete, .tag.proven { background: var(--green); }
+  .tag.current { background: var(--blue); }
+  .tag.designed { background: var(--yellow); }
+  .tag.deferred { background: #334155; }
+  .tag.nottested { background: var(--orange); }
+  .tag.unknown { background: #64748b; }
+  .tag.blocked, .tag.notdeployed { background: var(--red); }
+  .tag.proposed { background: var(--purple); }
+  .tag.notdef { background: var(--gray); }
+  .legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 18px; margin: 14px 0 0; font-size: 13px; color: var(--muted); }
+  .lg { display: inline-flex; align-items: center; gap: 6px; }
+
+  .block { background: #fff; border: 1px solid var(--line); border-radius: 16px; margin: 22px 0; padding: 16px 18px; }
+  .block > h2 { margin: 0 0 4px; font-size: clamp(19px, 2.3vw, 26px); letter-spacing: .5px; }
+  .block > .lead { margin: 0 0 12px; color: var(--muted); }
+
+  .qgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .qc { border: 2px solid var(--ink); border-radius: 14px; background: #fff; overflow: hidden; }
+  .qb { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; font: inherit; font-size: 16px; font-weight: 700; color: var(--ink);
+    background: #fff; border: 0; padding: 12px 14px; cursor: pointer; min-height: 64px; }
+  .qb:hover { background: #f1f5f9; }
+  .qb:focus-visible { outline: 3px solid #2563eb; outline-offset: -3px; }
+  .qn { flex: 0 0 auto; width: 28px; height: 28px; border-radius: 50%; background: var(--blue); color: #fff; font-size: 14px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; }
+  .qt { flex: 1; }
+  .qi { flex: 0 0 auto; font-size: 22px; font-weight: 800; color: var(--muted); }
+  .qb[aria-expanded="true"] { background: #dbeafe; }
+  .qb[aria-expanded="true"] .qi { transform: rotate(45deg); }
+  .qa { padding: 4px 14px 12px; background: #dbeafe; font-size: 15px; }
+  .qa p { margin: 0 0 6px; }
+  .qa a { font-weight: 700; font-size: 14px; }
+
+  .fig { background: #fff; border: 1px solid var(--line); border-radius: 18px; margin: 22px 0; padding: 14px 16px 16px; box-shadow: 0 1px 3px rgba(15,23,42,.06); transition: box-shadow .3s; }
+  .fig.flash, .fig.follow-on { box-shadow: 0 0 0 4px #2563eb; }
+  .fig-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 10px; }
+  .num { font-weight: 800; font-size: 13px; color: #fff; background: #334155; border-radius: 6px; padding: 2px 8px; }
+  .fig-head h2 { margin: 0; font-size: clamp(18px, 2vw, 24px); flex: 1; min-width: 200px; }
+  .fig-head .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  button.img { display: block; width: 100%; padding: 0; margin: 0; border: 0; background: none; cursor: zoom-in; border-radius: 10px; }
+  button.img img { display: block; width: 100%; max-width: 1100px; height: auto; margin: 0 auto; border-radius: 10px; }
+  .take { margin: 12px 4px 0; font-size: clamp(16px, 1.8vw, 19px); font-weight: 700; text-align: center; }
+  .why { margin: 6px 4px 0; font-size: 14.5px; color: var(--muted); text-align: center; }
+  .learn { display: none; margin: 12px 4px 0; padding: 10px 14px; background: #f1f5f9; border-left: 4px solid var(--blue); border-radius: 6px; font-size: 15px; color: #1e293b; }
+  body.learning .learn { display: block; }
+  .learn p { margin: 0 0 6px; }
+  .learn ul { margin: 0; padding-left: 20px; }
+  .learn li { margin: 2px 0; }
+
+  .one { text-align: center; }
+  .flow { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px; margin: 10px 0 0; }
+  .flow .step { font-weight: 700; font-size: 15px; border-radius: 10px; padding: 8px 12px; border: 2px solid; }
+  .flow .step.p { background: #dcfce7; border-color: var(--green); }
+  .flow .step.d { background: #fef9c3; border-color: var(--yellow); border-style: dashed; }
+  .flow .step.h { background: #1d4ed8; border-color: #1e3a8a; color: #fff; letter-spacing: 1px; }
+  .flow .arr { font-size: 20px; color: var(--muted); }
+  .one .next { display: inline-block; margin: 16px 0 0; font-size: 18px; font-weight: 800; color: #334155; background: #f1f5f9; border: 2px dotted #64748b; border-radius: 12px; padding: 8px 16px; }
+  .warn { margin: 18px auto 4px; max-width: 900px; font-size: clamp(18px, 2.6vw, 28px); font-weight: 800; letter-spacing: .5px; color: var(--red);
+    background: #fee2e2; border: 4px solid var(--red); border-radius: 16px; padding: 14px 16px; }
+
+  .links { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .lk { display: flex; flex-direction: column; gap: 2px; text-decoration: none; color: var(--ink); border: 1.5px solid var(--line); border-left: 6px solid var(--blue); border-radius: 12px; padding: 10px 12px; background: #fff; }
+  .lk:hover { border-color: var(--blue); }
+  .lk span { font-size: 13.5px; color: var(--muted); }
+  footer { text-align: center; color: var(--muted); font-size: 12.5px; padding: 10px 10px 40px; }
+
+  #followbar { position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 30; display: none; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center;
+    width: min(720px, calc(100% - 20px)); background: #0f172a; color: #fff; border-radius: 14px; padding: 10px 14px; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+  body.following #followbar { display: flex; }
+  body.following main { padding-bottom: 110px; }
+  #followbar .where { flex: 1 1 240px; font-size: 14px; }
+  #followbar .where b { display: block; font-size: 15.5px; }
+  #followbar button { font: inherit; font-weight: 800; font-size: 14px; border-radius: 10px; padding: 7px 14px; cursor: pointer; border: 2px solid #fff; background: #0f172a; color: #fff; }
+  #followbar button.next { background: #22c55e; border-color: #22c55e; color: #052e16; }
+  #followbar button:disabled { opacity: .45; cursor: default; }
+  #followbar button:focus-visible { outline: 3px solid #93c5fd; outline-offset: 2px; }
+
+  #overlay { position: fixed; inset: 0; z-index: 50; background: rgba(15,23,42,.7); display: none; align-items: center; justify-content: center; padding: 12px; }
+  #overlay.open { display: flex; }
+  .panel { background: #fff; border-radius: 18px; width: min(1200px, 100%); max-height: calc(100vh - 24px); overflow: auto; padding: 14px 18px 14px; box-shadow: 0 20px 50px rgba(0,0,0,.35); }
+  .panel .top { display: flex; align-items: center; gap: 12px; }
+  .panel .pn { font-size: 13px; font-weight: 800; color: #fff; background: #334155; border-radius: 6px; padding: 2px 8px; }
+  .panel h2 { margin: 0; font-size: 20px; flex: 1; }
+  .panel img { display: block; width: 100%; height: auto; max-height: calc(100vh - 210px); object-fit: contain; margin: 10px 0; }
+  .panel .pt { margin: 0; font-size: 16px; font-weight: 700; }
+  .panel .pw { margin: 4px 0 0; font-size: 14.5px; color: var(--muted); }
+  .panel .acts { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin-top: 10px; }
+  .panel button { font: inherit; font-weight: 700; font-size: 14px; border-radius: 10px; padding: 7px 14px; cursor: pointer; border: 2px solid var(--ink); background: #fff; }
+  .panel button.x { padding: 3px 10px; }
+
+  @media (max-width: 1020px) {
+    nav { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; }
+    nav a { flex: 0 0 auto; }
+    .strip { grid-template-columns: repeat(2, 1fr); }
+    .strip .st:last-child { grid-column: 1 / -1; }
+    .qgrid, .links { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 640px) {
+    .bar { padding: 6px 10px; gap: 6px 8px; }
+    .brand { font-size: 13.5px; }
+    .brand small { display: none; }
+    .controls { gap: 6px; }
+    .ctl { padding: 5px 10px; font-size: 11.5px; }
+    .seg button { padding: 5px 9px; font-size: 11px; }
+    nav a { font-size: 11.5px; padding: 4px 9px; }
+    main { padding: 10px; }
+    .fig { padding: 10px; border-radius: 14px; }
+    .block { padding: 12px; }
+    .qgrid, .links { grid-template-columns: 1fr; }
+    .flow .step { font-size: 14px; padding: 6px 10px; }
+  }
+  @media (max-width: 440px) {
+    .hm { display: none; }
+    .st { padding: 8px 10px; }
+    .st b { font-size: 13px; }
+  }
+  @media print {
+    header, #overlay, #followbar { display: none !important; }
+    .learn { display: block; }
+    .fig { break-inside: avoid; }
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .fig { transition: none; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header id="top">
+  <div class="bar">
+    <a class="brand" href="../index.html">Project Status<small>VM-to-Kubernetes Migration Platform</small></a>
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Display mode">
+        <button type="button" id="modeVisual" aria-pressed="true" title="Diagram and a one-line takeaway">VISUAL</button>
+        <button type="button" id="modeLearn" aria-pressed="false" title="Diagram, short explanation and key points">LEARNING</button>
+      </div>
+      <button type="button" class="ctl" id="followBtn" title="Walk through 10 key diagrams in order">FOLLOW<span class="hm"> THE PROJECT</span></button>
+    </div>
+    <nav aria-label="Sections">
+      <a href="#fig-01">OVERVIEW</a>
+      <a href="#fig-03">LAB</a>
+      <a href="#fig-05">DISK</a>
+      <a href="#fig-06">PROVEN</a>
+      <a href="#fig-07">NOT BUILT</a>
+      <a href="#fig-08">CONVERSION</a>
+      <a href="#fig-09">NETWORK</a>
+      <a href="#fig-10">STORAGE</a>
+      <a href="#fig-11">TARGET</a>
+      <a href="#fig-12">ROADMAP</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <div class="hero">
+    <h1>VM-to-Kubernetes Migration Platform</h1>
+    <p class="sub">Where we are, what we proved, and where we're going</p>
+  </div>
+
+  <div class="here" role="status" aria-label="Current position: Stage 1H, KubeVirt target design, awaiting review">
+    <span class="k">YOU ARE HERE</span>
+    <span class="s">Stage 1H</span>
+    <span class="d">KubeVirt target design</span>
+    <span class="r">AWAITING REVIEW</span>
+  </div>
+  <p class="nextdef">Stage 1I is not yet defined.</p>
+
+  <div class="strip" aria-label="Status at a glance">
+      <div class="st complete"><span class="sn">Stage 0</span><b>COMPLETE</b></div>
+      <div class="st complete"><span class="sn">Stages 1A to 1G</span><b>COMPLETE / PROVEN</b></div>
+      <div class="st current"><span class="sn">Stage 1H</span><b>DESIGNED / AWAITING REVIEW</b></div>
+      <div class="st notdef"><span class="sn">Stage 1I</span><b>NOT YET DEFINED</b></div>
+      <div class="st notdeployed"><span class="sn">AWS / Kubernetes / KubeVirt / CDI</span><b>NOTHING EXISTS</b></div>
+  </div>
+  <div class="legend" aria-label="Status labels">
+      <span class="lg"><span class="tag proven">PROVEN</span>seen working in our lab (PASS stage)</span>
+      <span class="lg"><span class="tag designed">DESIGNED</span>written down; nothing built</span>
+      <span class="lg"><span class="tag deferred">DEFERRED</span>postponed on purpose</span>
+      <span class="lg"><span class="tag nottested">NOT TESTED</span>deliberately not done</span>
+      <span class="lg"><span class="tag unknown">UNKNOWN</span>not known yet</span>
+      <span class="lg"><span class="tag blocked">BLOCKED</span>cannot start (AWS credentials)</span>
+      <span class="lg"><span class="tag proposed">PROPOSED</span>a suggestion, not official</span>
+  </div>
+
+  <section class="block" id="sixty" aria-labelledby="q-h">
+    <h2 id="q-h">ANSWER THESE IN 60 SECONDS</h2>
+    <p class="lead">Think of your answer, then click to check.</p>
+    <div class="qgrid">
+      <div class="qc"><button type="button" class="qb" aria-expanded="false" aria-controls="qa-0"><span class="qn">1</span><span class="qt">Where are we?</span><span class="qi" aria-hidden="true">+</span></button><div class="qa" id="qa-0" hidden><p>Stage 1H: the KubeVirt target is designed and awaiting your review. Stage 0 and 1A to 1G are complete. Stage 1I is not yet defined.</p><a href="#fig-02">See diagram 02 &#8594;</a></div></div>
+      <div class="qc"><button type="button" class="qb" aria-expanded="false" aria-controls="qa-1"><span class="qn">2</span><span class="qt">What have we actually proven?</span><span class="qi" aria-hidden="true">+</span></button><div class="qa" id="qa-1" hidden><p>A real VMware VM, a cold byte-identical disk copy, qemu-img and virt-v2v conversions, and a UEFI + virtio boot under QEMU/KVM with nginx serving the same page (HTTP 200). All in our local lab.</p><a href="#fig-06">See diagram 06 &#8594;</a></div></div>
+      <div class="qc"><button type="button" class="qb" aria-expanded="false" aria-controls="qa-2"><span class="qn">3</span><span class="qt">Where is the converted disk?</span><span class="qi" aria-hidden="true">+</span></button><div class="qa" id="qa-2" hidden><p>On conversion-host-01, under /srv/migration-lab/stage-1g/: the qemu-img and virt-v2v outputs plus one network-fixed test copy. The golden VMDK is on Windows. None of it is in Git.</p><a href="#fig-05">See diagram 05 &#8594;</a></div></div>
+      <div class="qc"><button type="button" class="qb" aria-expanded="false" aria-controls="qa-3"><span class="qn">4</span><span class="qt">Did we create a persistent KubeVirt VM?</span><span class="qi" aria-hidden="true">+</span></button><div class="qa" id="qa-3" hidden><p>No. No cluster and no KubeVirt VM exist. The converted disks booted only in temporary QEMU/KVM test guests inside conversion-host-01, and those were deleted.</p><a href="#fig-07">See diagram 07 &#8594;</a></div></div>
+      <div class="qc"><button type="button" class="qb" aria-expanded="false" aria-controls="qa-4"><span class="qn">5</span><span class="qt">Why does the network need remediation?</span><span class="qi" aria-hidden="true">+</span></button><div class="qa" id="qa-4" hidden><p>The NIC changes from VMXNET3 to virtio, so its name changes from ens192 to enp0s3. The old netplan still looks for ens192, so the guest boots with no network. Matching by driver virtio_net fixed it in 1G; the 1H design uses DHCP.</p><a href="#fig-09">See diagram 09 &#8594;</a></div></div>
+      <div class="qc"><button type="button" class="qb" aria-expanded="false" aria-controls="qa-5"><span class="qn">6</span><span class="qt">What happens next?</span><span class="qi" aria-hidden="true">+</span></button><div class="qa" id="qa-5" hidden><p>You review Stage 1H. Then Stage 1I has to be defined and approved (objective, scope, change boundary), and AWS credentials must work; they are BLOCKED today. Anything beyond that is a proposal.</p><a href="#fig-12">See diagram 12 &#8594;</a></div></div>
+    </div>
+  </section>
+
+  <section class="fig" id="fig-01" aria-labelledby="h-01">
+    <div class="fig-head"><span class="num">01</span><h2 id="h-01">The whole journey</h2><span class="tags"><span class="tag complete">COMPLETE: 0, 1A-1G</span><span class="tag current">CURRENT: 1H</span><span class="tag proposed">RIGHT SIDE: PROPOSED</span></span></div>
+    <button type="button" class="img" data-open="01" aria-label="Enlarge diagram 01: The whole journey"><img src="../diagrams/project-status-visual/01-project-journey.svg" width="1200" height="1040" alt="Left column, official stages: Stage 0 complete, Stages 1A to 1G proven, Stage 1H designed and current (you are here), Stage 1I not yet defined. Right column, a proposed path with no stage numbers: target platform build, actual VM migration, migration workflow, custom controller, GitOps, observability and security, modernization, native Kubernetes workload." loading="lazy"></button>
+    <p class="take">Stage 0 and 1A-1G are done, 1H is designed, 1I is not defined. The rest is a proposal.</p>
+    <p class="why"><b>Why it matters:</b> It keeps official status apart from ideas about the future.</p>
+    <div class="learn">
+      <p>The left column is the official record from the Stage 1 README. The right column is a proposed path drawn from existing designs; it has no stage numbers.</p>
+      <ul><li>Official: Stage 0 and 1A to 1G complete; 1H awaiting review.</li><li>Stage 1I exists only as a name.</li><li>The proposed path is not approved.</li></ul>
+    </div>
+  </section>
+  <section class="fig" id="fig-02" aria-labelledby="h-02">
+    <div class="fig-head"><span class="num">02</span><h2 id="h-02">Where are we now?</h2><span class="tags"><span class="tag current">CURRENT: STAGE 1H</span><span class="tag current">AWAITING REVIEW</span><span class="tag notdef">1I: NOT DEFINED</span></span></div>
+    <button type="button" class="img" data-open="02" aria-label="Enlarge diagram 02: Where are we now?"><img src="../diagrams/project-status-visual/02-current-position.svg" width="1200" height="990" alt="Project 1.5 tree: Stage 0 and Stages 1A to 1G complete with green ticks, Stage 1H KubeVirt target design awaiting review with a YOU ARE HERE marker, Stage 1I not defined and not started." loading="lazy"></button>
+    <p class="take">We are at Stage 1H: the KubeVirt target is designed and awaiting review.</p>
+    <p class="why"><b>Why it matters:</b> Get this right first; everything else depends on it.</p>
+    <div class="learn">
+      <p>Eight stages are complete and proven in the lab. Stage 1H is a design with no infrastructure. Stage 1I has a name but no definition.</p>
+      <ul><li>Stage 1H: H1 to H10 PASS as documentation gates.</li><li>Stage 1I needs your review of 1H, your approval and AWS credentials.</li><li>No stage numbers after 1I exist.</li></ul>
+    </div>
+  </section>
+  <section class="fig" id="fig-03" aria-labelledby="h-03">
+    <div class="fig-head"><span class="num">03</span><h2 id="h-03">Our current lab</h2><span class="tags"><span class="tag proven">OBSERVED LAB</span><span class="tag notdeployed">NO CLOUD, NO KUBERNETES</span></span></div>
+    <button type="button" class="img" data-open="03" aria-label="Enlarge diagram 03: Our current lab"><img src="../diagrams/project-status-visual/03-current-lab.svg" width="1200" height="920" alt="Windows 11 laptop, VMware Workstation 17.6.4, nested ESXi 8.0.3 (esxi-8-lab). On it: legacy-source-vm (source, powered on), conversion-host-01 (conversion, powered on) and kvm-learning-01 (learning, powered off). No Kubernetes, KubeVirt, CDI or AWS." loading="lazy"></button>
+    <p class="take">One laptop, one nested ESXi host, three VMs. Nothing in the cloud.</p>
+    <p class="why"><b>Why it matters:</b> Everything proven so far happened inside this one box.</p>
+    <div class="learn">
+      <p>Windows runs VMware Workstation, which runs a nested ESXi 8.0.3 host. On it are the source VM, the conversion host and a KVM learning VM.</p>
+      <ul><li>Power states as recorded after Stage 1H (not re-observed).</li><li>No Kubernetes, KubeVirt, CDI or AWS resource exists.</li><li>No disk file is stored in Git.</li></ul>
+    </div>
+  </section>
+  <section class="fig" id="fig-04" aria-labelledby="h-04">
+    <div class="fig-head"><span class="num">04</span><h2 id="h-04">Three VMs, three different jobs</h2><span class="tags"><span class="tag proven">OBSERVED ROLES</span></span></div>
+    <button type="button" class="img" data-open="04" aria-label="Enlarge diagram 04: Three VMs, three different jobs"><img src="../diagrams/project-status-visual/04-three-vm-roles.svg" width="1200" height="760" alt="Three cards: LEARN kvm-learning-01 (KVM, QEMU, libvirt, VirtIO), MIGRATE THIS legacy-source-vm (Ubuntu, nginx, PVSCSI, VMXNET3, static IP), CONVERT / INSPECT conversion-host-01 (qemu-img, libguestfs, virt-v2v, QEMU/KVM test boots)." loading="lazy"></button>
+    <p class="take">Migrate this, convert here, learn there: three roles, not three copies.</p>
+    <p class="why"><b>Why it matters:</b> Mixing up these VMs is the easiest way to misread the project.</p>
+    <div class="learn">
+      <p>legacy-source-vm is the VM we migrate, and it stays unchanged. conversion-host-01 holds the disk copies and the tools. kvm-learning-01 was only for learning KVM.</p>
+      <ul><li>The source VM was never pointed at a converted disk.</li><li>Test boots ran inside conversion-host-01.</li><li>kvm-learning-01 never touched the converted disk.</li></ul>
+    </div>
+  </section>
+  <section class="fig" id="fig-05" aria-labelledby="h-05">
+    <div class="fig-head"><span class="num">05</span><h2 id="h-05">The disk journey</h2><span class="tags"><span class="tag proven">PROVEN: 1E-1G</span><span class="tag designed">CDI / PVC: DESIGNED</span></span></div>
+    <button type="button" class="img" data-open="05" aria-label="Enlarge diagram 05: The disk journey"><img src="../diagrams/project-status-visual/05-disk-journey.svg" width="1200" height="1060" alt="Source VMDK on ESXi, cold acquisition to the Windows golden artifact, scp to the working copy on conversion-host-01, qemu-img and virt-v2v to converted qcow2 files, temporary QEMU/KVM test guest (deleted). Future, designed only: new qcow2 copy, CDI upload, PVC, KubeVirt VM." loading="lazy"></button>
+    <p class="take">Source VMDK, then golden copy on Windows, then working copy, then converted qcow2 on conversion-host-01.</p>
+    <p class="why"><b>Why it matters:</b> It answers the question: where is the migration disk right now?</p>
+    <div class="learn">
+      <p>Every copy is hashed and the original is never modified. The converted qcow2 files live on conversion-host-01. The path into Kubernetes (CDI, PVC, KubeVirt VM) is designed only.</p>
+      <ul><li>Golden copy: C:\VMs\legacy-source-vm\stage-1e\, read-only.</li><li>Converted copies: /srv/migration-lab/stage-1g/ on conversion-host-01.</li><li>Test guests were deleted. None of these files is in Git.</li></ul>
+    </div>
+  </section>
+  <section class="fig" id="fig-06" aria-labelledby="h-06">
+    <div class="fig-head"><span class="num">06</span><h2 id="h-06">What we have actually proven</h2><span class="tags"><span class="tag proven">PROVEN: 1A-1G</span><span class="tag designed">KUBEVIRT: DESIGNED ONLY</span></span></div>
+    <button type="button" class="img" data-open="06" aria-label="Enlarge diagram 06: What we have actually proven"><img src="../diagrams/project-status-visual/06-proven-capabilities.svg" width="1200" height="900" alt="Green ticks grouped as source, KVM, conversion, application and network capabilities, each with its stage. The KubeVirt column is marked designed only: no cluster, no import, no KubeVirt VM." loading="lazy"></button>
+    <p class="take">Source, disk copy, conversion, KVM boot and nginx are proven. KubeVirt is not.</p>
+    <p class="why"><b>Why it matters:</b> Only proven items count as evidence.</p>
+    <div class="learn">
+      <p>Every green tick was observed in a PASS stage record from 1A to 1G. KubeVirt is the only area that is design only.</p>
+      <ul><li>UEFI boot proven with Secure Boot off; Secure Boot on is NOT TESTED.</li><li>Network fix proven on an isolated test network; DNS not proven.</li><li>libvirt proven only with the learning image.</li></ul>
+    </div>
+  </section>
+  <section class="fig" id="fig-07" aria-labelledby="h-07">
+    <div class="fig-head"><span class="num">07</span><h2 id="h-07">Not built yet</h2><span class="tags"><span class="tag designed">DESIGNED</span><span class="tag deferred">DEFERRED</span><span class="tag blocked">AWS CREDENTIALS: BLOCKED</span></span></div>
+    <button type="button" class="img" data-open="07" aria-label="Enlarge diagram 07: Not built yet"><img src="../diagrams/project-status-visual/07-not-yet-built.svg" width="1200" height="1100" alt="Stack of items not built: AWS environment, Kubernetes, KubeVirt, CDI, PVC, DataVolume and KubeVirt VM (designed, not started); actual migration (not started); migration CRD, controller, GitOps and observability (deferred)." loading="lazy"></button>
+    <p class="take">AWS, Kubernetes, KubeVirt, CDI and the migration itself do not exist yet.</p>
+    <p class="why"><b>Why it matters:</b> It stops a design from being mistaken for a deployment.</p>
+    <div class="learn">
+      <p>The first seven items are designed in Stage 1H but not started. The controller, GitOps and observability are deferred. Building on AWS is blocked until credentials work.</p>
+      <ul><li>AWS credentials: BLOCKED (U15).</li><li>Controller: direction accepted, implementation deferred (ADR 005).</li><li>Stage 1H record: &quot;No migration occurred&quot;.</li></ul>
+    </div>
+  </section>
+  <section class="fig" id="fig-08" aria-labelledby="h-08">
+    <div class="fig-head"><span class="num">08</span><h2 id="h-08">Two conversion paths (Stage 1G)</h2><span class="tags"><span class="tag proven">PROVEN: BOTH BOOTED</span></span></div>
+    <button type="button" class="img" data-open="08" aria-label="Enlarge diagram 08: Two conversion paths (Stage 1G)"><img src="../diagrams/project-status-visual/08-conversion-paths.svg" width="1200" height="860" alt="Path A: working VMDK, qemu-img convert, qcow2 with guest bytes unchanged, QEMU/KVM boot. Path B: working VMDK, virt-v2v with guest-aware changes, qcow2 plus libvirt XML, QEMU/KVM boot. Neither fixed netplan; one network change did." loading="lazy"></button>
+    <p class="take">qemu-img changes the box. virt-v2v changes the box and what is inside.</p>
+    <p class="why"><b>Why it matters:</b> Stage 1H chose the virt-v2v output as the base for the future import image.</p>
+    <div class="learn">
+      <p>Both converted the same protected working copy to qcow2, and both booted under QEMU/KVM with UEFI and virtio. Neither fixed the network; one netplan change did.</p>
+      <ul><li>qemu-img: 5 s, guest bytes identical.</li><li>virt-v2v: 136 s; VMware Tools removed, initramfs rebuilt.</li><li>virt-v2v -o kubevirt: NOT TESTED.</li></ul>
+    </div>
+  </section>
+  <section class="fig" id="fig-09" aria-labelledby="h-09">
+    <div class="fig-head"><span class="num">09</span><h2 id="h-09">How the network changes</h2><span class="tags"><span class="tag proven">1G FIX: PROVEN</span><span class="tag designed">KUBEVIRT NETWORK: DESIGNED</span></span></div>
+    <button type="button" class="img" data-open="09" aria-label="Enlarge diagram 09: How the network changes"><img src="../diagrams/project-status-visual/09-network-transformation.svg" width="1200" height="900" alt="Three columns. VMware: VMXNET3, ens192, netplan, 192.168.50.31 works. KVM test: VirtIO-Net, enp0s3, old netplan still looks for ens192, no network until one netplan fix. KubeVirt design: VirtIO-Net, masquerade, DHCP, guest 10.0.2.2, Kubernetes Service NodePort 30080." loading="lazy"></button>
+    <p class="take">The NIC name changes, so the old netplan breaks. Matching by driver fixes it.</p>
+    <p class="why"><b>Why it matters:</b> A VM that boots without a network is still a failed migration.</p>
+    <div class="learn">
+      <p>VMXNET3 becomes virtio-net, and ens192 becomes enp0s3. Netplan still looked for ens192, so the guest had no network until one netplan change. The KubeVirt design uses the same fix with DHCP behind masquerade.</p>
+      <ul><li>192.168.50.31 is not preserved (ADR 008).</li><li>Continuity = the same nginx page hash through a NodePort Service.</li><li>DNS: not proven.</li></ul>
+    </div>
+  </section>
+  <section class="fig" id="fig-10" aria-labelledby="h-10">
+    <div class="fig-head"><span class="num">10</span><h2 id="h-10">How the disk storage changes</h2><span class="tags"><span class="tag proven">VMDK TO QCOW2: PROVEN</span><span class="tag designed">RAW ON PVC: DESIGNED</span></span></div>
+    <button type="button" class="img" data-open="10" aria-label="Enlarge diagram 10: How the disk storage changes"><img src="../diagrams/project-status-visual/10-storage-transformation.svg" width="1200" height="900" alt="VMware: VMDK, cold copy, golden artifact. KVM workbench: working VMDK, qemu-img or virt-v2v, qcow2. KubeVirt design: qcow2, CDI upload, DataVolume, PVC on EBS gp3, raw disk on a Block PVC." loading="lazy"></button>
+    <p class="take">qcow2 in transit, raw on a Block PVC at rest. The PVC part is design only.</p>
+    <p class="why"><b>Why it matters:</b> Storage choices decide what the VM can do later.</p>
+    <div class="learn">
+      <p>The VMDK was copied cold and converted to qcow2 in the lab. The design uploads a qcow2 through CDI into a 40 GiB gp3 Block PVC, stored raw. No PVC or DataVolume exists.</p>
+      <ul><li>The DataVolume is standalone: deleting the VM keeps the disk.</li><li>ReadWriteOnce: not live-migratable, accepted for a cold migration.</li><li>Route for moving the qcow2 to AWS: DEFERRED to 1I.</li></ul>
+    </div>
+  </section>
+  <section class="fig" id="fig-11" aria-labelledby="h-11">
+    <div class="fig-head"><span class="num">11</span><h2 id="h-11">The Stage 1H target (ADRs 007 to 010)</h2><span class="tags"><span class="tag designed">DESIGNED</span><span class="tag notdeployed">NOT DEPLOYED</span></span></div>
+    <button type="button" class="img" data-open="11" aria-label="Enlarge diagram 11: The Stage 1H target (ADRs 007 to 010)"><img src="../diagrams/project-status-visual/11-kubevirt-target.svg" width="1200" height="1060" alt="Designed stack: AWS ap-south-1, EC2 m8i.xlarge, CentOS Stream 9, Kubernetes 1.36, CRI-O 1.36, flannel, KubeVirt v1.9.0, CDI v1.66.1, VirtualMachine, virt-launcher pod, QEMU, KVM, Ubuntu 24.04.5, nginx. Storage side: qcow2, CDI upload, PVC, VM disk. Network side: masquerade, DHCP, Service, operator /32. Stamped DESIGNED, NOT DEPLOYED." loading="lazy"></button>
+    <p class="take">Every layer of the target is chosen on paper. None of it exists.</p>
+    <p class="why"><b>Why it matters:</b> The build stage will not have to guess: the target is fully specified.</p>
+    <div class="learn">
+      <p>One EC2 m8i.xlarge node in ap-south-1 with nested virtualization, CentOS Stream 9, Kubernetes 1.36 by kubeadm, KubeVirt v1.9.0 and CDI v1.66.1. The migrated guest would run in a virt-launcher Pod on QEMU/KVM.</p>
+      <ul><li>CDI v1.66.1 is a candidate until the runtime gate passes.</li><li>About USD 0.24 per hour while running; destroyed after each session.</li><li>EKS deferred, not rejected (ADR 007).</li></ul>
+    </div>
+  </section>
+  <section class="fig" id="fig-12" aria-labelledby="h-12">
+    <div class="fig-head"><span class="num">12</span><h2 id="h-12">Where we could go from here</h2><span class="tags"><span class="tag proposed">PROPOSED</span><span class="tag proposed">NOT OFFICIAL</span></span></div>
+    <button type="button" class="img" data-open="12" aria-label="Enlarge diagram 12: Where we could go from here"><img src="../diagrams/project-status-visual/12-future-roadmap.svg" width="1200" height="960" alt="Current: Stage 1H review. Proposed, not official: define and approve Stage 1I, build target platform, runtime validation, first KubeVirt boot, first actual VM migration, migration workflow, custom migration CRD and controller, failure and recovery, GitOps, observability, security, modernization, portfolio." loading="lazy"></button>
+    <p class="take">Only 1I is an official name, and it is undefined. Everything else is a proposal.</p>
+    <p class="why"><b>Why it matters:</b> It shows a direction without pretending decisions were made.</p>
+    <div class="learn">
+      <p>After 1H is reviewed, a likely next step is to define 1I around building the target and a first KubeVirt boot. Everything after that comes from existing designs and has no stage numbers.</p>
+      <ul><li>What 1I contains is your decision.</li><li>The order follows the documented architecture.</li><li>No stage numbers beyond 1I.</li></ul>
+    </div>
+  </section>
+
+  <section class="block one" id="one-screen" aria-labelledby="one-h">
+    <h2 id="one-h">THE ONE SCREEN I SHOULD REMEMBER</h2>
+    <div class="flow"><span class="step p">VMware</span><span class="arr" aria-hidden="true">&#8594;</span><span class="step p">legacy-source-vm</span><span class="arr" aria-hidden="true">&#8594;</span><span class="step p">VMDK</span><span class="arr" aria-hidden="true">&#8594;</span><span class="step p">cold acquisition</span><span class="arr" aria-hidden="true">&#8594;</span><span class="step p">golden artifact</span><span class="arr" aria-hidden="true">&#8594;</span><span class="step p">conversion host</span><span class="arr" aria-hidden="true">&#8594;</span><span class="step p">qemu-img / virt-v2v</span><span class="arr" aria-hidden="true">&#8594;</span><span class="step p">KVM boot proven</span><span class="arr" aria-hidden="true">&#8594;</span><span class="step d">KubeVirt target designed</span><span class="arr" aria-hidden="true">&#8594;</span><span class="step h">YOU ARE HERE</span></div>
+    <p class="next">NEXT: Stage 1I &#8212; not yet defined</p>
+    <p class="warn">NO KUBERNETES / KUBEVIRT / CDI DEPLOYMENT EXISTS YET.</p>
+  </section>
+
+  <section class="block" id="links" aria-labelledby="l-h">
+    <h2 id="l-h">Go deeper</h2>
+    <p class="lead">This page adds no facts. The records below are the source of truth.</p>
+    <div class="links">
+      <a class="lk" href="../stage-0/stage-0-visual-learning.html"><b>Stage 0 Visual Learning</b><span>24 diagrams: the architecture</span></a>
+      <a class="lk" href="../stage-1/stage-1-visual-learning.html"><b>Stage 1 Visual Learning</b><span>18 diagrams: what we built and proved</span></a>
+      <a class="lk" href="../stage-0/"><b>Stage 0 Technical Docs</b><span>theory, architecture, feasibility</span></a>
+      <a class="lk" href="../stage-1/"><b>Stage 1 Technical Docs</b><span>records for 1A to 1H</span></a>
+      <a class="lk" href="../adr/"><b>ADRs</b><span>decisions 001 to 010</span></a>
+      <a class="lk" href="project-status-and-next-steps.md"><b>Project Status Markdown</b><span>the full status sheet (source of truth for this page)</span></a>
+    </div>
+    <p><a href="../index.html">&#8592; Learning portal home</a></p>
+  </section>
+</main>
+<footer>Status as recorded after Stage 1H (2026-09-28). Self-contained page: no external scripts, styles, fonts or images.</footer>
+
+<div id="followbar" role="region" aria-label="Follow the project">
+  <div class="where" id="fWhere" aria-live="polite"></div>
+  <button type="button" id="fPrev">&#8592; BACK</button>
+  <button type="button" class="next" id="fNext">NEXT &#8594;</button>
+  <button type="button" id="fExit" aria-label="Exit follow the project">EXIT</button>
+</div>
+
+<div id="overlay" role="dialog" aria-modal="true" aria-labelledby="ovTitle" hidden>
+  <div class="panel" id="panel">
+    <div class="top"><span class="pn" id="ovNum"></span><h2 id="ovTitle"></h2><button type="button" class="x" id="ovX" aria-label="Close">&#10005;</button></div>
+    <img id="ovImg" src="data:," alt="">
+    <p class="pt" id="ovTake"></p>
+    <p class="pw" id="ovWhy"></p>
+    <div class="acts"><a id="ovFull" href="#" target="_blank" rel="noopener">Open full-size SVG</a><button type="button" id="ovClose">Close (Esc)</button></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var DATA = {"modal": {"01": {"t": "The whole journey", "src": "../diagrams/project-status-visual/01-project-journey.svg", "alt": "Left column, official stages: Stage 0 complete, Stages 1A to 1G proven, Stage 1H designed and current (you are here), Stage 1I not yet defined. Right column, a proposed path with no stage numbers: target platform build, actual VM migration, migration workflow, custom controller, GitOps, observability and security, modernization, native Kubernetes workload.", "take": "Stage 0 and 1A-1G are done, 1H is designed, 1I is not defined. The rest is a proposal.", "why": "It keeps official status apart from ideas about the future."}, "02": {"t": "Where are we now?", "src": "../diagrams/project-status-visual/02-current-position.svg", "alt": "Project 1.5 tree: Stage 0 and Stages 1A to 1G complete with green ticks, Stage 1H KubeVirt target design awaiting review with a YOU ARE HERE marker, Stage 1I not defined and not started.", "take": "We are at Stage 1H: the KubeVirt target is designed and awaiting review.", "why": "Get this right first; everything else depends on it."}, "03": {"t": "Our current lab", "src": "../diagrams/project-status-visual/03-current-lab.svg", "alt": "Windows 11 laptop, VMware Workstation 17.6.4, nested ESXi 8.0.3 (esxi-8-lab). On it: legacy-source-vm (source, powered on), conversion-host-01 (conversion, powered on) and kvm-learning-01 (learning, powered off). No Kubernetes, KubeVirt, CDI or AWS.", "take": "One laptop, one nested ESXi host, three VMs. Nothing in the cloud.", "why": "Everything proven so far happened inside this one box."}, "04": {"t": "Three VMs, three different jobs", "src": "../diagrams/project-status-visual/04-three-vm-roles.svg", "alt": "Three cards: LEARN kvm-learning-01 (KVM, QEMU, libvirt, VirtIO), MIGRATE THIS legacy-source-vm (Ubuntu, nginx, PVSCSI, VMXNET3, static IP), CONVERT / INSPECT conversion-host-01 (qemu-img, libguestfs, virt-v2v, QEMU/KVM test boots).", "take": "Migrate this, convert here, learn there: three roles, not three copies.", "why": "Mixing up these VMs is the easiest way to misread the project."}, "05": {"t": "The disk journey", "src": "../diagrams/project-status-visual/05-disk-journey.svg", "alt": "Source VMDK on ESXi, cold acquisition to the Windows golden artifact, scp to the working copy on conversion-host-01, qemu-img and virt-v2v to converted qcow2 files, temporary QEMU/KVM test guest (deleted). Future, designed only: new qcow2 copy, CDI upload, PVC, KubeVirt VM.", "take": "Source VMDK, then golden copy on Windows, then working copy, then converted qcow2 on conversion-host-01.", "why": "It answers the question: where is the migration disk right now?"}, "06": {"t": "What we have actually proven", "src": "../diagrams/project-status-visual/06-proven-capabilities.svg", "alt": "Green ticks grouped as source, KVM, conversion, application and network capabilities, each with its stage. The KubeVirt column is marked designed only: no cluster, no import, no KubeVirt VM.", "take": "Source, disk copy, conversion, KVM boot and nginx are proven. KubeVirt is not.", "why": "Only proven items count as evidence."}, "07": {"t": "Not built yet", "src": "../diagrams/project-status-visual/07-not-yet-built.svg", "alt": "Stack of items not built: AWS environment, Kubernetes, KubeVirt, CDI, PVC, DataVolume and KubeVirt VM (designed, not started); actual migration (not started); migration CRD, controller, GitOps and observability (deferred).", "take": "AWS, Kubernetes, KubeVirt, CDI and the migration itself do not exist yet.", "why": "It stops a design from being mistaken for a deployment."}, "08": {"t": "Two conversion paths (Stage 1G)", "src": "../diagrams/project-status-visual/08-conversion-paths.svg", "alt": "Path A: working VMDK, qemu-img convert, qcow2 with guest bytes unchanged, QEMU/KVM boot. Path B: working VMDK, virt-v2v with guest-aware changes, qcow2 plus libvirt XML, QEMU/KVM boot. Neither fixed netplan; one network change did.", "take": "qemu-img changes the box. virt-v2v changes the box and what is inside.", "why": "Stage 1H chose the virt-v2v output as the base for the future import image."}, "09": {"t": "How the network changes", "src": "../diagrams/project-status-visual/09-network-transformation.svg", "alt": "Three columns. VMware: VMXNET3, ens192, netplan, 192.168.50.31 works. KVM test: VirtIO-Net, enp0s3, old netplan still looks for ens192, no network until one netplan fix. KubeVirt design: VirtIO-Net, masquerade, DHCP, guest 10.0.2.2, Kubernetes Service NodePort 30080.", "take": "The NIC name changes, so the old netplan breaks. Matching by driver fixes it.", "why": "A VM that boots without a network is still a failed migration."}, "10": {"t": "How the disk storage changes", "src": "../diagrams/project-status-visual/10-storage-transformation.svg", "alt": "VMware: VMDK, cold copy, golden artifact. KVM workbench: working VMDK, qemu-img or virt-v2v, qcow2. KubeVirt design: qcow2, CDI upload, DataVolume, PVC on EBS gp3, raw disk on a Block PVC.", "take": "qcow2 in transit, raw on a Block PVC at rest. The PVC part is design only.", "why": "Storage choices decide what the VM can do later."}, "11": {"t": "The Stage 1H target (ADRs 007 to 010)", "src": "../diagrams/project-status-visual/11-kubevirt-target.svg", "alt": "Designed stack: AWS ap-south-1, EC2 m8i.xlarge, CentOS Stream 9, Kubernetes 1.36, CRI-O 1.36, flannel, KubeVirt v1.9.0, CDI v1.66.1, VirtualMachine, virt-launcher pod, QEMU, KVM, Ubuntu 24.04.5, nginx. Storage side: qcow2, CDI upload, PVC, VM disk. Network side: masquerade, DHCP, Service, operator /32. Stamped DESIGNED, NOT DEPLOYED.", "take": "Every layer of the target is chosen on paper. None of it exists.", "why": "The build stage will not have to guess: the target is fully specified."}, "12": {"t": "Where we could go from here", "src": "../diagrams/project-status-visual/12-future-roadmap.svg", "alt": "Current: Stage 1H review. Proposed, not official: define and approve Stage 1I, build target platform, runtime validation, first KubeVirt boot, first actual VM migration, migration workflow, custom migration CRD and controller, failure and recovery, GitOps, observability, security, modernization, portfolio.", "take": "Only 1I is an official name, and it is undefined. Everything else is a proposal.", "why": "It shows a direction without pretending decisions were made."}}, "follow": [{"n": "01", "t": "The whole journey"}, {"n": "02", "t": "Where are we now?"}, {"n": "03", "t": "Our current lab"}, {"n": "05", "t": "The disk journey"}, {"n": "06", "t": "What we have actually proven"}, {"n": "08", "t": "Two conversion paths (Stage 1G)"}, {"n": "09", "t": "How the network changes"}, {"n": "10", "t": "How the disk storage changes"}, {"n": "11", "t": "The Stage 1H target (ADRs 007 to 010)"}, {"n": "12", "t": "Where we could go from here"}], "navFor": {"fig-01": "fig-01", "fig-02": "fig-01", "fig-03": "fig-03", "fig-04": "fig-03", "fig-05": "fig-05", "fig-06": "fig-06", "fig-07": "fig-07", "fig-08": "fig-08", "fig-09": "fig-09", "fig-10": "fig-10", "fig-11": "fig-11", "fig-12": "fig-12"}};
+  var body = document.body;
+  function store(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function load(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+
+  var header = document.getElementById('top');
+  function pad() { document.documentElement.style.scrollPaddingTop = (header.offsetHeight + 12) + 'px'; }
+  window.addEventListener('resize', pad); pad();
+
+  function goTo(id, flash) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (flash) { el.classList.add('flash'); setTimeout(function () { el.classList.remove('flash'); }, 1600); }
+  }
+
+  var mV = document.getElementById('modeVisual'), mL = document.getElementById('modeLearn');
+  function setLearn(on) {
+    body.classList.toggle('learning', on);
+    mV.setAttribute('aria-pressed', on ? 'false' : 'true');
+    mL.setAttribute('aria-pressed', on ? 'true' : 'false');
+    store('status-learning-mode', on ? '1' : '0');
+  }
+  setLearn(load('status-learning-mode') === '1');
+  mV.addEventListener('click', function () { setLearn(false); });
+  mL.addEventListener('click', function () { setLearn(true); });
+
+  var jumps = document.querySelectorAll('a[href^="#fig-"]');
+  for (var i = 0; i < jumps.length; i++) {
+    jumps[i].addEventListener('click', function (e) {
+      e.preventDefault();
+      var id = this.getAttribute('href').slice(1);
+      goTo(id, true);
+      if (history.replaceState) history.replaceState(null, '', '#' + id);
+    });
+  }
+
+  var qbs = document.querySelectorAll('.qb');
+  for (var q = 0; q < qbs.length; q++) {
+    qbs[q].addEventListener('click', function () {
+      var open = this.getAttribute('aria-expanded') === 'true';
+      this.setAttribute('aria-expanded', open ? 'false' : 'true');
+      document.getElementById(this.getAttribute('aria-controls')).hidden = open;
+    });
+  }
+
+  var ov = document.getElementById('overlay'), panel = document.getElementById('panel'), lastFocus = null;
+  function openModal(n) {
+    var d = DATA.modal[n]; if (!d) return;
+    lastFocus = document.activeElement;
+    document.getElementById('ovNum').textContent = n;
+    document.getElementById('ovTitle').textContent = d.t;
+    var img = document.getElementById('ovImg'); img.src = d.src; img.alt = d.alt;
+    document.getElementById('ovTake').textContent = d.take;
+    document.getElementById('ovWhy').textContent = 'Why it matters: ' + d.why;
+    document.getElementById('ovFull').href = d.src;
+    ov.hidden = false; ov.classList.add('open');
+    document.getElementById('ovClose').focus();
+  }
+  function closeModal() {
+    if (!ov.classList.contains('open')) return;
+    ov.classList.remove('open'); ov.hidden = true;
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  var opens = document.querySelectorAll('[data-open]');
+  for (var k = 0; k < opens.length; k++) {
+    opens[k].addEventListener('click', function () { openModal(this.getAttribute('data-open')); });
+  }
+  document.getElementById('ovClose').addEventListener('click', closeModal);
+  document.getElementById('ovX').addEventListener('click', closeModal);
+  ov.addEventListener('click', function (e) { if (e.target === ov) closeModal(); });
+  document.addEventListener('keydown', function (e) {
+    if (ov.classList.contains('open')) {
+      if (e.key === 'Escape') { e.preventDefault(); closeModal(); return; }
+      if (e.key === 'Tab') {
+        var f = panel.querySelectorAll('a[href], button'), first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    } else if (e.key === 'Escape' && body.classList.contains('following')) {
+      stopFollow();
+    }
+  });
+
+  var idx = -1, seq = DATA.follow;
+  var where = document.getElementById('fWhere'), nextBtn = document.getElementById('fNext'), prevBtn = document.getElementById('fPrev');
+  function clearOn() {
+    var on = document.querySelectorAll('.fig.follow-on');
+    for (var j = 0; j < on.length; j++) on[j].classList.remove('follow-on');
+  }
+  function show() {
+    clearOn();
+    if (idx >= seq.length) {
+      where.innerHTML = '<b>You now know where Project 1.5 stands.</b>Here is the one screen to remember.';
+      nextBtn.textContent = 'FINISH';
+      prevBtn.disabled = false;
+      goTo('one-screen', false);
+      return;
+    }
+    var s = seq[idx];
+    var el = document.getElementById('fig-' + s.n);
+    if (el) el.classList.add('follow-on');
+    where.innerHTML = '';
+    var b = document.createElement('b'); b.textContent = s.n + ' \u00b7 ' + s.t; where.appendChild(b);
+    where.appendChild(document.createTextNode('Step ' + (idx + 1) + ' of ' + seq.length));
+    nextBtn.innerHTML = 'NEXT &#8594;';
+    prevBtn.disabled = idx === 0;
+    goTo('fig-' + s.n, false);
+  }
+  function startFollow() { body.classList.add('following'); idx = 0; show(); nextBtn.focus(); }
+  function stopFollow() {
+    body.classList.remove('following'); idx = -1; clearOn();
+    document.getElementById('followBtn').focus();
+  }
+  document.getElementById('followBtn').addEventListener('click', startFollow);
+  document.getElementById('fExit').addEventListener('click', stopFollow);
+  nextBtn.addEventListener('click', function () { if (idx >= seq.length) { stopFollow(); return; } idx++; show(); });
+  prevBtn.addEventListener('click', function () { if (idx > 0) { idx = Math.min(idx, seq.length) - 1; show(); } });
+
+  var navLinks = document.querySelectorAll('nav a');
+  var figs = document.querySelectorAll('section.fig');
+  function mark(target) {
+    for (var j = 0; j < navLinks.length; j++) {
+      var on = navLinks[j].getAttribute('href') === '#' + target;
+      if (on && !navLinks[j].classList.contains('active') && window.innerWidth <= 1020) {
+        var nav = navLinks[j].parentNode;
+        nav.scrollLeft = navLinks[j].offsetLeft - nav.clientWidth / 2 + navLinks[j].offsetWidth / 2;
+      }
+      navLinks[j].classList.toggle('active', on);
+    }
+  }
+  function edges() {
+    var mid = window.innerHeight * 0.45;
+    if (figs.length && (figs[0].getBoundingClientRect().top > mid || figs[figs.length - 1].getBoundingClientRect().bottom < mid)) mark('');
+  }
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) mark(DATA.navFor[en.target.id] || ''); });
+      edges();
+    }, { rootMargin: '-40% 0px -55% 0px' });
+    for (var m = 0; m < figs.length; m++) io.observe(figs[m]);
+    window.addEventListener('scroll', edges, { passive: true });
+  }
+})();
+</script>
+</body>
+</html>
