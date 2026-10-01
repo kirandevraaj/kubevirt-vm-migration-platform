@@ -151,6 +151,6 @@
   <text x="624" y="867.12" class="t" text-anchor="start" style="font-size:16px">RUNTIME DISK (EBS vol-0d94fba4ddd3d84d2)</text>
   <text x="624" y="886.66" class="s" text-anchor="start" style="font-size:13px">writable: the running guest changes it (logs, timers)</text>
   <text x="624" y="905.66" class="s" text-anchor="start" style="font-size:13px">apt-daily-upgrade already ran inside it at 04:19</text>
-  <text x="624" y="924.66" class="s" text-anchor="start" style="font-size:13px">kept until Gate I5; removed only via DataVolume deletion</text>
-  <text x="624" y="943.66" class="s" text-anchor="start" style="font-size:13px">(I5-D), then reclaim Delete, verified in I5-E; not run</text>
+  <text x="624" y="924.66" class="s" text-anchor="start" style="font-size:13px">deleted in Gate I5 only via its DataVolume (I5-D),</text>
+  <text x="624" y="943.66" class="s" text-anchor="start" style="font-size:13px">then reclaim Delete; NotFound in AWS (I5-E)</text>
 </svg>

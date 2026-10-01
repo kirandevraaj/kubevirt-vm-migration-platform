@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="960" viewBox="0 0 1200 960" role="img" aria-labelledby="title desc">
   <title id="title">Stage 1I migration pipeline: 18 steps</title>
-  <desc id="desc">Twenty cards in four rows: steps 1 to 6 from Stage 1C to 1G (source, cold copy, characterization, qemu-img and virt-v2v), steps 7 to 9 Gate I1 (guest agent, network adaptation, immutable image), step 10 Gate I2 (isolated boot test), the Gate I3 platform, steps 11 to 18 Gate I4 (transfer, CDI import, PVC on EBS, VM, VMI, virt-launcher, QEMU/KVM boot, nginx through NodePort), and Gate I5 (final validation and controlled teardown, sub-gates I5-A to I5-J) not started.</desc>
+  <desc id="desc">Twenty cards in four rows: steps 1 to 6 from Stage 1C to 1G (source, cold copy, characterization, qemu-img and virt-v2v), steps 7 to 9 Gate I1 (guest agent, network adaptation, immutable image), step 10 Gate I2 (isolated boot test), the Gate I3 platform, steps 11 to 18 Gate I4 (transfer, CDI import, PVC on EBS, VM, VMI, virt-launcher, QEMU/KVM boot, nginx through NodePort), and Gate I5 (final validation and controlled teardown, sub-gates I5-A to I5-J) PASS: the VM, its disk and the AWS platform were removed and verified.</desc>
   <style>
     text { font-family: 'Segoe UI', Arial, sans-serif; }
     .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
@@ -14,12 +14,12 @@
     .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
     .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
   </style>
-  <defs><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker><marker id="m6d28d9" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#6d28d9"/></marker></defs>
+  <defs><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker></defs>
   <rect width="1200" height="960" fill="#ffffff"/>
   <text x="600.0" y="44" class="h" text-anchor="middle">The migration pipeline: 18 numbered steps, five gates</text>
   <text x="600.0" y="70" class="sub" text-anchor="middle">Read left to right, row by row - every step has evidence in the records</text>
   <rect x="1083" y="84" width="87" height="20" rx="10.0" fill="#15803d"/>
-  <text x="1126.5" y="97.96" class="pill" text-anchor="middle" style="font-size:11px">I1-I4 PASS</text>
+  <text x="1126.5" y="97.96" class="pill" text-anchor="middle" style="font-size:11px">I1-I5 PASS</text>
   <rect x="40" y="104" width="186" height="21" rx="10.5" fill="#15803d"/>
   <text x="133.0" y="118.82" class="pill" text-anchor="middle" style="font-size:12px">Stage 1C-1G: steps 1-6</text>
   <rect x="238" y="104" width="117" height="21" rx="10.5" fill="#15803d"/>
@@ -30,8 +30,8 @@
   <text x="534.5" y="118.82" class="pill" text-anchor="middle" style="font-size:12px">I3: platform</text>
   <rect x="601" y="104" width="132" height="21" rx="10.5" fill="#15803d"/>
   <text x="667.0" y="118.82" class="pill" text-anchor="middle" style="font-size:12px">I4: steps 11-18</text>
-  <rect x="745" y="104" width="132" height="21" rx="10.5" fill="#6d28d9"/>
-  <text x="811.0" y="118.82" class="pill" text-anchor="middle" style="font-size:12px">I5: NOT STARTED</text>
+  <rect x="745" y="104" width="148" height="21" rx="10.5" fill="#15803d"/>
+  <text x="819.0" y="118.82" class="pill" text-anchor="middle" style="font-size:12px">I5: teardown PASS</text>
   <rect x="40" y="160" width="212" height="128" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
   <text x="146.0" y="201.48" class="t" text-anchor="middle" style="font-size:14px">Source VM identified</text>
   <text x="146.0" y="219.84" class="s" text-anchor="middle" style="font-size:12px">legacy-source-vm on ESXi 8.0.3</text>
@@ -221,15 +221,15 @@
   <text x="908.0" y="733.96" class="pill" text-anchor="middle" style="font-size:11px">I4</text>
   <circle cx="725" cy="734" r="17" fill="#15803d"/>
   <text x="725" y="739" class="pill" text-anchor="middle" style="font-size:13px">18</text>
-  <path d="M934,794.0 L947,794.0" fill="none" stroke="#6d28d9" stroke-width="2" stroke-dasharray="9 6" marker-end="url(#m6d28d9)"/>
-  <rect x="948" y="730" width="212" height="128" rx="10" fill="#f1f5f9" stroke="#64748b" stroke-width="1.8" stroke-dasharray="3 4"/>
-  <text x="1054.0" y="771.48" class="t" text-anchor="middle" style="font-size:14px">Gate I5</text>
-  <text x="1054.0" y="789.84" class="s" text-anchor="middle" style="font-size:12px">final validation and</text>
-  <text x="1054.0" y="807.84" class="s" text-anchor="middle" style="font-size:12px">controlled teardown</text>
-  <text x="1054.0" y="825.84" class="s" text-anchor="middle" style="font-size:12px">I5-A to I5-J, not approved</text>
-  <rect x="1056" y="720" width="94" height="20" rx="10.0" fill="#6d28d9"/>
-  <text x="1103.0" y="733.96" class="pill" text-anchor="middle" style="font-size:11px">NOT STARTED</text>
-  <circle cx="952" cy="734" r="17" fill="#6d28d9"/>
+  <path d="M934,794.0 L947,794.0" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="948" y="730" width="212" height="128" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="1054.0" y="771.48" class="t" text-anchor="middle" style="font-size:14px">Validation + teardown</text>
+  <text x="1054.0" y="789.84" class="s" text-anchor="middle" style="font-size:12px">HTTP 200 before teardown</text>
+  <text x="1054.0" y="807.84" class="s" text-anchor="middle" style="font-size:12px">VM, disk and AWS removed</text>
+  <text x="1054.0" y="825.84" class="s" text-anchor="middle" style="font-size:12px">I5-A to I5-J all PASS</text>
+  <rect x="1120" y="720" width="30" height="20" rx="10.0" fill="#15803d"/>
+  <text x="1135.0" y="733.96" class="pill" text-anchor="middle" style="font-size:11px">I5</text>
+  <circle cx="952" cy="734" r="17" fill="#15803d"/>
   <text x="952" y="739" class="pill" text-anchor="middle" style="font-size:13px">I5</text>
   <text x="600" y="312" class="xs halo" text-anchor="middle" style="font-weight:700">laptop: source + conversion</text>
   <text x="600" y="502" class="xs halo" text-anchor="middle" style="font-weight:700">I3 built the AWS target; I4 starts</text>

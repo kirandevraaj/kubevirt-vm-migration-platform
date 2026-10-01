@@ -19,7 +19,7 @@
   <text x="600.0" y="44" class="h" text-anchor="middle">One request, one disk, one VM</text>
   <text x="600.0" y="70" class="sub" text-anchor="middle">The whole Stage 1I result on one page</text>
   <rect x="1005" y="84" width="165" height="20" rx="10.0" fill="#15803d"/>
-  <text x="1087.5" y="97.96" class="pill" text-anchor="middle" style="font-size:11px">OBSERVED - I1-I4 PASS</text>
+  <text x="1087.5" y="97.96" class="pill" text-anchor="middle" style="font-size:11px">OBSERVED - I1-I5 PASS</text>
   <rect x="30" y="108" width="370" height="630" rx="14" fill="#f0fdf4" stroke="#15803d" stroke-width="1.8"/>
   <text x="215" y="136" class="lab" text-anchor="middle" style="fill:#15803d">ONE REQUEST</text>
   <rect x="65" y="152" width="300" height="42" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
@@ -114,5 +114,5 @@
   <text x="985.0" y="699.48" class="t" text-anchor="middle" style="font-size:14px">same identity + content</text>
   <path d="M985,660 L985,672" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
   <rect x="30" y="752" width="1140" height="52" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
-  <text x="600.0" y="783.12" class="t" text-anchor="middle" style="font-size:16px">Same guest, same content, new manager - point-in-time, no cutover; I1-I4 PASS, I5 not started</text>
+  <text x="600.0" y="783.12" class="t" text-anchor="middle" style="font-size:16px">Same guest, same content, new manager - point-in-time, no cutover; I1-I5 PASS, Stage 1I complete</text>
 </svg>

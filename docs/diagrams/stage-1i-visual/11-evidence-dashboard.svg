@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1000" viewBox="0 0 1200 1000" role="img" aria-labelledby="title desc">
   <title id="title">Evidence dashboard I1 to I5</title>
-  <desc id="desc">Five gate rows: I1 offline preparation PASS (41 of 41), I2 boot test PASS (54 of 54), I3 AWS platform PASS, I4 first KubeVirt migration PASS (36 of 36 guest checks, external HTTP 200), I5 final validation and controlled teardown (I5-A to I5-J) not started. Below, nine Gate I4 runtime checks: DataVolume Succeeded, PVC Bound, EBS attached, VM and VMI Running and Ready, virt-launcher Running, guest agent responsive, nginx HTTP 200 in the guest and external NodePort access.</desc>
+  <desc id="desc">Five gate rows: I1 offline preparation PASS (41 of 41), I2 boot test PASS (54 of 54), I3 AWS platform PASS, I4 first KubeVirt migration PASS (36 of 36 guest checks, external HTTP 200), I5 final validation and controlled teardown (I5-A to I5-J) PASS. Below, nine Gate I4 runtime checks: DataVolume Succeeded, PVC Bound, EBS attached, VM and VMI Running and Ready, virt-launcher Running, guest agent responsive, nginx HTTP 200 in the guest and external NodePort access.</desc>
   <style>
     text { font-family: 'Segoe UI', Arial, sans-serif; }
     .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
@@ -18,8 +18,8 @@
   <rect width="1200" height="1000" fill="#ffffff"/>
   <text x="600.0" y="44" class="h" text-anchor="middle">Evidence dashboard: gates I1 to I5</text>
   <text x="600.0" y="70" class="sub" text-anchor="middle">Every PASS below is an observed check in the Stage 1I record</text>
-  <rect x="1005" y="84" width="165" height="20" rx="10.0" fill="#6d28d9"/>
-  <text x="1087.5" y="97.96" class="pill" text-anchor="middle" style="font-size:11px">STAGE 1I NOT COMPLETE</text>
+  <rect x="1033" y="84" width="137" height="20" rx="10.0" fill="#15803d"/>
+  <text x="1101.5" y="97.96" class="pill" text-anchor="middle" style="font-size:11px">STAGE 1I COMPLETE</text>
   <rect x="30" y="110" width="1140" height="58" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
   <circle cx="64" cy="139" r="20" fill="#15803d"/>
   <text x="64" y="144" class="pill" text-anchor="middle" style="font-size:13px">I1</text>
@@ -52,14 +52,14 @@
   <rect x="330" y="338" width="47" height="21" rx="10.5" fill="#15803d"/>
   <text x="353.5" y="352.82" class="pill" text-anchor="middle" style="font-size:12px">PASS</text>
   <text x="470" y="354" class="s" text-anchor="start" style="font-size:13px">36 of 36 guest checks; external HTTP 200; identity identical; evidence reconciled</text>
-  <rect x="30" y="390" width="1140" height="58" rx="10" fill="#f1f5f9" stroke="#64748b" stroke-width="1.8" stroke-dasharray="3 4"/>
-  <circle cx="64" cy="419" r="20" fill="#6d28d9"/>
+  <rect x="30" y="390" width="1140" height="58" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <circle cx="64" cy="419" r="20" fill="#15803d"/>
   <text x="64" y="424" class="pill" text-anchor="middle" style="font-size:13px">I5</text>
   <text x="98" y="415" class="t" text-anchor="start" style="font-size:16px">Validation + teardown</text>
-  <text x="98" y="435" class="xs" text-anchor="start">defined, not approved</text>
-  <rect x="330" y="408" width="101" height="21" rx="10.5" fill="#6d28d9"/>
-  <text x="380.5" y="422.82" class="pill" text-anchor="middle" style="font-size:12px">NOT STARTED</text>
-  <text x="470" y="424" class="s" text-anchor="start" style="font-size:13px">10 sub-gates I5-A to I5-J; none passed; VM, Service, DV, PVC, PV and EBS kept until I5-C/D</text>
+  <text x="98" y="435" class="xs" text-anchor="start">11:19 - 11:30 UTC</text>
+  <rect x="330" y="408" width="47" height="21" rx="10.5" fill="#15803d"/>
+  <text x="353.5" y="422.82" class="pill" text-anchor="middle" style="font-size:12px">PASS</text>
+  <text x="470" y="424" class="s" text-anchor="start" style="font-size:13px">10 of 10 sub-gates; HTTP 200 before teardown; VM, disk and AWS removed; 0 orphans</text>
   <text x="48" y="490" class="lab" text-anchor="start" style="fill:#15803d">GATE I4 RUNTIME CHECKLIST  (all OBSERVED in the Stage 1I record, 04:04 - 04:28 UTC)</text>
   <rect x="30" y="506" width="366" height="112" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
   <text x="213.0" y="548.12" class="t" text-anchor="middle" style="font-size:16px">DataVolume Succeeded</text>
@@ -108,6 +108,6 @@
   <path d="M821,782 L827.0,788.3 L839,774.8" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
   <text x="600" y="900" class="xs" text-anchor="middle" style="font-weight:600">Live check (read-only, 10:46 UTC): VM + VMI Running/Ready, DataVolume Succeeded, PVC + PV Bound, endpoint 10.244.0.30 ready.</text>
   <text x="600" y="924" class="xs" text-anchor="middle">Evidence files live outside the repo: conversion-host-01:/srv/migration-lab/stage-1i/evidence/ (copy on kvm-learning-01).</text>
-  <rect x="30" y="944" width="1140" height="44" rx="10" fill="#f1f5f9" stroke="#64748b" stroke-width="1.8" stroke-dasharray="3 4"/>
-  <text x="600.0" y="970.8" class="t" text-anchor="middle" style="font-size:15px">Stage 1I is NOT complete: I1-I4 PASS, I5 not started</text>
+  <rect x="30" y="944" width="1140" height="44" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="600.0" y="970.8" class="t" text-anchor="middle" style="font-size:15px">Stage 1I complete: I1-I5 PASS, 2026-10-01 - the temporary AWS target was destroyed and verified</text>
 </svg>

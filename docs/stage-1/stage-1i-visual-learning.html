@@ -166,7 +166,7 @@
       <button class="st" data-stage="I2" type="button">I2</button>
       <button class="st comp" data-stage="I3" type="button">I3</button>
       <button class="st" data-stage="I4" type="button">I4</button>
-      <button class="st nt" data-stage="I5" type="button">I5</button>
+      <button class="st" data-stage="I5" type="button">I5</button>
       <a href="#objects">KUBEVIRT</a>
       <a href="#packet">NETWORK</a>
       <a href="#storage">STORAGE</a>
@@ -186,9 +186,8 @@
     <h1>Stage 1I &#8212; The First VM Running on KubeVirt</h1>
     <p>Look first. Turn on <b>Learning Mode</b> only if you want a short explanation under each picture.</p>
     <div class="status">
-      <span class="tag done big">I1 &#8211; I4: PASS</span>
-      <span class="tag nt big">I5: NOT STARTED</span>
-      <span class="tag future big">STAGE 1I: NOT COMPLETE</span>
+      <span class="tag done big">I1 &#8211; I5: PASS</span>
+      <span class="tag done big">STAGE 1I: COMPLETED &#8212; 2026-10-01</span>
     </div>
     <div class="legend" aria-label="Visual language">
       <span class="k"><span class="sw done"></span>OBSERVED / ACTUAL (solid)</span>
@@ -197,7 +196,6 @@
       <span class="k"><span class="sw design"></span>CONCEPT / TEACHING (dashed)</span>
       <span class="k"><span class="sw future"></span>FUTURE / REFERENCE (dotted)</span>
       <span class="k"><span class="sw risk"></span>CLOSED / RISK</span>
-      <span class="k"><span class="tag nt">NOT STARTED</span></span>
     </div>
     <p class="note"><b>LIVE CHECK</b> = a read-only inspection of the running VM made while preparing this page (2026-10-01, 10:46 UTC: pod spec, <code>virsh</code> domain XML, <code>ps</code>, <code>ip addr</code>, Service and endpoints). It is not part of the Stage 1I record and changed nothing. Everything else comes from the Stage 1I record.</p>
   </div>
@@ -214,15 +212,15 @@
 
   <section class="fig" id="pipeline">
     <div class="fig-head"><span class="num">02</span><h3>The migration pipeline: 18 numbered steps</h3>
-      <span class="tags"><span class="tag done">I1-I4 PASS</span><span class="tag nt">I5 NOT STARTED</span></span></div>
+      <span class="tags"><span class="tag done">I1-I5 PASS</span></span></div>
     <div class="stagebtns" aria-label="Open a gate summary">
       <span class="lbl">Click a gate for a 20-second summary</span>
       <button type="button" data-stage="I1">I1</button><button type="button" data-stage="I2">I2</button>
       <button type="button" data-stage="I3" class="comp">I3</button><button type="button" data-stage="I4">I4</button>
-      <button type="button" data-stage="I5" class="nt">I5</button>
+      <button type="button" data-stage="I5">I5</button>
     </div>
-    <a class="img" href="../diagrams/stage-1i-visual/02-pipeline.svg" target="_blank"><img src="../diagrams/stage-1i-visual/02-pipeline.svg" alt="Twenty cards in four rows: steps 1-6 (Stage 1C-1G), 7-9 (I1), 10 (I2), the I3 platform, 11-18 (I4) and Gate I5 not started."></a>
-    <p class="caption">Steps 1 to 6 are earlier Stage 1 work. <b>I1</b> changed the guest offline (guest agent, network by driver, first-boot cleanup) and froze the image. <b>I2</b> booted that exact image in isolation. <b>I3</b> built the AWS platform. <b>I4</b> moved the image, imported it with CDI, created the VM and proved it end to end. <b>I5</b> is final validation and controlled teardown, defined in the record as sub-gates I5-A to I5-J. <b>It has not started</b> and needs explicit approval.</p>
+    <a class="img" href="../diagrams/stage-1i-visual/02-pipeline.svg" target="_blank"><img src="../diagrams/stage-1i-visual/02-pipeline.svg" alt="Twenty cards in four rows: steps 1-6 (Stage 1C-1G), 7-9 (I1), 10 (I2), the I3 platform, 11-18 (I4) and Gate I5 (final validation and controlled teardown) PASS."></a>
+    <p class="caption">Steps 1 to 6 are earlier Stage 1 work. <b>I1</b> changed the guest offline (guest agent, network by driver, first-boot cleanup) and froze the image. <b>I2</b> booted that exact image in isolation. <b>I3</b> built the AWS platform. <b>I4</b> moved the image, imported it with CDI, created the VM and proved it end to end. <b>I5</b> checked the VM one last time (HTTP 200, the same page hash), then removed the VM, its disk and the AWS platform through their owners and verified the removal: sub-gates I5-A to I5-J all PASS.</p>
   </section>
 
   <!-- LEVEL 2 -->
@@ -295,9 +293,9 @@
 
   <section class="fig" id="evidence">
     <div class="fig-head"><span class="num">11</span><h3>Evidence dashboard: I1 to I5</h3>
-      <span class="tags"><span class="tag done">I1-I4 PASS</span><span class="tag nt">I5 NOT STARTED</span></span></div>
-    <a class="img" href="../diagrams/stage-1i-visual/11-evidence-dashboard.svg" target="_blank"><img src="../diagrams/stage-1i-visual/11-evidence-dashboard.svg" alt="Five gate rows with times and results, and nine Gate I4 runtime checks: DataVolume Succeeded, PVC Bound, EBS attached, VM and VMI Running/Ready, virt-launcher Running, guest agent responsive, nginx HTTP 200, external NodePort OK."></a>
-    <p class="caption">Each PASS is backed by checks in the Stage 1I record: 41/41 for I1, 54/54 for I2, a fully healthy platform for I3, and 36/36 guest checks plus external HTTP for I4. <b>"DataVolume Succeeded" alone proves only that CDI finished writing.</b> The image was proven by the transfer hash, and the guest by boot, identity and HTTP checks.</p>
+      <span class="tags"><span class="tag done">I1-I5 PASS</span></span></div>
+    <a class="img" href="../diagrams/stage-1i-visual/11-evidence-dashboard.svg" target="_blank"><img src="../diagrams/stage-1i-visual/11-evidence-dashboard.svg" alt="Five gate rows with times and results, all PASS, and nine Gate I4 runtime checks: DataVolume Succeeded, PVC Bound, EBS attached, VM and VMI Running/Ready, virt-launcher Running, guest agent responsive, nginx HTTP 200, external NodePort OK."></a>
+    <p class="caption">Each PASS is backed by checks in the Stage 1I record: 41/41 for I1, 54/54 for I2, a fully healthy platform for I3, 36/36 guest checks plus external HTTP for I4, and 10 of 10 sub-gates for I5 (a final HTTP 200, then a teardown verified in Kubernetes and in AWS). <b>"DataVolume Succeeded" alone proves only that CDI finished writing.</b> The image was proven by the transfer hash, and the guest by boot, identity and HTTP checks.</p>
   </section>
 
   <!-- FINAL -->
@@ -327,7 +325,7 @@
   <section class="block fmap" aria-label="60-second story">
     <p class="over">Stage 1I put the same VM under Kubernetes.</p>
     <div class="flow"><a class="step ok" href="#mission">ESXi VM</a><span class="arr" aria-hidden="true">&#8594;</span><a class="step ok" href="#pipeline">cold copy</a><span class="arr" aria-hidden="true">&#8594;</span><a class="step ok" href="#pipeline">prepare (I1)</a><span class="arr" aria-hidden="true">&#8594;</span><a class="step ok" href="#pipeline">boot test (I2)</a><span class="arr" aria-hidden="true">&#8594;</span><a class="step" href="#infra">AWS platform (I3)</a><span class="arr" aria-hidden="true">&#8594;</span><a class="step" href="#storage">CDI &#8594; PVC</a><span class="arr" aria-hidden="true">&#8594;</span><a class="step" href="#objects">VM &#8594; VMI</a><span class="arr" aria-hidden="true">&#8594;</span><a class="step" href="#qemu">virt-launcher &#8594; QEMU/KVM</a><span class="arr" aria-hidden="true">&#8594;</span><a class="step ok" href="#guest">same guest</a><span class="arr" aria-hidden="true">&#8594;</span><a class="step ok" href="#packet">nginx HTTP 200</a></div>
-    <p class="under">I1 &#8211; I4 PASS. I5 has not started.</p>
+    <p class="under">I1 &#8211; I5 PASS. After the final check, the VM, its disk and the AWS platform were removed; Stage 1I is complete.</p>
   </section>
 
   <div class="level" id="remember"><span class="lv">REMEMBER</span><h2>5 things to remember</h2></div>
@@ -352,7 +350,7 @@
   <div class="srcs">
     <b>Source of truth</b> (this page adds no facts beyond the read-only live check; the records win):
     <ul>
-      <li><a href="stage-1i-first-kubevirt-migration.md">Stage 1I record: gates I1-I4, I5 definition (section 19)</a></li>
+      <li><a href="stage-1i-first-kubevirt-migration.md">Stage 1I record: gates I1-I5 (I5 in section 19)</a></li>
       <li><a href="stage-1i-runtime-snapshot.md">Stage 1I pre-I5 runtime snapshot (read-only)</a></li>
       <li><a href="stage-1h-kubevirt-target-feasibility.md">1H KubeVirt target feasibility</a></li>
       <li><a href="stage-1h-architecture-review.md">1H architecture review</a></li>
@@ -397,12 +395,12 @@
       ['WHEN', '03:47 to 04:28 UTC (migration, then evidence reconciliation).'],
       ['WHAT', 'SFTP transfer (321 s, hash matched), CDI upload to a 40Gi Block PVC on encrypted EBS, one VM and one NodePort Service.'],
       ['PROVED', '36 of 36 guest checks, guest agent, identity identical, external HTTP 200 with the source page hash.']] },
-    'I5': { t: 'Final validation and controlled teardown', s: 'nt', go: '#evidence', rows: [
-      ['STATUS', 'NOT STARTED. No I5 gate has passed. Needs explicit approval.'],
-      ['VALIDATE', 'I5-A final runtime validation, I5-B final evidence capture.'],
-      ['TEARDOWN', 'I5-C delete VM (and Service), I5-D delete DataVolume, I5-E verify PVC/PV/EBS gone, I5-F verify migration objects gone, I5-G terraform destroy.'],
-      ['VERIFY', 'I5-H AWS resources gone, I5-I detection-only orphan-volume scan, I5-J remove temporary credentials and tunnels.'],
-      ['KEPT', 'VM (running), Service, DataVolume, PVC, PV and EBS vol-0d94fba4ddd3d84d2 until I5-C/D.']] }
+    'I5': { t: 'Final validation and controlled teardown', s: 'done', go: '#evidence', rows: [
+      ['WHEN', '11:19 to 11:30 UTC. I5-A to I5-J all PASS.'],
+      ['VALIDATE', 'I5-A: HTTP 200, 267 bytes, the source page hash; VM, VMI, virt-launcher, DataVolume, PVC and PV healthy. I5-B: evidence saved outside Git.'],
+      ['TEARDOWN', 'I5-C deleted the VM and the Service legacy-source-vm-http. I5-D deleted the DataVolume; the PVC, PV and EBS vol-0d94fba4ddd3d84d2 followed through their lifecycle. I5-G: terraform destroy, 10 resources.'],
+      ['VERIFY', 'I5-E, I5-F and I5-H: storage, cluster objects and AWS resources confirmed gone. I5-I: no orphan volume. I5-J: temporary credentials and tunnels removed.'],
+      ['SOURCE', 'The ESXi source VM was never modified and stayed in service.']] }
   };
   var TAGS = { done: ['done', 'PASS'], comp: ['comp', 'PASS (PLATFORM)'], nt: ['nt', 'NOT STARTED'] };
   var COLORS = { done: '#15803d', comp: '#1d4ed8', nt: '#6d28d9' };

@@ -63,7 +63,7 @@ VMware ESXi (source host)
                    (nginx as a container image, Deployment, Service)
 ```
 
-Stage 1 covered everything up to "proven bootable under KVM/QEMU" in the lab (1A to 1G), and **designed** the KubeVirt target on paper (1H). Nothing on AWS or Kubernetes exists yet. Stage 1I is "Not yet defined" in the README.
+Stage 1 covered everything up to "proven bootable under KVM/QEMU" in the lab (1A to 1G), and **designed** the KubeVirt target on paper (1H). Nothing on AWS or Kubernetes existed by the end of 1H. Stage 1I, defined and completed later (I1 to I5 PASS, 2026-10-01), is covered in the [Stage 1I record](stage-1i-first-kubevirt-migration.md) and not retold here.
 
 ## 4. Stage 1 in One Story
 
@@ -726,7 +726,7 @@ This table follows the current [Stage 1 README](README.md) ("Current source host
 | 1F | Complete (PASS), 2026-09-27 | `conversion-host-01` (Vmid 3), **powered on**, 192.168.50.32; working copy in `/srv/migration-lab/working/` (read-only, immutable) | Safe Linux workbench and inspection |
 | 1G | Complete (PASS), 2026-09-28 | ADR 006; artifacts in `/srv/migration-lab/stage-1g/`: qemu-img qcow2 (`08c62ac5...5447`), virt-v2v qcow2 + XML (`94bc1cd6...91c6`), remediated copy (`5326b130...d3d6`); ovmf installed; no QEMU guest running | Proven conversion and KVM boot |
 | 1H | Done: H1 to H10 PASS, awaiting user review | ADRs 007 to 010, design record and diagrams. **No AWS resource, cluster or Kubernetes object exists.** | The chosen KubeVirt target, on paper |
-| 1I | Not yet defined; not started, awaiting user approval | Entry criteria only (1H record, section 28) | Next step |
+| 1I | Complete (PASS), 2026-10-01: I1 to I5 PASS | Nothing left running: the temporary AWS target was destroyed and verified in Gate I5; evidence kept outside Git | First KubeVirt migration ([Stage 1I record](stage-1i-first-kubevirt-migration.md)) |
 
 Historical versus current, where older documents describe an earlier moment:
 
@@ -746,7 +746,7 @@ Historical versus current, where older documents describe an earlier moment:
 - **1E -> 1F:** We could not sensibly inspect or convert anything before we had a byte-identical golden copy that would never need to be taken from the source again.
 - **1F -> 1G:** We could not sensibly run conversions before understanding what is inside the disk and having a protected working copy and proven tools.
 - **1G -> 1H:** We could not sensibly design the KubeVirt target (storage format, network model, guest remediation) before knowing that the converted disk boots with UEFI and VirtIO, and exactly what breaks.
-- **1H -> 1I:** Stage 1I is not yet defined. The 1H record lists its entry criteria, including recovering AWS credentials (U15, BLOCKED).
+- **1H -> 1I:** We could not sensibly build anything on AWS before the target was designed and its open decisions were recorded. Stage 1I then built that target, migrated the VM and removed everything again (I1 to I5 PASS, 2026-10-01; [Stage 1I record](stage-1i-first-kubevirt-migration.md)).
 
 ## 13. Stage 1 One-Page Cheat Sheet
 

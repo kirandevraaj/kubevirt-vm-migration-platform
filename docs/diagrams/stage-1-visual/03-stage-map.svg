@@ -174,7 +174,7 @@
   <text x="928" y="799" class="s" text-anchor="start" style="font-size:14px">nothing provisioned</text>
   <line x1="926" y1="820" x2="1170" y2="820" stroke="#e2e8f0" stroke-width="1.5"/>
   <text x="928" y="836" class="lab" text-anchor="start" style="fill:#475569">NEXT</text>
-  <text x="928" y="858" class="s" text-anchor="start" style="font-size:14px">1I not yet defined;</text>
-  <text x="928" y="877" class="s" text-anchor="start" style="font-size:14px">AWS credentials BLOCKED</text>
+  <text x="928" y="858" class="s" text-anchor="start" style="font-size:14px">1I: first migration;</text>
+  <text x="928" y="877" class="s" text-anchor="start" style="font-size:14px">I1-I5 PASS, 2026-10-01</text>
   <path d="M1048,488 L1048,498 L160,498 L160,508" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
 </svg>

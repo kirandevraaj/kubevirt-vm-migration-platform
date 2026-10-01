@@ -93,7 +93,7 @@
   <text x="664" y="653.75" class="s" text-anchor="start" style="font-size:12.5px">The VM only names the PVC (claimName).</text>
   <text x="664" y="672.25" class="s" text-anchor="start" style="font-size:12.5px">Disk lifecycle: delete the DataVolume -&gt; its PVC goes;</text>
   <text x="664" y="690.75" class="s" text-anchor="start" style="font-size:12.5px">the PV's reclaimPolicy Delete then removes the EBS volume.</text>
-  <text x="664" y="709.25" class="s" text-anchor="start" style="font-size:12.5px">Teardown order: gates I5-C to I5-F (Stage 1H 29.1); not run.</text>
+  <text x="664" y="709.25" class="s" text-anchor="start" style="font-size:12.5px">Gates I5-C to I5-E followed this order and proved it.</text>
   <text x="664" y="727.75" class="s" text-anchor="start" style="font-size:12.5px">Nothing in the VM's ownership chain points to EBS.</text>
   <path d="M562,183 L606,183 L606,297 L647,297" fill="none" stroke="#475569" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m475569)"/>
   <text x="604" y="176" class="xs halo" text-anchor="middle" style="font-weight:700">spec: claimName</text>

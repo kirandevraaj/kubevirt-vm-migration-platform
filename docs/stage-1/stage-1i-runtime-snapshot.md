@@ -3,9 +3,9 @@
 | Field | Value |
 |---|---|
 | Project | Project 1.5: VM-to-Kubernetes Migration Platform |
-| Stage | 1I, after Gate I4 and **before Gate I5**. Stage 1I is **not complete** |
+| Stage | 1I, after Gate I4 and **before Gate I5**. Stage 1I was not complete when this snapshot was taken; Gate I5 passed later the same day and Stage 1I is complete (2026-10-01) |
 | Date | 2026-10-01, 11:04:45 to 11:05:57 UTC |
-| Nature | **Read-only learning snapshot.** It is not a gate and not an I5 result. Gate I5-A (final runtime validation) still has to run after approval ([Stage 1I record, section 19](stage-1i-first-kubevirt-migration.md#19-i5--final-validation-and-controlled-teardown)) |
+| Nature | **Read-only learning snapshot.** It is not a gate and not an I5 result. Gate I5-A (final runtime validation) ran separately afterwards, at 11:19 UTC ([Stage 1I record, section 19](stage-1i-first-kubevirt-migration.md#19-i5--final-validation-and-controlled-teardown)) |
 | Changed | Nothing in AWS, Kubernetes, KubeVirt, the node's network or the VM. No create, patch or delete; no rule, route, link or Service change; no `qemu-agent-command` and no `qemu-monitor-command` |
 | Evidence | `kvm-learning-01:~/stage-1i/evidence/stage-1i-pre-i5-runtime-snapshot.txt` (817 lines, sha256 `366dd345afcd9d198dd7160e6dbdb7d8d8ab4de620a9cd643248bc1f5ed06f94`), with a copy on the operator workstation. Outside Git |
 | Related | [Stage 1I record](stage-1i-first-kubevirt-migration.md) (Gate I4: section 18), [Stage 1I visual](stage-1i-visual-learning.html), [ADR 008](../adr/008-kubevirt-network-model.md), [ADR 009](../adr/009-kubevirt-storage-model.md) |
@@ -196,10 +196,10 @@ What this shows:
 | # | Observation | Effect |
 |---|---|---|
 | O1 | `virsh dominfo` reports `tainted: custom guest agent control commands issued`. This comes from the Gate I4 direct `qemu-agent-command` queries (section 18.7). This snapshot used only `virsh domifaddr/domhostname/domfsinfo` and `virtctl guestosinfo` | Informational. libvirt marks the domain once and keeps the flag until the domain stops; behaviour is unchanged |
-| O2 | A long-lived `sh` (PID 123 in `compute`, started about 04:36 UTC), most likely from an earlier interactive `kubectl exec`; origin not determined | Not touched. It ends with the Pod in Gate I5-C |
+| O2 | A long-lived `sh` (PID 123 in `compute`, started about 04:36 UTC), most likely from an earlier interactive `kubectl exec`; origin not determined | Not touched. It ended with the Pod in Gate I5-C (Pod gone at 11:22:00 UTC) |
 | O3 | kube-proxy rewrites its chains on sync, so its NAT counters were [0:0] at rest; they were readable only right after a request | Counters were taken immediately around the request |
 | O4 | libvirt reports security model `none`: confinement comes from the container (SELinux `container_t` with MCS categories, seccomp `-sandbox on`, uid 107, dropped capabilities), not from libvirt sVirt | Expected for KubeVirt (INFERRED from the observed labels) |
-| O5 | The guest's `apt-daily` refresh is due at 11:56:40 UTC; a later `apt-daily-upgrade` could install updates in the migrated guest (Gate I4 section 18.9) | Drift decision remains open for Gate I5-A |
+| O5 | The guest's `apt-daily` refresh is due at 11:56:40 UTC; a later `apt-daily-upgrade` could install updates in the migrated guest (Gate I4 section 18.9) | Closed by Gate I5-A (11:19 to 11:20 UTC): 0 dpkg entries since Gate I1, and the guest was stopped at 11:21:49, before the refresh was due |
 | O6 | The guest's nginx access log, journal and `auth.log`, and the node's sshd log, record this snapshot's SSH sessions and three HTTP requests (one external, two to 127.0.0.1) | The only side effects. Nothing else was written |
 
 ## 10. Resource impact
