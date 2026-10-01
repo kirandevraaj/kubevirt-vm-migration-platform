@@ -1,0 +1,27 @@
+# Rendered on the node with envsubst; NODE_PRIVATE_IP comes from the Terraform output private_ip.
+apiVersion: kubeadm.k8s.io/v1beta4
+kind: InitConfiguration
+localAPIEndpoint:
+  advertiseAddress: ${NODE_PRIVATE_IP}
+  bindPort: 6443
+nodeRegistration:
+  criSocket: unix:///var/run/crio/crio.sock
+---
+apiVersion: kubeadm.k8s.io/v1beta4
+kind: ClusterConfiguration
+clusterName: stage1i
+kubernetesVersion: v1.36.5
+networking:
+  podSubnet: 10.244.0.0/16
+  serviceSubnet: 10.96.0.0/12
+  dnsDomain: cluster.local
+apiServer:
+  # 127.0.0.1 lets the operator reach the API through an SSH local forward without exposing 6443.
+  certSANs:
+    - 127.0.0.1
+    - localhost
+    - ${NODE_PRIVATE_IP}
+---
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+cgroupDriver: systemd

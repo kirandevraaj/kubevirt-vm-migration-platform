@@ -1,0 +1,21 @@
+# Stage 1I Gate I4: external HTTP validation only (Stage 1H section 29.4).
+# NodePort 30080 is reachable only from the operator /32 (AWS security group). No Service for guest SSH.
+apiVersion: v1
+kind: Service
+metadata:
+  name: legacy-source-vm-http
+  namespace: default
+  labels:
+    app.kubernetes.io/name: legacy-source-vm
+    app.kubernetes.io/part-of: project-1-5
+    project15/stage: stage-1i
+spec:
+  type: NodePort
+  selector:
+    project15/vm: legacy-source-vm-migrated
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30080

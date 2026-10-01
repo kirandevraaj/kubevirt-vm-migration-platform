@@ -1,0 +1,27 @@
+# Stage 1I Gate I4: standalone upload DataVolume for the migrated disk (Stage 1H sections 16 and 18).
+# Filled by `virtctl image-upload dv legacy-source-vm-disk --no-create` on the node.
+# The VM only references the resulting PVC; deleting the VM does not delete this disk.
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: legacy-source-vm-disk
+  namespace: default
+  labels:
+    app.kubernetes.io/name: legacy-source-vm
+    app.kubernetes.io/part-of: project-1-5
+    project15/stage: stage-1i
+    project15/role: migration-disk
+  annotations:
+    # The StorageClass is WaitForFirstConsumer; the upload server is the first consumer.
+    cdi.kubevirt.io/storage.bind.immediate.requested: "true"
+spec:
+  source:
+    upload: {}
+  storage:
+    storageClassName: ebs-gp3-encrypted
+    volumeMode: Block
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 40Gi

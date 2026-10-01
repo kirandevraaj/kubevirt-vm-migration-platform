@@ -1,0 +1,55 @@
+# Stage 1I Gate I4: the first migrated VM (Stage 1H section 18 step 7, ADR 008).
+# Machine type, CPU model and EFI variable store are left at KubeVirt defaults.
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: legacy-source-vm-migrated
+  namespace: default
+  labels:
+    app.kubernetes.io/name: legacy-source-vm
+    app.kubernetes.io/part-of: project-1-5
+    project15/stage: stage-1i
+spec:
+  runStrategy: Manual
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: legacy-source-vm
+        project15/stage: stage-1i
+        project15/vm: legacy-source-vm-migrated
+    spec:
+      domain:
+        cpu:
+          sockets: 1
+          cores: 2
+          threads: 1
+        memory:
+          guest: 4096Mi
+        firmware:
+          bootloader:
+            efi:
+              secureBoot: false
+        devices:
+          disks:
+            - name: rootdisk
+              bootOrder: 1
+              disk:
+                bus: virtio
+          interfaces:
+            - name: default
+              model: virtio
+              masquerade: {}
+              ports:
+                - name: http
+                  port: 80
+                  protocol: TCP
+                - name: ssh
+                  port: 22
+                  protocol: TCP
+      networks:
+        - name: default
+          pod: {}
+      volumes:
+        - name: rootdisk
+          persistentVolumeClaim:
+            claimName: legacy-source-vm-disk
