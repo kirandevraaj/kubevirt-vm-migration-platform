@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="860" viewBox="0 0 1200 860" role="img" aria-labelledby="title desc">
+  <title id="title">What actually runs where</title>
+  <desc id="desc">Nested boxes: the AWS Nitro host runs the EC2 instance (CentOS Stream 9, kernel 5.14, KVM nested), which runs kubelet, CRI-O, the control plane and KubeVirt agents; inside it the virt-launcher Pod, its compute container, the qemu-kvm process, the guest kernel 6.8 and nginx. Six question cards explain what is a container, where the hypervisor runs, what Kubernetes schedules, who drives libvirt, where the disk is and where the network is.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs></defs>
+  <rect width="1200" height="860" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">What actually runs where?</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">One EC2 instance, a VM nested inside a Pod - read the boxes from the outside in</text>
+  <rect x="1097" y="84" width="73" height="20" rx="10.0" fill="#15803d"/>
+  <text x="1133.5" y="97.96" class="pill" text-anchor="middle" style="font-size:11px">OBSERVED</text>
+  <rect x="30" y="108" width="560" height="720" rx="12" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="44" y="130" class="lab" text-anchor="start" style="font-size:12px;fill:#334155">AWS NITRO HOST (bare metal, not ours)</text>
+  <rect x="50" y="148" width="520" height="664" rx="12" fill="#fff7ed" stroke="#c2410c" stroke-width="1.8"/>
+  <text x="64" y="170" class="lab" text-anchor="start" style="font-size:12px;fill:#c2410c">EC2 m8i.xlarge - CentOS Stream 9, kernel 5.14</text>
+  <rect x="70" y="260" width="480" height="536" rx="12" fill="#eff6ff" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="84" y="282" class="lab" text-anchor="start" style="font-size:12px;fill:#1d4ed8">virt-launcher Pod (Kubernetes object)</text>
+  <rect x="90" y="300" width="440" height="480" rx="12" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="104" y="322" class="lab" text-anchor="start" style="font-size:12px;fill:#1d4ed8">container compute (CRI-O)</text>
+  <rect x="110" y="400" width="400" height="364" rx="12" fill="#f0fdf4" stroke="#15803d" stroke-width="1.8"/>
+  <text x="124" y="422" class="lab" text-anchor="start" style="font-size:12px;fill:#15803d">qemu-kvm process = the VM</text>
+  <rect x="130" y="480" width="360" height="268" rx="12" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="144" y="502" class="lab" text-anchor="start" style="font-size:12px;fill:#15803d">guest kernel 6.8.0-142 (Ubuntu 24.04.5)</text>
+  <text x="70" y="196" class="xs" text-anchor="start" style="font-weight:600">kernel: KVM (kvm_intel nested=Y), /dev/kvm</text>
+  <text x="70" y="214" class="xs" text-anchor="start">host processes: kubelet, CRI-O, kube-apiserver, etcd,</text>
+  <text x="70" y="230" class="xs" text-anchor="start">virt-handler, flanneld, EBS CSI node plugin</text>
+  <text x="110" y="342" class="xs" text-anchor="start">virt-launcher, virtqemud, virtlogd</text>
+  <text x="110" y="358" class="xs" text-anchor="start">+ sidecar container guest-console-log</text>
+  <text x="130" y="440" class="xs" text-anchor="start">vCPU threads run guest code on /dev/kvm</text>
+  <rect x="150" y="520" width="320" height="52" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="310.0" y="541.57" class="t" text-anchor="middle" style="font-size:13.5px">systemd, qemu-guest-agent</text>
+  <text x="310.0" y="559.43" class="s" text-anchor="middle" style="font-size:11.5px">guest processes; own kernel, not the node's</text>
+  <rect x="150" y="586" width="320" height="52" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="310.0" y="607.57" class="t" text-anchor="middle" style="font-size:13.5px">nginx 1.24.0 :80</text>
+  <text x="310.0" y="625.43" class="s" text-anchor="middle" style="font-size:11.5px">what the user's curl reaches</text>
+  <rect x="150" y="652" width="320" height="76" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="310.0" y="676.82" class="t" text-anchor="middle" style="font-size:13.5px">enp1s0 10.0.2.2  |  /dev/vda</text>
+  <text x="310.0" y="694.68" class="s" text-anchor="middle" style="font-size:11.5px">virtio-net &lt;- tap0 in the Pod</text>
+  <text x="310.0" y="712.18" class="s" text-anchor="middle" style="font-size:11.5px">virtio-blk &lt;- /dev/rootdisk &lt;- EBS</text>
+  <rect x="620" y="108" width="550" height="108" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="634" y="148.46" class="t" text-anchor="start" style="font-size:15.5px">Is the VM a container?</text>
+  <text x="634" y="167.5" class="s" text-anchor="start" style="font-size:12.5px">No. The VM is the qemu-kvm process inside the compute container.</text>
+  <text x="634" y="186.0" class="s" text-anchor="start" style="font-size:12.5px">The guest has its own kernel (6.8); the node runs 5.14.</text>
+  <circle cx="620" cy="108" r="14" fill="#6d28d9"/>
+  <text x="620" y="113" class="pill" text-anchor="middle" style="font-size:13px">Q</text>
+  <rect x="620" y="230" width="550" height="108" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="634" y="270.46" class="t" text-anchor="start" style="font-size:15.5px">Where does the hypervisor run?</text>
+  <text x="634" y="289.5" class="s" text-anchor="start" style="font-size:12.5px">KVM is in the EC2 node's kernel (nested on Nitro, /dev/kvm).</text>
+  <text x="634" y="308.0" class="s" text-anchor="start" style="font-size:12.5px">QEMU is a user-space process inside the launcher Pod.</text>
+  <circle cx="620" cy="230" r="14" fill="#6d28d9"/>
+  <text x="620" y="235" class="pill" text-anchor="middle" style="font-size:13px">Q</text>
+  <rect x="620" y="352" width="550" height="108" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="634" y="392.46" class="t" text-anchor="start" style="font-size:15.5px">What does Kubernetes schedule?</text>
+  <text x="634" y="411.5" class="s" text-anchor="start" style="font-size:12.5px">The virt-launcher Pod: requests 4372Mi memory and 200m CPU.</text>
+  <text x="634" y="430.0" class="s" text-anchor="start" style="font-size:12.5px">Kubernetes never sees the guest; KubeVirt maps Pod &lt;-&gt; VM.</text>
+  <circle cx="620" cy="352" r="14" fill="#6d28d9"/>
+  <text x="620" y="357" class="pill" text-anchor="middle" style="font-size:13px">Q</text>
+  <rect x="620" y="474" width="550" height="108" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="634" y="514.46" class="t" text-anchor="start" style="font-size:15.5px">Who drives libvirt?</text>
+  <text x="634" y="533.5" class="s" text-anchor="start" style="font-size:12.5px">virt-handler (node agent) instructs virt-launcher in the Pod;</text>
+  <text x="634" y="552.0" class="s" text-anchor="start" style="font-size:12.5px">virtqemud in the Pod starts and controls qemu-kvm.</text>
+  <circle cx="620" cy="474" r="14" fill="#6d28d9"/>
+  <text x="620" y="479" class="pill" text-anchor="middle" style="font-size:13px">Q</text>
+  <rect x="620" y="596" width="550" height="108" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="634" y="636.46" class="t" text-anchor="start" style="font-size:15.5px">Where is the disk?</text>
+  <text x="634" y="655.5" class="s" text-anchor="start" style="font-size:12.5px">On EBS vol-0d94fba4ddd3d84d2, attached to the node as /dev/xvdaa,</text>
+  <text x="634" y="674.0" class="s" text-anchor="start" style="font-size:12.5px">given to the Pod as /dev/rootdisk, seen by the guest as vda.</text>
+  <circle cx="620" cy="596" r="14" fill="#6d28d9"/>
+  <text x="620" y="601" class="pill" text-anchor="middle" style="font-size:13px">Q</text>
+  <rect x="620" y="718" width="550" height="108" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="634" y="758.46" class="t" text-anchor="start" style="font-size:15.5px">Where is the network?</text>
+  <text x="634" y="777.5" class="s" text-anchor="start" style="font-size:12.5px">Pod IP 10.244.0.30 on flannel; guest 10.0.2.2 behind masquerade</text>
+  <text x="634" y="796.0" class="s" text-anchor="start" style="font-size:12.5px">inside the Pod; the outside world uses NodePort 30080.</text>
+  <circle cx="620" cy="718" r="14" fill="#6d28d9"/>
+  <text x="620" y="723" class="pill" text-anchor="middle" style="font-size:13px">Q</text>
+</svg>

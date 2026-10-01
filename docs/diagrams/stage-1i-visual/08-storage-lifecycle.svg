@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1010" viewBox="0 0 1200 1010" role="img" aria-labelledby="title desc">
+  <title id="title">Storage lifecycle</title>
+  <desc id="desc">Top: the golden VMDK on Windows and the immutable prepared qcow2 on conversion-host-01 (artifacts), plus the temporary node copy and CDI scratch PVC, both deleted. Middle: CDI upload, DataVolume, PVC, PV and EBS gp3 encrypted volume. Lower row: the EBS volume attached to the node, /dev/rootdisk in the virt-launcher Pod, QEMU host_device, guest vda and the Ubuntu filesystems. StorageClass and DataVolume properties: 40 GiB, Block, RWO, gp3 encrypted, WaitForFirstConsumer, reclaim Delete. Bottom: golden artifact versus runtime disk.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m15803d" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#15803d"/></marker><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker><marker id="mc2410c" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#c2410c"/></marker></defs>
+  <rect width="1200" height="1010" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">Storage lifecycle: from a qcow2 file to the guest's vda</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">Golden artifact vs runtime disk - CDI import observed in Gate I4</text>
+  <rect x="1097" y="84" width="73" height="20" rx="10.0" fill="#15803d"/>
+  <text x="1133.5" y="97.96" class="pill" text-anchor="middle" style="font-size:11px">OBSERVED</text>
+  <rect x="30" y="108" width="1140" height="176" rx="14" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.6"/>
+  <text x="48" y="132" class="lab" text-anchor="start">ARTIFACTS (files)</text>
+  <rect x="48" y="146" width="250" height="120" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="173.0" y="183.05" class="t" text-anchor="middle" style="font-size:15px">Golden VMDK (1E)</text>
+  <text x="173.0" y="202.0" class="s" text-anchor="middle" style="font-size:12.5px">on Windows, never modified</text>
+  <text x="173.0" y="220.5" class="s" text-anchor="middle" style="font-size:12.5px">40 GiB flat extent</text>
+  <text x="173.0" y="239.0" class="s" text-anchor="middle" style="font-size:12.5px">SHA256 verified x3</text>
+  <rect x="229" y="136" width="59" height="20" rx="10.0" fill="#15803d"/>
+  <text x="258.5" y="149.96" class="pill" text-anchor="middle" style="font-size:11px">GOLDEN</text>
+  <path d="M300,206 L330,206" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="332" y="146" width="300" height="120" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="482.0" y="183.05" class="t" text-anchor="middle" style="font-size:15px">Prepared qcow2 (I1)</text>
+  <text x="482.0" y="202.0" class="s" text-anchor="middle" style="font-size:12.5px">conversion-host-01, 0444 + chattr +i</text>
+  <text x="482.0" y="220.5" class="s" text-anchor="middle" style="font-size:12.5px">2,932,998,144 bytes; 40 GiB virtual</text>
+  <text x="482.0" y="239.0" class="s" text-anchor="middle" style="font-size:12.5px">sha256 2b30e195...93b2</text>
+  <rect x="514" y="136" width="108" height="20" rx="10.0" fill="#15803d"/>
+  <text x="568.0" y="149.96" class="pill" text-anchor="middle" style="font-size:11px">AUTHORITATIVE</text>
+  <path d="M634,206 L664,206" fill="none" stroke="#15803d" stroke-width="2.4" marker-end="url(#m15803d)"/>
+  <rect x="666" y="146" width="236" height="120" rx="10" fill="#f1f5f9" stroke="#64748b" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="784.0" y="183.05" class="t" text-anchor="middle" style="font-size:15px">Temporary node copy</text>
+  <text x="784.0" y="202.0" class="s" text-anchor="middle" style="font-size:12.5px">SFTP, 321 s, sha256 matched</text>
+  <text x="784.0" y="220.5" class="s" text-anchor="middle" style="font-size:12.5px">fed virtctl image-upload</text>
+  <text x="784.0" y="239.0" class="s" text-anchor="middle" style="font-size:12.5px">deleted 04:06:51</text>
+  <rect x="826" y="136" width="66" height="20" rx="10.0" fill="#64748b"/>
+  <text x="859.0" y="149.96" class="pill" text-anchor="middle" style="font-size:11px">DELETED</text>
+  <rect x="922" y="146" width="230" height="120" rx="10" fill="#f1f5f9" stroke="#64748b" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="1037.0" y="183.05" class="t" text-anchor="middle" style="font-size:15px">CDI scratch PVC</text>
+  <text x="1037.0" y="202.0" class="s" text-anchor="middle" style="font-size:12.5px">43Gi Filesystem</text>
+  <text x="1037.0" y="220.5" class="s" text-anchor="middle" style="font-size:12.5px">upload landed here first</text>
+  <text x="1037.0" y="239.0" class="s" text-anchor="middle" style="font-size:12.5px">EBS deleted 04:04:21</text>
+  <rect x="1076" y="136" width="66" height="20" rx="10.0" fill="#64748b"/>
+  <text x="1109.0" y="149.96" class="pill" text-anchor="middle" style="font-size:11px">DELETED</text>
+  <path d="M784,268 L784,290 L130,290 L130,318" fill="none" stroke="#15803d" stroke-width="2.4" marker-end="url(#m15803d)"/>
+  <text x="450" y="284" class="xs halo" text-anchor="middle" style="font-weight:700">upload through port-forwarded cdi-uploadproxy (127.0.0.1:18443 on the node)</text>
+  <text x="48" y="312" class="lab" text-anchor="start" style="fill:#1d4ed8">KUBERNETES OBJECTS</text>
+  <rect x="30" y="322" width="210" height="112" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="135.0" y="355.05" class="t" text-anchor="middle" style="font-size:15px">CDI upload + convert</text>
+  <text x="135.0" y="374.0" class="s" text-anchor="middle" style="font-size:12.5px">virtctl image-upload</text>
+  <text x="135.0" y="392.5" class="s" text-anchor="middle" style="font-size:12.5px">qemu-img convert -O raw</text>
+  <text x="135.0" y="411.0" class="s" text-anchor="middle" style="font-size:12.5px">03:57:34 to 04:03:27</text>
+  <path d="M242,378 L258,378" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="260" y="322" width="210" height="112" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="365.0" y="355.05" class="t" text-anchor="middle" style="font-size:15px">DataVolume</text>
+  <text x="365.0" y="374.0" class="s" text-anchor="middle" style="font-size:12.5px">legacy-source-vm-disk</text>
+  <text x="365.0" y="392.5" class="s" text-anchor="middle" style="font-size:12.5px">source: upload; Succeeded</text>
+  <text x="365.0" y="411.0" class="s" text-anchor="middle" style="font-size:12.5px">standalone (no owner)</text>
+  <path d="M472,378 L488,378" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="490" y="322" width="210" height="112" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="595.0" y="355.05" class="t" text-anchor="middle" style="font-size:15px">PVC</text>
+  <text x="595.0" y="374.0" class="s" text-anchor="middle" style="font-size:12.5px">Bound, 40Gi</text>
+  <text x="595.0" y="392.5" class="s" text-anchor="middle" style="font-size:12.5px">volumeMode Block, RWO</text>
+  <text x="595.0" y="411.0" class="s" text-anchor="middle" style="font-size:12.5px">owner: the DataVolume</text>
+  <path d="M702,378 L718,378" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="720" y="322" width="210" height="112" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="825.0" y="355.05" class="t" text-anchor="middle" style="font-size:15px">PV</text>
+  <text x="825.0" y="374.0" class="s" text-anchor="middle" style="font-size:12.5px">pvc-87c920c1-...</text>
+  <text x="825.0" y="392.5" class="s" text-anchor="middle" style="font-size:12.5px">reclaimPolicy Delete</text>
+  <text x="825.0" y="411.0" class="s" text-anchor="middle" style="font-size:12.5px">zone ap-south-1a</text>
+  <path d="M932,378 L948,378" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="950" y="322" width="210" height="112" rx="10" fill="#fff7ed" stroke="#c2410c" stroke-width="1.8"/>
+  <text x="1055.0" y="355.05" class="t" text-anchor="middle" style="font-size:15px">EBS volume</text>
+  <text x="1055.0" y="374.0" class="s" text-anchor="middle" style="font-size:12.5px">vol-0d94fba4ddd3d84d2</text>
+  <text x="1055.0" y="392.5" class="s" text-anchor="middle" style="font-size:12.5px">gp3, encrypted (aws/ebs)</text>
+  <text x="1055.0" y="411.0" class="s" text-anchor="middle" style="font-size:12.5px">3000 IOPS, 125 MiB/s</text>
+  <path d="M1065,436 L1065,496" fill="none" stroke="#c2410c" stroke-width="2.4" marker-end="url(#mc2410c)"/>
+  <text x="1076" y="470" class="xs halo" text-anchor="start" style="font-weight:700">attach</text>
+  <text x="48" y="488" class="lab" text-anchor="start" style="fill:#15803d">RUNTIME (read right to left)</text>
+  <rect x="30" y="498" width="210" height="112" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="135.0" y="531.05" class="t" text-anchor="middle" style="font-size:15px">Ubuntu filesystems</text>
+  <text x="135.0" y="550.0" class="s" text-anchor="middle" style="font-size:12.5px">/ = vda2 ext4 db8b3bb3...</text>
+  <text x="135.0" y="568.5" class="s" text-anchor="middle" style="font-size:12.5px">/boot/efi = vda1 vfat</text>
+  <text x="135.0" y="587.0" class="s" text-anchor="middle" style="font-size:12.5px">mounted by UUID</text>
+  <path d="M258,554 L242,554" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="260" y="498" width="210" height="112" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="365.0" y="531.05" class="t" text-anchor="middle" style="font-size:15px">guest /dev/vda</text>
+  <text x="365.0" y="550.0" class="s" text-anchor="middle" style="font-size:12.5px">virtio-blk-pci</text>
+  <text x="365.0" y="568.5" class="s" text-anchor="middle" style="font-size:12.5px">GPT: vda1 + vda2</text>
+  <text x="365.0" y="587.0" class="s" text-anchor="middle" style="font-size:12.5px">same layout as source sda</text>
+  <path d="M488,554 L472,554" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="490" y="498" width="210" height="112" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="595.0" y="531.05" class="t" text-anchor="middle" style="font-size:15px">QEMU host_device</text>
+  <text x="595.0" y="550.0" class="s" text-anchor="middle" style="font-size:12.5px">libvirt disk type=block</text>
+  <text x="595.0" y="568.5" class="s" text-anchor="middle" style="font-size:12.5px">raw, cache=none</text>
+  <text x="595.0" y="587.0" class="s" text-anchor="middle" style="font-size:12.5px">io=native, discard=unmap</text>
+  <path d="M718,554 L702,554" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="720" y="498" width="210" height="112" rx="10" fill="#ecfeff" stroke="#0e7490" stroke-width="1.8"/>
+  <text x="825.0" y="531.05" class="t" text-anchor="middle" style="font-size:15px">/dev/rootdisk</text>
+  <text x="825.0" y="550.0" class="s" text-anchor="middle" style="font-size:12.5px">block device in the</text>
+  <text x="825.0" y="568.5" class="s" text-anchor="middle" style="font-size:12.5px">virt-launcher compute</text>
+  <text x="825.0" y="587.0" class="s" text-anchor="middle" style="font-size:12.5px">container (volumeDevice)</text>
+  <path d="M948,554 L932,554" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="950" y="498" width="210" height="112" rx="10" fill="#fff7ed" stroke="#c2410c" stroke-width="1.8"/>
+  <text x="1055.0" y="531.05" class="t" text-anchor="middle" style="font-size:15px">Attached to node</text>
+  <text x="1055.0" y="550.0" class="s" text-anchor="middle" style="font-size:12.5px">/dev/xvdaa, in-use</text>
+  <text x="1055.0" y="568.5" class="s" text-anchor="middle" style="font-size:12.5px">DeleteOnTermination</text>
+  <text x="1055.0" y="587.0" class="s" text-anchor="middle" style="font-size:12.5px">false</text>
+  <text x="48" y="650" class="lab" text-anchor="start">STORAGECLASS ebs-gp3-encrypted + DATAVOLUME SPEC</text>
+  <rect x="30" y="662" width="272" height="60" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="166.0" y="687.48" class="t" text-anchor="middle" style="font-size:14px">40 GiB</text>
+  <text x="166.0" y="705.84" class="s" text-anchor="middle" style="font-size:12px">the source disk size</text>
+  <rect x="317" y="662" width="272" height="60" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="453.0" y="687.48" class="t" text-anchor="middle" style="font-size:14px">volumeMode: Block</text>
+  <text x="453.0" y="705.84" class="s" text-anchor="middle" style="font-size:12px">raw block, no filesystem layer</text>
+  <rect x="604" y="662" width="272" height="60" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="740.0" y="687.48" class="t" text-anchor="middle" style="font-size:14px">ReadWriteOnce</text>
+  <text x="740.0" y="705.84" class="s" text-anchor="middle" style="font-size:12px">one node: LiveMigratable=False</text>
+  <rect x="891" y="662" width="272" height="60" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="1027.0" y="687.48" class="t" text-anchor="middle" style="font-size:14px">gp3, encrypted: true</text>
+  <text x="1027.0" y="705.84" class="s" text-anchor="middle" style="font-size:12px">aws/ebs KMS key</text>
+  <rect x="30" y="734" width="272" height="60" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="166.0" y="759.48" class="t" text-anchor="middle" style="font-size:14px">WaitForFirstConsumer</text>
+  <text x="166.0" y="777.84" class="s" text-anchor="middle" style="font-size:12px">+ bind.immediate annotation</text>
+  <rect x="317" y="734" width="272" height="60" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="453.0" y="759.48" class="t" text-anchor="middle" style="font-size:14px">reclaimPolicy: Delete</text>
+  <text x="453.0" y="777.84" class="s" text-anchor="middle" style="font-size:12px">PV deletion removes the EBS</text>
+  <rect x="604" y="734" width="272" height="60" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="740.0" y="759.48" class="t" text-anchor="middle" style="font-size:14px">ebs.csi.aws.com</text>
+  <text x="740.0" y="777.84" class="s" text-anchor="middle" style="font-size:12px">CSI-created, not in Terraform</text>
+  <rect x="891" y="734" width="272" height="60" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="1027.0" y="759.48" class="t" text-anchor="middle" style="font-size:14px">allowVolumeExpansion</text>
+  <text x="1027.0" y="777.84" class="s" text-anchor="middle" style="font-size:12px">true (not used)</text>
+  <rect x="30" y="820" width="560" height="160" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="44" y="867.12" class="t" text-anchor="start" style="font-size:16px">GOLDEN / PREPARED ARTIFACT</text>
+  <text x="44" y="886.66" class="s" text-anchor="start" style="font-size:13px">files on the laptop: golden VMDK + prepared qcow2</text>
+  <text x="44" y="905.66" class="s" text-anchor="start" style="font-size:13px">immutable; never written by any gate</text>
+  <text x="44" y="924.66" class="s" text-anchor="start" style="font-size:13px">the rollback point: can be re-imported any time</text>
+  <text x="44" y="943.66" class="s" text-anchor="start" style="font-size:13px">not running, not on AWS</text>
+  <rect x="610" y="820" width="560" height="160" rx="10" fill="#fff7ed" stroke="#c2410c" stroke-width="1.8"/>
+  <text x="624" y="867.12" class="t" text-anchor="start" style="font-size:16px">RUNTIME DISK (EBS vol-0d94fba4ddd3d84d2)</text>
+  <text x="624" y="886.66" class="s" text-anchor="start" style="font-size:13px">writable: the running guest changes it (logs, timers)</text>
+  <text x="624" y="905.66" class="s" text-anchor="start" style="font-size:13px">apt-daily-upgrade already ran inside it at 04:19</text>
+  <text x="624" y="924.66" class="s" text-anchor="start" style="font-size:13px">kept until Gate I5; removed only via DataVolume deletion</text>
+  <text x="624" y="943.66" class="s" text-anchor="start" style="font-size:13px">(I5-D), then reclaim Delete, verified in I5-E; not run</text>
+</svg>

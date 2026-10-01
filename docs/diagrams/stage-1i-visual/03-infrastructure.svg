@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="930" viewBox="0 0 1200 930" role="img" aria-labelledby="title desc">
+  <title id="title">Stage 1I infrastructure</title>
+  <desc id="desc">Left: the laptop. Windows 11 runs VMware Workstation Pro with nested ESXi 8.0.3 (192.168.50.11) hosting kvm-learning-01 (192.168.50.30, jump host), legacy-source-vm (192.168.50.31, source, still running) and conversion-host-01 (192.168.50.32). Right: AWS ap-south-1, VPC 10.40.0.0/16, public subnet 10.40.1.0/24, a security group allowing only TCP 22 and 30080 from the operator /32, and the EC2 m8i.xlarge node (10.40.1.10, public 3.6.94.104) running Kubernetes 1.36.5, CRI-O 1.36.6, Flannel, KubeVirt 1.9.0, CDI 1.66.1 and the EBS CSI driver. TCP 6443 is not public; the API is reached through an SSH tunnel.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m15803d" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#15803d"/></marker><marker id="m1d4ed8" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#1d4ed8"/></marker><marker id="m6d28d9" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#6d28d9"/></marker><marker id="mc2410c" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#c2410c"/></marker></defs>
+  <rect width="1200" height="930" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">Infrastructure: where every piece actually runs</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">Laptop lab (source, conversion, jump host) + a disposable AWS target - real names and addresses</text>
+  <rect x="1097" y="84" width="73" height="20" rx="10.0" fill="#15803d"/>
+  <text x="1133.5" y="97.96" class="pill" text-anchor="middle" style="font-size:11px">OBSERVED</text>
+  <rect x="30" y="110" width="500" height="790" rx="14" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.6"/>
+  <text x="48" y="136" class="lab" text-anchor="start">LAPTOP - Windows 11 (operator)</text>
+  <rect x="50" y="150" width="460" height="74" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="280.0" y="173.3" class="t" text-anchor="middle" style="font-size:15px">Windows 11 host</text>
+  <text x="280.0" y="192.25" class="s" text-anchor="middle" style="font-size:12.5px">browser + curl (HTTP check), ssh to kvm-learning-01</text>
+  <text x="280.0" y="210.75" class="s" text-anchor="middle" style="font-size:12.5px">golden VMDK (Stage 1E) stored here, outside VMware</text>
+  <rect x="50" y="240" width="460" height="644" rx="14" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.6"/>
+  <text x="66" y="264" class="lab" text-anchor="start" style="fill:#1d4ed8">VMWARE WORKSTATION PRO</text>
+  <text x="66" y="283" class="xs" text-anchor="start">VMnet8 NAT 192.168.50.0/24</text>
+  <rect x="66" y="298" width="428" height="572" rx="12" fill="#ffffff" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="82" y="322" class="lab" text-anchor="start" style="fill:#1d4ed8">NESTED ESXi 8.0.3</text>
+  <text x="82" y="341" class="xs" text-anchor="start">esxi-8-lab 192.168.50.11</text>
+  <rect x="84" y="360" width="392" height="150" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="280.0" y="402.8" class="t" text-anchor="middle" style="font-size:15px">kvm-learning-01   192.168.50.30</text>
+  <text x="280.0" y="421.75" class="s" text-anchor="middle" style="font-size:12.5px">jump host: kubectl + virtctl</text>
+  <text x="280.0" y="440.25" class="s" text-anchor="middle" style="font-size:12.5px">API tunnel -&gt; 127.0.0.1:16443 (systemd user unit)</text>
+  <text x="280.0" y="458.75" class="s" text-anchor="middle" style="font-size:12.5px">Headlamp port-forward 127.0.0.1:18081</text>
+  <text x="280.0" y="477.25" class="s" text-anchor="middle" style="font-size:12.5px">guest SSH via virtctl port-forward (API)</text>
+  <rect x="386" y="350" width="80" height="20" rx="10.0" fill="#1d4ed8"/>
+  <text x="426.0" y="363.96" class="pill" text-anchor="middle" style="font-size:11px">JUMP HOST</text>
+  <rect x="84" y="532" width="392" height="124" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="280.0" y="571.05" class="t" text-anchor="middle" style="font-size:15px">legacy-source-vm   192.168.50.31</text>
+  <text x="280.0" y="590.0" class="s" text-anchor="middle" style="font-size:12.5px">the SOURCE: Ubuntu 24.04.5 + nginx</text>
+  <text x="280.0" y="608.5" class="s" text-anchor="middle" style="font-size:12.5px">still running; not contacted in Stage 1I</text>
+  <text x="280.0" y="627.0" class="s" text-anchor="middle" style="font-size:12.5px">point-in-time copy, no cutover</text>
+  <rect x="407" y="522" width="59" height="20" rx="10.0" fill="#15803d"/>
+  <text x="436.5" y="535.96" class="pill" text-anchor="middle" style="font-size:11px">SOURCE</text>
+  <rect x="84" y="678" width="392" height="176" rx="10" fill="#ede9fe" stroke="#6d28d9" stroke-width="1.8"/>
+  <text x="280.0" y="724.55" class="t" text-anchor="middle" style="font-size:15px">conversion-host-01   192.168.50.32</text>
+  <text x="280.0" y="743.5" class="s" text-anchor="middle" style="font-size:12.5px">authoritative prepared qcow2 (0444, chattr +i)</text>
+  <text x="280.0" y="762.0" class="s" text-anchor="middle" style="font-size:12.5px">I1 offline preparation, I2 QEMU/KVM boot test</text>
+  <text x="280.0" y="780.5" class="s" text-anchor="middle" style="font-size:12.5px">I4: outbound SFTP straight to the node</text>
+  <text x="280.0" y="799.0" class="s" text-anchor="middle" style="font-size:12.5px">temporary transfer key: removed + shredded</text>
+  <text x="280.0" y="817.5" class="s" text-anchor="middle" style="font-size:12.5px">evidence file kept here</text>
+  <rect x="379" y="668" width="87" height="20" rx="10.0" fill="#6d28d9"/>
+  <text x="422.5" y="681.96" class="pill" text-anchor="middle" style="font-size:11px">CONVERSION</text>
+  <rect x="546" y="110" width="124" height="790" rx="12" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.6" stroke-dasharray="3 4"/>
+  <text x="608" y="136" class="lab" text-anchor="middle">INTERNET</text>
+  <text x="608" y="156" class="xs" text-anchor="middle">one operator /32</text>
+  <text x="608" y="172" class="xs" text-anchor="middle">egress (shared)</text>
+  <rect x="686" y="110" width="484" height="790" rx="14" fill="#fff7ed" stroke="#c2410c" stroke-width="1.6"/>
+  <text x="704" y="136" class="lab" text-anchor="start" style="fill:#c2410c">AWS ap-south-1 (Mumbai)</text>
+  <rect x="700" y="150" width="456" height="700" rx="12" fill="#ffffff" stroke="#c2410c" stroke-width="1.6"/>
+  <text x="716" y="174" class="lab" text-anchor="start" style="fill:#c2410c">VPC 10.40.0.0/16</text>
+  <text x="716" y="192" class="xs" text-anchor="start">internet gateway; no NAT GW, LB or Elastic IP</text>
+  <rect x="714" y="204" width="428" height="504" rx="12" fill="#fffbeb" stroke="#fdba74" stroke-width="1.6"/>
+  <text x="730" y="226" class="lab" text-anchor="start" style="fill:#b45309">PUBLIC SUBNET 10.40.1.0/24 - ap-south-1a</text>
+  <rect x="726" y="238" width="404" height="456" rx="12" fill="#fef2f2" stroke="#b91c1c" stroke-width="1.8" stroke-dasharray="7 4"/>
+  <text x="742" y="260" class="lab" text-anchor="start" style="fill:#b91c1c">SECURITY GROUP</text>
+  <text x="742" y="278" class="xs" text-anchor="start" style="font-weight:600">in: TCP 22 + TCP 30080 from operator /32 only</text>
+  <rect x="740" y="290" width="376" height="392" rx="10" fill="#ffffff" stroke="#c2410c" stroke-width="1.8"/>
+  <text x="756" y="312" class="t" text-anchor="start" style="font-size:14.5px">EC2 i-012921f12ca5f9cfe   m8i.xlarge</text>
+  <text x="756" y="331" class="xs" text-anchor="start">4 vCPU, 16 GiB, nested virtualization (VT-x)</text>
+  <text x="756" y="348" class="xs" text-anchor="start">CentOS Stream 9, kernel 5.14.0-754.el9</text>
+  <text x="756" y="365" class="xs" text-anchor="start" style="font-weight:700">private 10.40.1.10   public 3.6.94.104</text>
+  <rect x="754" y="380" width="348" height="34" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="928.0" y="401.16" class="t" text-anchor="middle" style="font-size:13px">kube-apiserver :6443 (private; SSH tunnel only)</text>
+  <rect x="754" y="422" width="348" height="34" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="928.0" y="443.16" class="t" text-anchor="middle" style="font-size:13px">Kubernetes v1.36.5 - kubeadm, 1 node, no taints</text>
+  <rect x="754" y="464" width="348" height="34" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="928.0" y="485.16" class="t" text-anchor="middle" style="font-size:13px">CRI-O 1.36.6 + Flannel v0.28.9 (10.244.0.0/16)</text>
+  <rect x="754" y="506" width="348" height="34" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="928.0" y="527.16" class="t" text-anchor="middle" style="font-size:13px">KubeVirt v1.9.0 + CDI v1.66.1</text>
+  <rect x="754" y="548" width="348" height="34" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="928.0" y="569.16" class="t" text-anchor="middle" style="font-size:13px">EBS CSI (manifests v1.66.0, driver v1.65.0)</text>
+  <rect x="754" y="590" width="348" height="34" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="928.0" y="611.16" class="t" text-anchor="middle" style="font-size:13px">NodePort 30080 -&gt; legacy-source-vm-http</text>
+  <rect x="754" y="632" width="348" height="34" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="928.0" y="653.16" class="t" text-anchor="middle" style="font-size:13px">VM legacy-source-vm-migrated (launcher Pod)</text>
+  <rect x="714" y="724" width="428" height="110" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="928.0" y="755.89" class="t" text-anchor="middle" style="font-size:14.5px">EBS volumes (encrypted gp3)</text>
+  <text x="928.0" y="774.75" class="s" text-anchor="middle" style="font-size:12.5px">root vol-0077e3fb0d4c877a1, 50 GiB (Terraform)</text>
+  <text x="928.0" y="793.25" class="s" text-anchor="middle" style="font-size:12.5px">VM disk vol-0d94fba4ddd3d84d2, 40 GiB</text>
+  <text x="928.0" y="811.75" class="s" text-anchor="middle" style="font-size:12.5px">(created by EBS CSI; not in Terraform state)</text>
+  <path d="M928,684 L928,721" fill="none" stroke="#c2410c" stroke-width="2.2" stroke-dasharray="2 5" marker-end="url(#mc2410c)" stroke-linecap="round"/>
+  <text x="938" y="707" class="xs halo" text-anchor="start" style="font-weight:600">attached</text>
+  <text x="704" y="876" class="xs" text-anchor="start" style="font-weight:600">IAM instance profile: EBS CSI permissions only; no AWS keys on the node</text>
+  <path d="M510,187 L562,187 L562,607 L751,607" fill="none" stroke="#15803d" stroke-width="2.6" marker-end="url(#m15803d)"/>
+  <text x="608" y="210" class="xs halo" text-anchor="middle" style="font-weight:700">TCP 30080</text>
+  <text x="608" y="226" class="xs halo" text-anchor="middle">HTTP check</text>
+  <path d="M476,397 L626,397 L626,397 L751,397" fill="none" stroke="#1d4ed8" stroke-width="2.6" marker-end="url(#m1d4ed8)"/>
+  <text x="608" y="420" class="xs halo" text-anchor="middle" style="font-weight:700">TCP 22</text>
+  <text x="608" y="436" class="xs halo" text-anchor="middle">SSH tunnel</text>
+  <text x="608" y="452" class="xs halo" text-anchor="middle">-&gt; :6443</text>
+  <path d="M476,760 L650,760 L650,675 L737,675" fill="none" stroke="#6d28d9" stroke-width="2.4" stroke-dasharray="9 6" marker-end="url(#m6d28d9)"/>
+  <text x="608" y="786" class="xs halo" text-anchor="middle" style="font-weight:700">TCP 22 SFTP</text>
+  <text x="608" y="802" class="xs halo" text-anchor="middle">(I4 only)</text>
+  <path d="M556,520 L712,520" fill="none" stroke="#b91c1c" stroke-width="2.4" stroke-dasharray="9 6"/>
+  <path d="M715,509 L737,531 M737,509 L715,531" stroke="#b91c1c" stroke-width="5" stroke-linecap="round"/>
+  <text x="608" y="510" class="xs halo" text-anchor="middle" style="fill:#b91c1c;font-weight:700">TCP 6443</text>
+  <text x="608" y="544" class="xs halo" text-anchor="middle" style="fill:#b91c1c">no SG rule</text>
+</svg>

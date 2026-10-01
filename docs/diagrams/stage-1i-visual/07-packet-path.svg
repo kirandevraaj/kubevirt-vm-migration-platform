@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1078" viewBox="0 0 1200 1078" role="img" aria-labelledby="title desc">
+  <title id="title">Packet path of one HTTP request</title>
+  <desc id="desc">Windows curl to 3.6.94.104:30080, through the security group, the EC2 node, NodePort 30080, Service legacy-source-vm-http (ClusterIP 10.108.249.186:80), endpoint 10.244.0.30:80, the virt-launcher Pod, masquerade DNAT, k6t-eth0, tap0 and virtio-net to the guest at 10.0.2.2:80 and nginx, which returns HTTP 200 with the source page hash. Side panels explain the pod IP 10.244.0.30 versus the guest IP 10.0.2.2, and why curling 10.0.2.2 from the jump host is not the external test.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m15803d" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#15803d"/></marker><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker></defs>
+  <rect width="1200" height="1078" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">One HTTP request: Windows to nginx</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">External validation path observed in Gate I4: curl http://3.6.94.104:30080/ -&gt; HTTP 200</text>
+  <rect x="1097" y="84" width="73" height="20" rx="10.0" fill="#15803d"/>
+  <text x="1133.5" y="97.96" class="pill" text-anchor="middle" style="font-size:11px">OBSERVED</text>
+  <rect x="40" y="102" width="610" height="140" rx="12" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.4"/>
+  <text x="640" y="124" class="lab" text-anchor="end" style="font-size:11.5px;fill:#334155">INTERNET</text>
+  <rect x="40" y="254" width="610" height="140" rx="12" fill="#fff7ed" stroke="#fdba74" stroke-width="1.4"/>
+  <text x="640" y="276" class="lab" text-anchor="end" style="font-size:11.5px;fill:#c2410c">AWS VPC</text>
+  <rect x="40" y="406" width="610" height="210" rx="12" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.4"/>
+  <text x="640" y="428" class="lab" text-anchor="end" style="font-size:11.5px;fill:#1d4ed8">KUBERNETES</text>
+  <rect x="40" y="628" width="610" height="210" rx="12" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="1.4"/>
+  <text x="640" y="650" class="lab" text-anchor="end" style="font-size:11.5px;fill:#0e7490">LAUNCHER POD</text>
+  <rect x="40" y="850" width="610" height="210" rx="12" fill="#f0fdf4" stroke="#86efac" stroke-width="1.4"/>
+  <text x="640" y="872" class="lab" text-anchor="end" style="font-size:11.5px;fill:#15803d">GUEST VM</text>
+  <rect x="60" y="110" width="470" height="54" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="295.0" y="132.55" class="t" text-anchor="middle" style="font-size:15px">Windows workstation: curl</text>
+  <text x="295.0" y="151.5" class="s" text-anchor="middle" style="font-size:12.5px">from the operator /32 (laptop egress)</text>
+  <rect x="60" y="180" width="470" height="54" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="295.0" y="202.55" class="t" text-anchor="middle" style="font-size:15px">Public IP 3.6.94.104 : TCP 30080</text>
+  <text x="295.0" y="221.5" class="s" text-anchor="middle" style="font-size:12.5px">EC2 public IPv4, via the internet gateway</text>
+  <path d="M295,165 L295,178" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="60" y="262" width="470" height="54" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <text x="295.0" y="284.55" class="t" text-anchor="middle" style="font-size:15px">Security group sg-06b562ca7eacb63cb</text>
+  <text x="295.0" y="303.5" class="s" text-anchor="middle" style="font-size:12.5px">allows TCP 30080 from the operator /32 only</text>
+  <path d="M295,235 L295,260" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="60" y="332" width="470" height="54" rx="10" fill="#fff7ed" stroke="#c2410c" stroke-width="1.8"/>
+  <text x="295.0" y="354.55" class="t" text-anchor="middle" style="font-size:15px">EC2 node 10.40.1.10</text>
+  <text x="295.0" y="373.5" class="s" text-anchor="middle" style="font-size:12.5px">ip-10-40-1-10 (the only node)</text>
+  <path d="M295,317 L295,330" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="60" y="414" width="470" height="54" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="295.0" y="436.55" class="t" text-anchor="middle" style="font-size:15px">NodePort 30080</text>
+  <text x="295.0" y="455.5" class="s" text-anchor="middle" style="font-size:12.5px">the cluster's only NodePort (kube-proxy)</text>
+  <path d="M295,387 L295,412" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="60" y="484" width="470" height="54" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="295.0" y="506.55" class="t" text-anchor="middle" style="font-size:15px">Service legacy-source-vm-http</text>
+  <text x="295.0" y="525.5" class="s" text-anchor="middle" style="font-size:12.5px">ClusterIP 10.108.249.186 port 80 (live check)</text>
+  <path d="M295,469 L295,482" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="60" y="554" width="470" height="54" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="295.0" y="576.55" class="t" text-anchor="middle" style="font-size:15px">Endpoint 10.244.0.30:80</text>
+  <text x="295.0" y="595.5" class="s" text-anchor="middle" style="font-size:12.5px">selector project15/vm: legacy-source-vm-migrated</text>
+  <path d="M295,539 L295,552" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="60" y="636" width="470" height="54" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="295.0" y="658.55" class="t" text-anchor="middle" style="font-size:15px">virt-launcher Pod eth0 10.244.0.30</text>
+  <text x="295.0" y="677.5" class="s" text-anchor="middle" style="font-size:12.5px">Pod network namespace</text>
+  <path d="M295,609 L295,634" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="60" y="706" width="470" height="54" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="295.0" y="728.55" class="t" text-anchor="middle" style="font-size:15px">masquerade: nftables DNAT</text>
+  <text x="295.0" y="747.5" class="s" text-anchor="middle" style="font-size:12.5px">DNAT TCP 80 -&gt; 10.0.2.2:80; egress from 10.0.2.2 masqueraded</text>
+  <path d="M295,691 L295,704" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="60" y="776" width="470" height="54" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="295.0" y="798.55" class="t" text-anchor="middle" style="font-size:15px">k6t-eth0 10.0.2.1 -&gt; tap0 -&gt; virtio-net</text>
+  <text x="295.0" y="817.5" class="s" text-anchor="middle" style="font-size:12.5px">bridge inside the Pod</text>
+  <path d="M295,761 L295,774" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="60" y="858" width="470" height="54" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="295.0" y="880.55" class="t" text-anchor="middle" style="font-size:15px">guest enp1s0 10.0.2.2 : 80</text>
+  <text x="295.0" y="899.5" class="s" text-anchor="middle" style="font-size:12.5px">Ubuntu 24.04.5, DHCP lease from 10.0.2.1</text>
+  <path d="M295,831 L295,856" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="60" y="928" width="470" height="54" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="295.0" y="950.55" class="t" text-anchor="middle" style="font-size:15px">nginx 1.24.0</text>
+  <text x="295.0" y="969.5" class="s" text-anchor="middle" style="font-size:12.5px">listens on 0.0.0.0:80 and [::]:80</text>
+  <path d="M295,913 L295,926" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="60" y="998" width="470" height="54" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="295.0" y="1020.55" class="t" text-anchor="middle" style="font-size:15px">HTTP/1.1 200 OK</text>
+  <text x="295.0" y="1039.5" class="s" text-anchor="middle" style="font-size:12.5px">267 bytes, sha256 b9826e18...0046 = source page</text>
+  <path d="M295,983 L295,996" fill="none" stroke="#15803d" stroke-width="2.2" marker-end="url(#m15803d)"/>
+  <path d="M544.8,296 L544.8,289.7 A7.2,7.2 0 0 1 559.2,289.7 L559.2,296" fill="none" stroke="#b45309" stroke-width="3.15"/>
+  <rect x="540.3" y="296" width="23.400000000000002" height="18.0" rx="2.7" fill="#b45309"/>
+  <circle cx="552" cy="304.1" r="2.7" fill="#ffffff"/>
+  <rect x="670" y="110" width="500" height="410" rx="14" fill="#ffffff" stroke="#334155" stroke-width="1.6"/>
+  <text x="690" y="138" class="lab" text-anchor="start">TWO ADDRESSES, ONE VM - NOT A CONFLICT</text>
+  <rect x="690" y="154" width="220" height="250" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="800" y="196" class="h" text-anchor="middle" style="font-size:26px;fill:#1d4ed8">10.244.0.30</text>
+  <rect x="770.5" y="210" width="59" height="20" rx="10.0" fill="#1d4ed8"/>
+  <text x="800.0" y="223.96" class="pill" text-anchor="middle" style="font-size:11px">POD IP</text>
+  <text x="800" y="256" class="s" text-anchor="middle" style="font-size:12.5px">Kubernetes side</text>
+  <text x="800" y="282" class="s" text-anchor="middle" style="font-size:12.5px">the launcher Pod on flannel</text>
+  <text x="800" y="308" class="s" text-anchor="middle" style="font-size:12.5px">Service endpoint</text>
+  <text x="800" y="334" class="s" text-anchor="middle" style="font-size:12.5px">VMI status reports it</text>
+  <text x="800" y="360" class="s" text-anchor="middle" style="font-size:12.5px">routable in 10.244.0.0/16</text>
+  <rect x="930" y="154" width="220" height="250" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="1040" y="196" class="h" text-anchor="middle" style="font-size:26px;fill:#15803d">10.0.2.2</text>
+  <rect x="1003.5" y="210" width="73" height="20" rx="10.0" fill="#15803d"/>
+  <text x="1040.0" y="223.96" class="pill" text-anchor="middle" style="font-size:11px">GUEST IP</text>
+  <text x="1040" y="256" class="s" text-anchor="middle" style="font-size:12.5px">guest side (enp1s0)</text>
+  <text x="1040" y="282" class="s" text-anchor="middle" style="font-size:12.5px">DHCP from 10.0.2.1</text>
+  <text x="1040" y="308" class="s" text-anchor="middle" style="font-size:12.5px">guest agent reports it</text>
+  <text x="1040" y="334" class="s" text-anchor="middle" style="font-size:12.5px">lives only inside</text>
+  <text x="1040" y="360" class="s" text-anchor="middle" style="font-size:12.5px">this Pod's namespace</text>
+  <path d="M912,300 L928,300" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <path d="M928,316 L912,316" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <text x="920" y="430" class="s" text-anchor="middle" style="font-size:13px;font-weight:600">Masquerade NAT in the Pod translates between them.</text>
+  <text x="920" y="452" class="s" text-anchor="middle" style="font-size:13px">Different network namespaces, so the two never collide:</text>
+  <text x="920" y="474" class="s" text-anchor="middle" style="font-size:13px">10.0.2.0/24 does not exist on the node or in the VPC.</text>
+  <text x="920" y="500" class="xs" text-anchor="middle">VPC 10.40/16, pods 10.244/16, Services 10.96/12 do not overlap.</text>
+  <rect x="670" y="548" width="500" height="200" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="684" y="597.3" class="t" text-anchor="start" style="font-size:15px">Why curl 10.0.2.2 from the jump host is not the test</text>
+  <text x="684" y="616.25" class="s" text-anchor="start" style="font-size:12.5px">10.0.2.2 is not reachable from kvm-learning-01 (.50.30):</text>
+  <text x="684" y="634.75" class="s" text-anchor="start" style="font-size:12.5px">that subnet exists only inside the launcher Pod.</text>
+  <text x="684" y="653.25" class="s" text-anchor="start" style="font-size:12.5px">Even from inside the Pod, it would skip the public IP, SG,</text>
+  <text x="684" y="671.75" class="s" text-anchor="start" style="font-size:12.5px">NodePort, Service and endpoint - the parts a client uses.</text>
+  <text x="684" y="690.25" class="s" text-anchor="start" style="font-size:12.5px">Guest checks used virtctl port-forward (API) to port 22.</text>
+  <text x="684" y="708.75" class="s" text-anchor="start" style="font-size:12.5px">Only the external curl proves the exposed path end to end.</text>
+  <rect x="1094" y="538" width="66" height="20" rx="10.0" fill="#a16207"/>
+  <text x="1127.0" y="551.96" class="pill" text-anchor="middle" style="font-size:11px">CONCEPT</text>
+  <rect x="670" y="776" width="500" height="130" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="1.8" stroke-dasharray="9 5"/>
+  <text x="684" y="818.05" class="t" text-anchor="start" style="font-size:15px">Return path</text>
+  <text x="684" y="837.0" class="s" text-anchor="start" style="font-size:12.5px">nginx answers through its default gateway 10.0.2.1;</text>
+  <text x="684" y="855.5" class="s" text-anchor="start" style="font-size:12.5px">connection tracking reverses the Pod DNAT and the</text>
+  <text x="684" y="874.0" class="s" text-anchor="start" style="font-size:12.5px">NodePort NAT; the stateful SG lets the reply out.</text>
+  <rect x="1094" y="766" width="66" height="20" rx="10.0" fill="#a16207"/>
+  <text x="1127.0" y="779.96" class="pill" text-anchor="middle" style="font-size:11px">CONCEPT</text>
+</svg>

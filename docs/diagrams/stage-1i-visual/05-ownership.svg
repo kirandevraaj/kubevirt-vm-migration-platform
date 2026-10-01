@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="990" viewBox="0 0 1200 990" role="img" aria-labelledby="title desc">
+  <title id="title">KubeVirt and storage ownership model</title>
+  <desc id="desc">Left: VirtualMachine owns the VMI (controller ownerReference), the VMI owns the virt-launcher Pod, whose compute container runs virt-launcher-monitor, virt-launcher, virtqemud, virtlogd and qemu-kvm, plus a guest-console-log sidecar; the guest runs inside qemu-kvm. Right: the DataVolume owns the PVC; the PVC binds to the PV; the PV points to EBS volume vol-0d94fba4ddd3d84d2. The VM only references the PVC by name and does not own the disk. Bottom: VM is the desired state, VMI the running instance, virt-launcher the Pod hosting the VM, QEMU/KVM the hypervisor process.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m15803d" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#15803d"/></marker><marker id="m1d4ed8" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#1d4ed8"/></marker><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker></defs>
+  <rect width="1200" height="990" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">KubeVirt object model: who owns what</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">ownerReferences and bindings observed on the cluster - two lifecycles that meet at the PVC</text>
+  <rect x="1005" y="84" width="165" height="20" rx="10.0" fill="#15803d"/>
+  <text x="1087.5" y="97.96" class="pill" text-anchor="middle" style="font-size:11px">OBSERVED + LIVE CHECK</text>
+  <rect x="30" y="110" width="560" height="670" rx="14" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.6" stroke-dasharray="6 4"/>
+  <text x="48" y="134" class="lab" text-anchor="start" style="fill:#1d4ed8">KUBEVIRT: VM LIFECYCLE</text>
+  <rect x="620" y="110" width="550" height="670" rx="14" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.6" stroke-dasharray="6 4"/>
+  <text x="638" y="134" class="lab" text-anchor="start" style="fill:#b45309">CDI + EBS CSI: DISK LIFECYCLE</text>
+  <rect x="60" y="150" width="500" height="66" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="310.0" y="178.71" class="t" text-anchor="middle" style="font-size:15.5px">VirtualMachine   legacy-source-vm-migrated</text>
+  <text x="310.0" y="197.75" class="s" text-anchor="middle" style="font-size:12.5px">desired state; runStrategy Manual; top level (no owner)</text>
+  <path d="M200,218 L200,262" fill="none" stroke="#1d4ed8" stroke-width="2.6" marker-end="url(#m1d4ed8)"/>
+  <text x="212" y="238" class="xs halo" text-anchor="start" style="font-weight:700">ownerReference, controller=true</text>
+  <text x="212" y="254" class="xs halo" text-anchor="start">written by virt-controller</text>
+  <rect x="60" y="264" width="500" height="66" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="310.0" y="292.71" class="t" text-anchor="middle" style="font-size:15.5px">VirtualMachineInstance   legacy-source-vm-migrated</text>
+  <text x="310.0" y="311.75" class="s" text-anchor="middle" style="font-size:12.5px">the running instance; UID a12db97b-...; Running, Ready</text>
+  <path d="M200,332 L200,376" fill="none" stroke="#1d4ed8" stroke-width="2.6" marker-end="url(#m1d4ed8)"/>
+  <text x="212" y="352" class="xs halo" text-anchor="start" style="font-weight:700">ownerReference, controller=true</text>
+  <text x="212" y="368" class="xs halo" text-anchor="start">Pod created by virt-controller</text>
+  <rect x="60" y="378" width="500" height="300" rx="12" fill="#ffffff" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="76" y="400" class="t" text-anchor="start" style="font-size:14.5px">virt-launcher-legacy-source-vm-migrated-nqq8c</text>
+  <text x="76" y="418" class="xs" text-anchor="start">Pod, 2/2 Running, 0 restarts, pod IP 10.244.0.30</text>
+  <rect x="76" y="430" width="468" height="186" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.6"/>
+  <text x="90" y="450" class="lab" text-anchor="start" style="font-size:12px;fill:#1d4ed8">container: compute (virt-launcher:v1.9.0)</text>
+  <rect x="90" y="462" width="214" height="42" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="197.0" y="478.41" class="t" text-anchor="middle" style="font-size:13px">virt-launcher-monitor</text>
+  <text x="197.0" y="496.18" class="s" text-anchor="middle" style="font-size:11.5px">PID 1</text>
+  <rect x="316" y="462" width="214" height="42" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="423.0" y="478.41" class="t" text-anchor="middle" style="font-size:13px">virt-launcher</text>
+  <text x="423.0" y="496.18" class="s" text-anchor="middle" style="font-size:11.5px">PID 8</text>
+  <rect x="90" y="512" width="214" height="42" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="197.0" y="528.41" class="t" text-anchor="middle" style="font-size:13px">virtqemud</text>
+  <text x="197.0" y="546.18" class="s" text-anchor="middle" style="font-size:11.5px">libvirt 11.10.0</text>
+  <rect x="316" y="512" width="214" height="42" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="423.0" y="528.41" class="t" text-anchor="middle" style="font-size:13px">virtlogd</text>
+  <text x="423.0" y="546.18" class="s" text-anchor="middle" style="font-size:11.5px">PID 18</text>
+  <rect x="90" y="562" width="214" height="42" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="197.0" y="578.41" class="t" text-anchor="middle" style="font-size:13px">qemu-kvm</text>
+  <text x="197.0" y="596.18" class="s" text-anchor="middle" style="font-size:11.5px">QEMU 10.1.0</text>
+  <rect x="316" y="562" width="214" height="42" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="423.0" y="578.41" class="t" text-anchor="middle" style="font-size:13px">/dev/rootdisk</text>
+  <text x="423.0" y="596.18" class="s" text-anchor="middle" style="font-size:11.5px">volumeDevice (block)</text>
+  <rect x="260" y="624" width="284" height="44" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="402.0" y="641.41" class="t" text-anchor="middle" style="font-size:13px">container: guest-console-log</text>
+  <text x="402.0" y="659.18" class="s" text-anchor="middle" style="font-size:11.5px">native sidecar (restartPolicy Always)</text>
+  <path d="M197,606 L197,700" fill="none" stroke="#15803d" stroke-width="2.6" marker-end="url(#m15803d)"/>
+  <text x="208" y="690" class="xs halo" text-anchor="start" style="fill:#15803d;font-weight:700">runs the guest</text>
+  <rect x="60" y="702" width="500" height="60" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="310.0" y="727.71" class="t" text-anchor="middle" style="font-size:15.5px">Guest VM: Ubuntu 24.04.5 + nginx</text>
+  <text x="310.0" y="746.75" class="s" text-anchor="middle" style="font-size:12.5px">inside the qemu-kvm process, accelerated by /dev/kvm</text>
+  <rect x="650" y="150" width="490" height="66" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="895.0" y="178.71" class="t" text-anchor="middle" style="font-size:15.5px">DataVolume   legacy-source-vm-disk</text>
+  <text x="895.0" y="197.75" class="s" text-anchor="middle" style="font-size:12.5px">phase Succeeded; standalone (source: upload); no owner</text>
+  <path d="M790,218 L790,262" fill="none" stroke="#1d4ed8" stroke-width="2.6" marker-end="url(#m1d4ed8)"/>
+  <text x="802" y="238" class="xs halo" text-anchor="start" style="font-weight:700">ownerReference, controller=true</text>
+  <text x="802" y="254" class="xs halo" text-anchor="start">filled by cdi-controller</text>
+  <rect x="650" y="264" width="490" height="66" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="895.0" y="292.71" class="t" text-anchor="middle" style="font-size:15.5px">PersistentVolumeClaim   legacy-source-vm-disk</text>
+  <text x="895.0" y="311.75" class="s" text-anchor="middle" style="font-size:12.5px">Bound; 40Gi; volumeMode Block; RWO; ebs-gp3-encrypted</text>
+  <path d="M790,332 L790,376" fill="none" stroke="#475569" stroke-width="2.6" stroke-dasharray="2 5" marker-end="url(#m475569)" stroke-linecap="round"/>
+  <text x="802" y="352" class="xs halo" text-anchor="start" style="font-weight:700">binds (claimRef) - not ownership</text>
+  <text x="802" y="368" class="xs halo" text-anchor="start">csi-provisioner + kube-controller-manager</text>
+  <rect x="650" y="378" width="490" height="66" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="895.0" y="406.71" class="t" text-anchor="middle" style="font-size:15.5px">PersistentVolume   pvc-87c920c1-...-7daef98bc813</text>
+  <text x="895.0" y="425.75" class="s" text-anchor="middle" style="font-size:12.5px">cluster-scoped; reclaimPolicy Delete; zone ap-south-1a</text>
+  <path d="M790,446 L790,490" fill="none" stroke="#475569" stroke-width="2.6" stroke-dasharray="2 5" marker-end="url(#m475569)" stroke-linecap="round"/>
+  <text x="802" y="466" class="xs halo" text-anchor="start" style="font-weight:700">volumeHandle</text>
+  <text x="802" y="482" class="xs halo" text-anchor="start">attached by csi-attacher</text>
+  <rect x="650" y="492" width="490" height="66" rx="10" fill="#fff7ed" stroke="#c2410c" stroke-width="1.8"/>
+  <text x="895.0" y="520.71" class="t" text-anchor="middle" style="font-size:15.5px">EBS volume   vol-0d94fba4ddd3d84d2</text>
+  <text x="895.0" y="539.75" class="s" text-anchor="middle" style="font-size:12.5px">40 GiB gp3, encrypted; /dev/xvdaa on the node; not in Terraform</text>
+  <rect x="650" y="590" width="490" height="172" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <text x="664" y="634.71" class="t" text-anchor="start" style="font-size:15.5px">Deleting the VM does not delete the disk</text>
+  <text x="664" y="653.75" class="s" text-anchor="start" style="font-size:12.5px">The VM only names the PVC (claimName).</text>
+  <text x="664" y="672.25" class="s" text-anchor="start" style="font-size:12.5px">Disk lifecycle: delete the DataVolume -&gt; its PVC goes;</text>
+  <text x="664" y="690.75" class="s" text-anchor="start" style="font-size:12.5px">the PV's reclaimPolicy Delete then removes the EBS volume.</text>
+  <text x="664" y="709.25" class="s" text-anchor="start" style="font-size:12.5px">Teardown order: gates I5-C to I5-F (Stage 1H 29.1); not run.</text>
+  <text x="664" y="727.75" class="s" text-anchor="start" style="font-size:12.5px">Nothing in the VM's ownership chain points to EBS.</text>
+  <path d="M562,183 L606,183 L606,297 L647,297" fill="none" stroke="#475569" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m475569)"/>
+  <text x="604" y="176" class="xs halo" text-anchor="middle" style="font-weight:700">spec: claimName</text>
+  <path d="M532,583 L606,583 L606,311 L647,311" fill="none" stroke="#15803d" stroke-width="2.4" stroke-dasharray="2 5" marker-end="url(#m15803d)" stroke-linecap="round"/>
+  <text x="604" y="600" class="xs halo" text-anchor="middle" style="fill:#15803d;font-weight:700">uses as block</text>
+  <path d="M40,806 L100,806" fill="none" stroke="#1d4ed8" stroke-width="2.6" marker-end="url(#m1d4ed8)"/>
+  <text x="110" y="811" class="xs" text-anchor="start" style="font-weight:600">ownerReference (controller=true): deleting the owner deletes the child</text>
+  <path d="M560,806 L620,806" fill="none" stroke="#475569" stroke-width="2.2" stroke-dasharray="9 6" marker-end="url(#m475569)"/>
+  <text x="630" y="811" class="xs" text-anchor="start" style="font-weight:600">reference by name</text>
+  <path d="M780,806 L840,806" fill="none" stroke="#475569" stroke-width="2.4" stroke-dasharray="2 5" marker-end="url(#m475569)" stroke-linecap="round"/>
+  <text x="850" y="811" class="xs" text-anchor="start" style="font-weight:600">binding / use, not ownership</text>
+  <rect x="30" y="836" width="270" height="124" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="165.0" y="875.26" class="t" text-anchor="middle" style="font-size:18px">VM</text>
+  <text x="165.0" y="895.16" class="s" text-anchor="middle" style="font-size:13px">= the desired state</text>
+  <text x="165.0" y="914.16" class="s" text-anchor="middle" style="font-size:13px">persistent object you apply</text>
+  <text x="165.0" y="933.16" class="s" text-anchor="middle" style="font-size:13px">kept when the VM is stopped</text>
+  <rect x="318" y="836" width="270" height="124" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="453.0" y="875.26" class="t" text-anchor="middle" style="font-size:18px">VMI</text>
+  <text x="453.0" y="895.16" class="s" text-anchor="middle" style="font-size:13px">= the running instance</text>
+  <text x="453.0" y="914.16" class="s" text-anchor="middle" style="font-size:13px">exists while the VM runs</text>
+  <text x="453.0" y="933.16" class="s" text-anchor="middle" style="font-size:13px">created by virt-controller</text>
+  <rect x="606" y="836" width="270" height="124" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="741.0" y="875.26" class="t" text-anchor="middle" style="font-size:18px">virt-launcher</text>
+  <text x="741.0" y="895.16" class="s" text-anchor="middle" style="font-size:13px">= the Pod that hosts the VM</text>
+  <text x="741.0" y="914.16" class="s" text-anchor="middle" style="font-size:13px">one per running VMI</text>
+  <text x="741.0" y="933.16" class="s" text-anchor="middle" style="font-size:13px">what Kubernetes schedules</text>
+  <rect x="894" y="836" width="270" height="124" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="1029.0" y="875.26" class="t" text-anchor="middle" style="font-size:18px">QEMU/KVM</text>
+  <text x="1029.0" y="895.16" class="s" text-anchor="middle" style="font-size:13px">= the hypervisor process</text>
+  <text x="1029.0" y="914.16" class="s" text-anchor="middle" style="font-size:13px">qemu-kvm in container compute</text>
+  <text x="1029.0" y="933.16" class="s" text-anchor="middle" style="font-size:13px">KVM: /dev/kvm in the node kernel</text>
+</svg>

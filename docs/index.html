@@ -65,7 +65,8 @@
       <span class="tag done">STAGE 0: COMPLETE</span>
       <span class="tag done">STAGE 1A &#8211; 1G: DONE</span>
       <span class="tag design">STAGE 1H: DESIGN, AWAITING REVIEW</span>
-      <span class="tag future">STAGE 1I: NOT YET DEFINED</span>
+      <span class="tag done">STAGE 1I &#8212; FIRST KUBEVIRT MIGRATION: I1 &#8211; I4 PASS</span>
+      <span class="tag future">STAGE 1I GATE I5: NOT STARTED</span>
     </div>
   </div>
 </header>
@@ -86,6 +87,12 @@
       <p>Visual snapshot of where the migration project stands.</p>
       <span class="more">Open the status dashboard &#8594;</span>
     </a>
+    <a class="card" href="stage-1/stage-1i-visual-learning.html">
+      <span class="n">STAGE 1I</span>
+      <h3>Stage 1I &#8212; First KubeVirt Migration</h3>
+      <p>The first VM running on KubeVirt in 13 diagrams: pipeline, ownership, QEMU/KVM, packet path, storage and evidence. I1 &#8211; I4 PASS; I5 not started.</p>
+      <span class="more">Open the Stage 1I visuals &#8594;</span>
+    </a>
     <a class="card" href="stage-0/stage-0-visual-learning.html">
       <span class="n">STAGE 0</span>
       <h3>Stage 0 Visual Learning</h3>
@@ -101,7 +108,7 @@
     <a class="card" href="stage-1/">
       <span class="n">STAGE 1</span>
       <h3>Stage 1 Technical Documentation</h3>
-      <p>The detailed record of sub-stages 1A to 1H: scope, commands, evidence and results for each step.</p>
+      <p>The detailed record of sub-stages 1A to 1I: scope, commands, evidence and results for each step.</p>
       <span class="more">Read Stage 1 &#8594;</span>
     </a>
     <a class="card" href="adr/">
@@ -118,7 +125,7 @@
     </a>
   </div>
 
-  <p class="note">This portal is documentation only. The Kubernetes / KubeVirt target is a design; nothing has been provisioned yet.</p>
+  <p class="note">This portal is documentation only. Stage 1I runs a temporary KubeVirt target on AWS for the first migration; Gate I5 (final validation and controlled teardown) has not started.</p>
 </main>
 
 <footer>VM-to-Kubernetes Migration Platform &#183; Project 1.5</footer>

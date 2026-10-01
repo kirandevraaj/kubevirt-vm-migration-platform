@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">Guest OS view</title>
+  <desc id="desc">Left: the guest stack observed in Gate I4: UEFI EDK II with Secure Boot off, vda1 and vda2, kernel 6.8.0-142, enp1s0 with 10.0.2.2/24 by DHCP and default route via 10.0.2.1, systemd running, qemu-guest-agent and nginx 1.24.0. Right: what stayed identical to Stage 1C (hostname, machine-id, filesystem UUIDs, SSH host keys, nginx package and config, page hash, netplan) and what the platform changed (NIC name, MAC, disk bus, SMBIOS, IP, CPU). Bottom: HTTP validated, hash matched, apt timer watch item.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs></defs>
+  <rect width="1200" height="900" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">Inside the guest: the same Ubuntu on a new platform</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">Guest view observed in Gate I4: 36 of 36 guest checks, guest agent, identity comparison</text>
+  <rect x="1097" y="84" width="73" height="20" rx="10.0" fill="#15803d"/>
+  <text x="1133.5" y="97.96" class="pill" text-anchor="middle" style="font-size:11px">OBSERVED</text>
+  <rect x="30" y="108" width="540" height="590" rx="14" fill="#f0fdf4" stroke="#15803d" stroke-width="1.8"/>
+  <text x="48" y="134" class="lab" text-anchor="start" style="fill:#15803d">legacy-source-vm  (hostname unchanged)</text>
+  <rect x="50" y="150" width="500" height="64" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="300.0" y="177.55" class="t" text-anchor="middle" style="font-size:15px">nginx 1.24.0-2ubuntu7.18</text>
+  <text x="300.0" y="196.5" class="s" text-anchor="middle" style="font-size:12.5px">enabled, active; :80 on 0.0.0.0 and [::]; nginx -t ok</text>
+  <rect x="50" y="226" width="500" height="64" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="300.0" y="253.55" class="t" text-anchor="middle" style="font-size:15px">qemu-guest-agent 8.2.2</text>
+  <text x="300.0" y="272.5" class="s" text-anchor="middle" style="font-size:12.5px">active; /dev/virtio-ports/org.qemu.guest_agent.0</text>
+  <rect x="50" y="302" width="500" height="64" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="300.0" y="329.55" class="t" text-anchor="middle" style="font-size:15px">systemd: running</text>
+  <text x="300.0" y="348.5" class="s" text-anchor="middle" style="font-size:12.5px">0 failed units; boot 5.2 s; systemd-detect-virt = kvm</text>
+  <rect x="50" y="378" width="500" height="64" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="300.0" y="405.55" class="t" text-anchor="middle" style="font-size:15px">network: enp1s0 (virtio_net)</text>
+  <text x="300.0" y="424.5" class="s" text-anchor="middle" style="font-size:12.5px">10.0.2.2/24 DHCP; default via 10.0.2.1; DNS 10.96.0.10</text>
+  <rect x="50" y="454" width="500" height="64" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="300.0" y="481.55" class="t" text-anchor="middle" style="font-size:15px">kernel 6.8.0-142-generic</text>
+  <text x="300.0" y="500.5" class="s" text-anchor="middle" style="font-size:12.5px">Ubuntu 24.04.5 LTS; root=UUID=db8b3bb3-...</text>
+  <rect x="50" y="530" width="500" height="64" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="300.0" y="557.55" class="t" text-anchor="middle" style="font-size:15px">disk: /dev/vda (virtio)</text>
+  <text x="300.0" y="576.5" class="s" text-anchor="middle" style="font-size:12.5px">vda1 /boot/efi vfat C340-CD01; vda2 / ext4</text>
+  <rect x="50" y="606" width="500" height="64" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8"/>
+  <text x="300.0" y="633.55" class="t" text-anchor="middle" style="font-size:15px">firmware: UEFI (EDK II)</text>
+  <text x="300.0" y="652.5" class="s" text-anchor="middle" style="font-size:12.5px">Secure Boot disabled; NVRAM from the OVMF template</text>
+  <text x="300" y="690" class="xs" text-anchor="middle" style="font-weight:600">top = what users see; bottom = what boots first</text>
+  <rect x="600" y="108" width="570" height="330" rx="14" fill="#ffffff" stroke="#15803d" stroke-width="1.8"/>
+  <text x="618" y="134" class="lab" text-anchor="start" style="fill:#15803d">PRESERVED - identical to source / prepared image</text>
+  <path d="M623,162 L627.6666666666666,166.9 L637,156.4" fill="none" stroke="#15803d" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="650" y="166" class="s" text-anchor="start" style="font-size:13.5px">hostname legacy-source-vm</text>
+  <path d="M623,195 L627.6666666666666,199.9 L637,189.4" fill="none" stroke="#15803d" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="650" y="199" class="s" text-anchor="start" style="font-size:13.5px">machine-id d90f169b...</text>
+  <path d="M623,228 L627.6666666666666,232.9 L637,222.4" fill="none" stroke="#15803d" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="650" y="232" class="s" text-anchor="start" style="font-size:13.5px">root / ESP UUIDs db8b3bb3-... / C340-CD01</text>
+  <path d="M623,261 L627.6666666666666,265.9 L637,255.4" fill="none" stroke="#15803d" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="650" y="265" class="s" text-anchor="start" style="font-size:13.5px">SSH host keys (strict host-key check passed)</text>
+  <path d="M623,294 L627.6666666666666,298.9 L637,288.4" fill="none" stroke="#15803d" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="650" y="298" class="s" text-anchor="start" style="font-size:13.5px">nginx 1.24.0-2ubuntu7.18 package</text>
+  <path d="M623,327 L627.6666666666666,331.9 L637,321.4" fill="none" stroke="#15803d" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="650" y="331" class="s" text-anchor="start" style="font-size:13.5px">13 nginx config files (f6766240...9c8f)</text>
+  <path d="M623,360 L627.6666666666666,364.9 L637,354.4" fill="none" stroke="#15803d" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="650" y="364" class="s" text-anchor="start" style="font-size:13.5px">page sha256 b9826e18...0046 (disk + HTTP)</text>
+  <path d="M623,393 L627.6666666666666,397.9 L637,387.4" fill="none" stroke="#15803d" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="650" y="397" class="s" text-anchor="start" style="font-size:13.5px">netplan 89ea1ea3...6a3b (the I1-prepared file)</text>
+  <rect x="600" y="456" width="570" height="242" rx="14" fill="#ffffff" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="618" y="482" class="lab" text-anchor="start" style="fill:#1d4ed8">CHANGED BY THE PLATFORM - expected</text>
+  <text x="622" y="514" class="t" text-anchor="start" style="font-size:13.5px">NIC name</text>
+  <text x="720" y="514" class="s" text-anchor="start" style="font-size:13.5px">ens192 (source), enp0s3 (I2) -&gt; enp1s0</text>
+  <text x="622" y="544" class="t" text-anchor="start" style="font-size:13.5px">MAC</text>
+  <text x="720" y="544" class="s" text-anchor="start" style="font-size:13.5px">00:0c:29:0f:3d:15 -&gt; c6:ce:0d:f5:88:35</text>
+  <text x="622" y="574" class="t" text-anchor="start" style="font-size:13.5px">disk</text>
+  <text x="720" y="574" class="s" text-anchor="start" style="font-size:13.5px">PVSCSI sda -&gt; virtio vda</text>
+  <text x="622" y="604" class="t" text-anchor="start" style="font-size:13.5px">SMBIOS</text>
+  <text x="720" y="604" class="s" text-anchor="start" style="font-size:13.5px">VMware -&gt; KubeVirt</text>
+  <text x="622" y="634" class="t" text-anchor="start" style="font-size:13.5px">IP</text>
+  <text x="720" y="634" class="s" text-anchor="start" style="font-size:13.5px">192.168.50.31 static -&gt; 10.0.2.2 DHCP</text>
+  <text x="622" y="664" class="t" text-anchor="start" style="font-size:13.5px">CPU</text>
+  <text x="720" y="664" class="s" text-anchor="start" style="font-size:13.5px">i7-14650HX (I2) -&gt; Xeon GraniteRapids</text>
+  <rect x="30" y="724" width="360" height="150" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="210.0" y="775.62" class="t" text-anchor="middle" style="font-size:16px">HTTP validated</text>
+  <text x="210.0" y="795.16" class="s" text-anchor="middle" style="font-size:13px">in the guest: curl 127.0.0.1 -&gt; 200</text>
+  <text x="210.0" y="814.16" class="s" text-anchor="middle" style="font-size:13px">external: 3.6.94.104:30080 -&gt; 200</text>
+  <text x="210.0" y="833.16" class="s" text-anchor="middle" style="font-size:13px">Server: nginx/1.24.0 (Ubuntu)</text>
+  <rect x="420" y="724" width="360" height="150" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="600.0" y="775.62" class="t" text-anchor="middle" style="font-size:16px">Hash matched</text>
+  <text x="600.0" y="795.16" class="s" text-anchor="middle" style="font-size:13px">267 bytes, sha256 b9826e18...0046</text>
+  <text x="600.0" y="814.16" class="s" text-anchor="middle" style="font-size:13px">marker p15-stage1c-source-v1</text>
+  <text x="600.0" y="833.16" class="s" text-anchor="middle" style="font-size:13px">= the Stage 1C source page</text>
+  <rect x="810" y="724" width="360" height="150" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <text x="990.0" y="775.62" class="t" text-anchor="middle" style="font-size:16px">Watch item: apt timers</text>
+  <text x="990.0" y="795.16" class="s" text-anchor="middle" style="font-size:13px">came with the image; upgrade ran 04:19,</text>
+  <text x="990.0" y="814.16" class="s" text-anchor="middle" style="font-size:13px">installed nothing; later runs may drift</text>
+  <text x="990.0" y="833.16" class="s" text-anchor="middle" style="font-size:13px">the package set (I5 / ops decision)</text>
+</svg>

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="820" viewBox="0 0 1200 820" role="img" aria-labelledby="title desc">
+  <title id="title">One request, one disk, one VM</title>
+  <desc id="desc">Three columns. One request: curl, 3.6.94.104:30080, security group, NodePort, Service 10.108.249.186, Pod 10.244.0.30, DNAT, guest 10.0.2.2:80, nginx, HTTP 200. One disk: golden VMDK, prepared qcow2, CDI upload, DataVolume, PVC, PV, EBS volume, /dev/rootdisk, guest vda. One VM: VirtualMachine, VMI, virt-launcher Pod, qemu-kvm, Ubuntu guest, nginx.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker></defs>
+  <rect width="1200" height="820" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">One request, one disk, one VM</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">The whole Stage 1I result on one page</text>
+  <rect x="1005" y="84" width="165" height="20" rx="10.0" fill="#15803d"/>
+  <text x="1087.5" y="97.96" class="pill" text-anchor="middle" style="font-size:11px">OBSERVED - I1-I4 PASS</text>
+  <rect x="30" y="108" width="370" height="630" rx="14" fill="#f0fdf4" stroke="#15803d" stroke-width="1.8"/>
+  <text x="215" y="136" class="lab" text-anchor="middle" style="fill:#15803d">ONE REQUEST</text>
+  <rect x="65" y="152" width="300" height="42" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="215.0" y="177.48" class="t" text-anchor="middle" style="font-size:14px">curl from Windows</text>
+  <rect x="65" y="210" width="300" height="42" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="215.0" y="235.48" class="t" text-anchor="middle" style="font-size:14px">3.6.94.104:30080</text>
+  <path d="M215,196 L215,208" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="65" y="268" width="300" height="42" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <text x="215.0" y="293.48" class="t" text-anchor="middle" style="font-size:14px">SG: /32 only</text>
+  <path d="M215,254 L215,266" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="65" y="326" width="300" height="42" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="215.0" y="351.48" class="t" text-anchor="middle" style="font-size:14px">NodePort 30080</text>
+  <path d="M215,312 L215,324" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="65" y="384" width="300" height="42" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="215.0" y="409.48" class="t" text-anchor="middle" style="font-size:14px">Service 10.108.249.186:80</text>
+  <path d="M215,370 L215,382" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="65" y="442" width="300" height="42" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="215.0" y="467.48" class="t" text-anchor="middle" style="font-size:14px">Pod 10.244.0.30:80</text>
+  <path d="M215,428 L215,440" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="65" y="500" width="300" height="42" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="215.0" y="525.48" class="t" text-anchor="middle" style="font-size:14px">masquerade DNAT</text>
+  <path d="M215,486 L215,498" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="65" y="558" width="300" height="42" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="215.0" y="583.48" class="t" text-anchor="middle" style="font-size:14px">guest 10.0.2.2:80</text>
+  <path d="M215,544 L215,556" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="65" y="616" width="300" height="42" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="215.0" y="641.48" class="t" text-anchor="middle" style="font-size:14px">nginx 1.24.0</text>
+  <path d="M215,602 L215,614" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="65" y="674" width="300" height="42" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="215.0" y="699.48" class="t" text-anchor="middle" style="font-size:14px">HTTP 200, same sha256</text>
+  <path d="M215,660 L215,672" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="415" y="108" width="370" height="630" rx="14" fill="#fff7ed" stroke="#c2410c" stroke-width="1.8"/>
+  <text x="600" y="136" class="lab" text-anchor="middle" style="fill:#c2410c">ONE DISK</text>
+  <rect x="450" y="152" width="300" height="42" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="600.0" y="177.48" class="t" text-anchor="middle" style="font-size:14px">golden VMDK (1E)</text>
+  <rect x="450" y="210" width="300" height="42" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="600.0" y="235.48" class="t" text-anchor="middle" style="font-size:14px">prepared qcow2 (I1)</text>
+  <path d="M600,196 L600,208" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="450" y="268" width="300" height="42" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="600.0" y="293.48" class="t" text-anchor="middle" style="font-size:14px">SFTP + CDI upload</text>
+  <path d="M600,254 L600,266" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="450" y="326" width="300" height="42" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="600.0" y="351.48" class="t" text-anchor="middle" style="font-size:14px">DataVolume (Succeeded)</text>
+  <path d="M600,312 L600,324" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="450" y="384" width="300" height="42" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="600.0" y="409.48" class="t" text-anchor="middle" style="font-size:14px">PVC 40Gi Block RWO</text>
+  <path d="M600,370 L600,382" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="450" y="442" width="300" height="42" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="600.0" y="467.48" class="t" text-anchor="middle" style="font-size:14px">PV pvc-87c920c1-...</text>
+  <path d="M600,428 L600,440" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="450" y="500" width="300" height="42" rx="10" fill="#fff7ed" stroke="#c2410c" stroke-width="1.8"/>
+  <text x="600.0" y="525.48" class="t" text-anchor="middle" style="font-size:14px">EBS vol-0d94... gp3 enc.</text>
+  <path d="M600,486 L600,498" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="450" y="558" width="300" height="42" rx="10" fill="#ecfeff" stroke="#0e7490" stroke-width="1.8"/>
+  <text x="600.0" y="583.48" class="t" text-anchor="middle" style="font-size:14px">/dev/rootdisk</text>
+  <path d="M600,544 L600,556" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="450" y="616" width="300" height="42" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="600.0" y="641.48" class="t" text-anchor="middle" style="font-size:14px">QEMU host_device</text>
+  <path d="M600,602 L600,614" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="450" y="674" width="300" height="42" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="600.0" y="699.48" class="t" text-anchor="middle" style="font-size:14px">guest vda</text>
+  <path d="M600,660 L600,672" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="800" y="108" width="370" height="630" rx="14" fill="#eff6ff" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="985" y="136" class="lab" text-anchor="middle" style="fill:#1d4ed8">ONE VM</text>
+  <rect x="835" y="152" width="300" height="42" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="985.0" y="177.48" class="t" text-anchor="middle" style="font-size:14px">VirtualMachine</text>
+  <rect x="835" y="210" width="300" height="42" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="985.0" y="235.48" class="t" text-anchor="middle" style="font-size:14px">VMI</text>
+  <path d="M985,196 L985,208" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="835" y="268" width="300" height="42" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="985.0" y="293.48" class="t" text-anchor="middle" style="font-size:14px">virt-launcher Pod</text>
+  <path d="M985,254 L985,266" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="835" y="326" width="300" height="42" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="985.0" y="351.48" class="t" text-anchor="middle" style="font-size:14px">container compute</text>
+  <path d="M985,312 L985,324" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="835" y="384" width="300" height="42" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="985.0" y="409.48" class="t" text-anchor="middle" style="font-size:14px">virtqemud -&gt; qemu-kvm</text>
+  <path d="M985,370 L985,382" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="835" y="442" width="300" height="42" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="985.0" y="467.48" class="t" text-anchor="middle" style="font-size:14px">KVM /dev/kvm (nested)</text>
+  <path d="M985,428 L985,440" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="835" y="500" width="300" height="42" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="985.0" y="525.48" class="t" text-anchor="middle" style="font-size:14px">Ubuntu 24.04.5 guest</text>
+  <path d="M985,486 L985,498" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="835" y="558" width="300" height="42" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="985.0" y="583.48" class="t" text-anchor="middle" style="font-size:14px">qemu-guest-agent</text>
+  <path d="M985,544 L985,556" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="835" y="616" width="300" height="42" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="985.0" y="641.48" class="t" text-anchor="middle" style="font-size:14px">nginx</text>
+  <path d="M985,602 L985,614" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="835" y="674" width="300" height="42" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="985.0" y="699.48" class="t" text-anchor="middle" style="font-size:14px">same identity + content</text>
+  <path d="M985,660 L985,672" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="30" y="752" width="1140" height="52" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="600.0" y="783.12" class="t" text-anchor="middle" style="font-size:16px">Same guest, same content, new manager - point-in-time, no cutover; I1-I4 PASS, I5 not started</text>
+</svg>

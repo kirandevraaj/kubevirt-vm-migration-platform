@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="960" viewBox="0 0 1200 960" role="img" aria-labelledby="title desc">
+  <title id="title">Stage 1I migration pipeline: 18 steps</title>
+  <desc id="desc">Twenty cards in four rows: steps 1 to 6 from Stage 1C to 1G (source, cold copy, characterization, qemu-img and virt-v2v), steps 7 to 9 Gate I1 (guest agent, network adaptation, immutable image), step 10 Gate I2 (isolated boot test), the Gate I3 platform, steps 11 to 18 Gate I4 (transfer, CDI import, PVC on EBS, VM, VMI, virt-launcher, QEMU/KVM boot, nginx through NodePort), and Gate I5 (final validation and controlled teardown, sub-gates I5-A to I5-J) not started.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker><marker id="m6d28d9" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#6d28d9"/></marker></defs>
+  <rect width="1200" height="960" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">The migration pipeline: 18 numbered steps, five gates</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">Read left to right, row by row - every step has evidence in the records</text>
+  <rect x="1083" y="84" width="87" height="20" rx="10.0" fill="#15803d"/>
+  <text x="1126.5" y="97.96" class="pill" text-anchor="middle" style="font-size:11px">I1-I4 PASS</text>
+  <rect x="40" y="104" width="186" height="21" rx="10.5" fill="#15803d"/>
+  <text x="133.0" y="118.82" class="pill" text-anchor="middle" style="font-size:12px">Stage 1C-1G: steps 1-6</text>
+  <rect x="238" y="104" width="117" height="21" rx="10.5" fill="#15803d"/>
+  <text x="296.5" y="118.82" class="pill" text-anchor="middle" style="font-size:12px">I1: steps 7-9</text>
+  <rect x="367" y="104" width="101" height="21" rx="10.5" fill="#15803d"/>
+  <text x="417.5" y="118.82" class="pill" text-anchor="middle" style="font-size:12px">I2: step 10</text>
+  <rect x="480" y="104" width="109" height="21" rx="10.5" fill="#1d4ed8"/>
+  <text x="534.5" y="118.82" class="pill" text-anchor="middle" style="font-size:12px">I3: platform</text>
+  <rect x="601" y="104" width="132" height="21" rx="10.5" fill="#15803d"/>
+  <text x="667.0" y="118.82" class="pill" text-anchor="middle" style="font-size:12px">I4: steps 11-18</text>
+  <rect x="745" y="104" width="132" height="21" rx="10.5" fill="#6d28d9"/>
+  <text x="811.0" y="118.82" class="pill" text-anchor="middle" style="font-size:12px">I5: NOT STARTED</text>
+  <rect x="40" y="160" width="212" height="128" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="146.0" y="201.48" class="t" text-anchor="middle" style="font-size:14px">Source VM identified</text>
+  <text x="146.0" y="219.84" class="s" text-anchor="middle" style="font-size:12px">legacy-source-vm on ESXi 8.0.3</text>
+  <text x="146.0" y="237.84" class="s" text-anchor="middle" style="font-size:12px">Ubuntu 24.04.5 + nginx 1.24.0</text>
+  <text x="146.0" y="255.84" class="s" text-anchor="middle" style="font-size:12px">marker p15-stage1c-source-v1</text>
+  <rect x="212" y="150" width="30" height="20" rx="10.0" fill="#15803d"/>
+  <text x="227.0" y="163.96" class="pill" text-anchor="middle" style="font-size:11px">1C</text>
+  <circle cx="44" cy="164" r="17" fill="#334155"/>
+  <text x="44" y="169" class="pill" text-anchor="middle" style="font-size:13px">1</text>
+  <path d="M253,224.0 L266,224.0" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="267" y="160" width="212" height="128" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="373.0" y="201.48" class="t" text-anchor="middle" style="font-size:14px">Cold shutdown</text>
+  <text x="373.0" y="219.84" class="s" text-anchor="middle" style="font-size:12px">graceful guest shutdown</text>
+  <text x="373.0" y="237.84" class="s" text-anchor="middle" style="font-size:12px">a running VM locks its VMDK</text>
+  <text x="373.0" y="255.84" class="s" text-anchor="middle" style="font-size:12px">no snapshot shortcut</text>
+  <rect x="439" y="150" width="30" height="20" rx="10.0" fill="#15803d"/>
+  <text x="454.0" y="163.96" class="pill" text-anchor="middle" style="font-size:11px">1E</text>
+  <circle cx="271" cy="164" r="17" fill="#334155"/>
+  <text x="271" y="169" class="pill" text-anchor="middle" style="font-size:13px">2</text>
+  <path d="M480,224.0 L493,224.0" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="494" y="160" width="212" height="128" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="600.0" y="201.48" class="t" text-anchor="middle" style="font-size:14px">VMDK copied</text>
+  <text x="600.0" y="219.84" class="s" text-anchor="middle" style="font-size:12px">scp to Windows: golden VMDK</text>
+  <text x="600.0" y="237.84" class="s" text-anchor="middle" style="font-size:12px">the same SHA256 three times</text>
+  <text x="600.0" y="255.84" class="s" text-anchor="middle" style="font-size:12px">source powered back on</text>
+  <rect x="666" y="150" width="30" height="20" rx="10.0" fill="#15803d"/>
+  <text x="681.0" y="163.96" class="pill" text-anchor="middle" style="font-size:11px">1E</text>
+  <circle cx="498" cy="164" r="17" fill="#334155"/>
+  <text x="498" y="169" class="pill" text-anchor="middle" style="font-size:13px">3</text>
+  <path d="M707,224.0 L720,224.0" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="721" y="160" width="212" height="128" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="827.0" y="201.48" class="t" text-anchor="middle" style="font-size:14px">VMDK characterized</text>
+  <text x="827.0" y="219.84" class="s" text-anchor="middle" style="font-size:12px">GPT: EFI vfat + ext4 root</text>
+  <text x="827.0" y="237.84" class="s" text-anchor="middle" style="font-size:12px">PVSCSI sda, VMXNET3 ens192</text>
+  <text x="827.0" y="255.84" class="s" text-anchor="middle" style="font-size:12px">read-only inspection of the copy</text>
+  <rect x="857" y="150" width="66" height="20" rx="10.0" fill="#15803d"/>
+  <text x="890.0" y="163.96" class="pill" text-anchor="middle" style="font-size:11px">1D / 1F</text>
+  <circle cx="725" cy="164" r="17" fill="#334155"/>
+  <text x="725" y="169" class="pill" text-anchor="middle" style="font-size:13px">4</text>
+  <path d="M934,224.0 L947,224.0" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="948" y="160" width="212" height="128" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="1054.0" y="201.48" class="t" text-anchor="middle" style="font-size:14px">qcow2 conversion</text>
+  <text x="1054.0" y="219.84" class="s" text-anchor="middle" style="font-size:12px">qemu-img: container change</text>
+  <text x="1054.0" y="237.84" class="s" text-anchor="middle" style="font-size:12px">boots under QEMU/KVM</text>
+  <text x="1054.0" y="255.84" class="s" text-anchor="middle" style="font-size:12px">no network (netplan ens192)</text>
+  <rect x="1120" y="150" width="30" height="20" rx="10.0" fill="#15803d"/>
+  <text x="1135.0" y="163.96" class="pill" text-anchor="middle" style="font-size:11px">1G</text>
+  <circle cx="952" cy="164" r="17" fill="#334155"/>
+  <text x="952" y="169" class="pill" text-anchor="middle" style="font-size:13px">5</text>
+  <path d="M1054.0,290 L1054.0,318 L146.0,318 L146.0,336" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="40" y="350" width="212" height="128" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="146.0" y="391.48" class="t" text-anchor="middle" style="font-size:14px">virt-v2v guest preparation</text>
+  <text x="146.0" y="409.84" class="s" text-anchor="middle" style="font-size:12px">VMware Tools removed</text>
+  <text x="146.0" y="427.84" class="s" text-anchor="middle" style="font-size:12px">initramfs rebuilt for VirtIO</text>
+  <text x="146.0" y="445.84" class="s" text-anchor="middle" style="font-size:12px">qcow2 output kept read-only</text>
+  <rect x="212" y="340" width="30" height="20" rx="10.0" fill="#15803d"/>
+  <text x="227.0" y="353.96" class="pill" text-anchor="middle" style="font-size:11px">1G</text>
+  <circle cx="44" cy="354" r="17" fill="#334155"/>
+  <text x="44" y="359" class="pill" text-anchor="middle" style="font-size:13px">6</text>
+  <path d="M253,414.0 L266,414.0" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="267" y="350" width="212" height="128" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="373.0" y="391.48" class="t" text-anchor="middle" style="font-size:14px">Guest agent installed</text>
+  <text x="373.0" y="409.84" class="s" text-anchor="middle" style="font-size:12px">qemu-guest-agent 8.2.2</text>
+  <text x="373.0" y="427.84" class="s" text-anchor="middle" style="font-size:12px">+ liburing2, offline (C7)</text>
+  <text x="373.0" y="445.84" class="s" text-anchor="middle" style="font-size:12px">no guest network needed</text>
+  <rect x="439" y="340" width="30" height="20" rx="10.0" fill="#15803d"/>
+  <text x="454.0" y="353.96" class="pill" text-anchor="middle" style="font-size:11px">I1</text>
+  <circle cx="271" cy="354" r="17" fill="#15803d"/>
+  <text x="271" y="359" class="pill" text-anchor="middle" style="font-size:13px">7</text>
+  <path d="M480,414.0 L493,414.0" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="494" y="350" width="212" height="128" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="600.0" y="391.48" class="t" text-anchor="middle" style="font-size:14px">Network adapted for VirtIO</text>
+  <text x="600.0" y="409.84" class="s" text-anchor="middle" style="font-size:12px">netplan: driver virtio_net</text>
+  <text x="600.0" y="427.84" class="s" text-anchor="middle" style="font-size:12px">DHCP, not static .31 (C6)</text>
+  <text x="600.0" y="445.84" class="s" text-anchor="middle" style="font-size:12px">14 first-boot entries gone (C5)</text>
+  <rect x="666" y="340" width="30" height="20" rx="10.0" fill="#15803d"/>
+  <text x="681.0" y="353.96" class="pill" text-anchor="middle" style="font-size:11px">I1</text>
+  <circle cx="498" cy="354" r="17" fill="#15803d"/>
+  <text x="498" y="359" class="pill" text-anchor="middle" style="font-size:13px">8</text>
+  <path d="M707,414.0 L720,414.0" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="721" y="350" width="212" height="128" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="827.0" y="391.48" class="t" text-anchor="middle" style="font-size:14px">Prepared image immutable</text>
+  <text x="827.0" y="409.84" class="s" text-anchor="middle" style="font-size:12px">sha256 2b30e195...93b2</text>
+  <text x="827.0" y="427.84" class="s" text-anchor="middle" style="font-size:12px">mode 0444 + chattr +i</text>
+  <text x="827.0" y="445.84" class="s" text-anchor="middle" style="font-size:12px">41 of 41 checks PASS</text>
+  <rect x="893" y="340" width="30" height="20" rx="10.0" fill="#15803d"/>
+  <text x="908.0" y="353.96" class="pill" text-anchor="middle" style="font-size:11px">I1</text>
+  <circle cx="725" cy="354" r="17" fill="#15803d"/>
+  <text x="725" y="359" class="pill" text-anchor="middle" style="font-size:13px">9</text>
+  <path d="M934,414.0 L947,414.0" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="948" y="350" width="212" height="128" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="1054.0" y="391.48" class="t" text-anchor="middle" style="font-size:14px">Isolated boot test</text>
+  <text x="1054.0" y="409.84" class="s" text-anchor="middle" style="font-size:12px">disposable overlay, isolated netns</text>
+  <text x="1054.0" y="427.84" class="s" text-anchor="middle" style="font-size:12px">UEFI, DHCP, agent, nginx 200</text>
+  <text x="1054.0" y="445.84" class="s" text-anchor="middle" style="font-size:12px">54 of 54 checks PASS</text>
+  <rect x="1120" y="340" width="30" height="20" rx="10.0" fill="#15803d"/>
+  <text x="1135.0" y="353.96" class="pill" text-anchor="middle" style="font-size:11px">I2</text>
+  <circle cx="952" cy="354" r="17" fill="#15803d"/>
+  <text x="952" y="359" class="pill" text-anchor="middle" style="font-size:13px">10</text>
+  <path d="M1054.0,480 L1054.0,508 L146.0,508 L146.0,526" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="40" y="540" width="212" height="128" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="146.0" y="581.48" class="t" text-anchor="middle" style="font-size:14px">Target platform built</text>
+  <text x="146.0" y="599.84" class="s" text-anchor="middle" style="font-size:12px">Terraform: VPC, SG, EC2</text>
+  <text x="146.0" y="617.84" class="s" text-anchor="middle" style="font-size:12px">kubeadm 1.36.5, KubeVirt,</text>
+  <text x="146.0" y="635.84" class="s" text-anchor="middle" style="font-size:12px">CDI, EBS CSI, StorageClass</text>
+  <rect x="212" y="530" width="30" height="20" rx="10.0" fill="#1d4ed8"/>
+  <text x="227.0" y="543.96" class="pill" text-anchor="middle" style="font-size:11px">I3</text>
+  <circle cx="44" cy="544" r="17" fill="#1d4ed8"/>
+  <text x="44" y="549" class="pill" text-anchor="middle" style="font-size:13px">I3</text>
+  <path d="M253,604.0 L266,604.0" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="267" y="540" width="212" height="128" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="373.0" y="581.48" class="t" text-anchor="middle" style="font-size:14px">Transfer to AWS</text>
+  <text x="373.0" y="599.84" class="s" text-anchor="middle" style="font-size:12px">SFTP conversion host -&gt; node</text>
+  <text x="373.0" y="617.84" class="s" text-anchor="middle" style="font-size:12px">321 s, 2,932,998,144 bytes</text>
+  <text x="373.0" y="635.84" class="s" text-anchor="middle" style="font-size:12px">sha256 matched; key removed</text>
+  <rect x="439" y="530" width="30" height="20" rx="10.0" fill="#15803d"/>
+  <text x="454.0" y="543.96" class="pill" text-anchor="middle" style="font-size:11px">I4</text>
+  <circle cx="271" cy="544" r="17" fill="#15803d"/>
+  <text x="271" y="549" class="pill" text-anchor="middle" style="font-size:13px">11</text>
+  <path d="M480,604.0 L493,604.0" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="494" y="540" width="212" height="128" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="600.0" y="581.48" class="t" text-anchor="middle" style="font-size:14px">CDI DataVolume import</text>
+  <text x="600.0" y="599.84" class="s" text-anchor="middle" style="font-size:12px">virtctl image-upload through</text>
+  <text x="600.0" y="617.84" class="s" text-anchor="middle" style="font-size:12px">port-forwarded cdi-uploadproxy</text>
+  <text x="600.0" y="635.84" class="s" text-anchor="middle" style="font-size:12px">qemu-img convert to raw</text>
+  <rect x="666" y="530" width="30" height="20" rx="10.0" fill="#15803d"/>
+  <text x="681.0" y="543.96" class="pill" text-anchor="middle" style="font-size:11px">I4</text>
+  <circle cx="498" cy="544" r="17" fill="#15803d"/>
+  <text x="498" y="549" class="pill" text-anchor="middle" style="font-size:13px">12</text>
+  <path d="M707,604.0 L720,604.0" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="721" y="540" width="212" height="128" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="827.0" y="581.48" class="t" text-anchor="middle" style="font-size:14px">PVC binds to EBS</text>
+  <text x="827.0" y="599.84" class="s" text-anchor="middle" style="font-size:12px">40Gi Block RWO, gp3 encrypted</text>
+  <text x="827.0" y="617.84" class="s" text-anchor="middle" style="font-size:12px">PV pvc-87c920c1-...</text>
+  <text x="827.0" y="635.84" class="s" text-anchor="middle" style="font-size:12px">EBS vol-0d94fba4ddd3d84d2</text>
+  <rect x="893" y="530" width="30" height="20" rx="10.0" fill="#15803d"/>
+  <text x="908.0" y="543.96" class="pill" text-anchor="middle" style="font-size:11px">I4</text>
+  <circle cx="725" cy="544" r="17" fill="#15803d"/>
+  <text x="725" y="549" class="pill" text-anchor="middle" style="font-size:13px">13</text>
+  <path d="M934,604.0 L947,604.0" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="948" y="540" width="212" height="128" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="1054.0" y="581.48" class="t" text-anchor="middle" style="font-size:14px">KubeVirt VM created</text>
+  <text x="1054.0" y="599.84" class="s" text-anchor="middle" style="font-size:12px">legacy-source-vm-migrated</text>
+  <text x="1054.0" y="617.84" class="s" text-anchor="middle" style="font-size:12px">runStrategy Manual</text>
+  <text x="1054.0" y="635.84" class="s" text-anchor="middle" style="font-size:12px">started 04:04:35 UTC</text>
+  <rect x="1120" y="530" width="30" height="20" rx="10.0" fill="#15803d"/>
+  <text x="1135.0" y="543.96" class="pill" text-anchor="middle" style="font-size:11px">I4</text>
+  <circle cx="952" cy="544" r="17" fill="#15803d"/>
+  <text x="952" y="549" class="pill" text-anchor="middle" style="font-size:13px">14</text>
+  <path d="M1054.0,670 L1054.0,698 L146.0,698 L146.0,716" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="40" y="730" width="212" height="128" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="146.0" y="771.48" class="t" text-anchor="middle" style="font-size:14px">VMI created</text>
+  <text x="146.0" y="789.84" class="s" text-anchor="middle" style="font-size:12px">by virt-controller</text>
+  <text x="146.0" y="807.84" class="s" text-anchor="middle" style="font-size:12px">Running 5 s after start</text>
+  <text x="146.0" y="825.84" class="s" text-anchor="middle" style="font-size:12px">LiveMigratable=False (RWO)</text>
+  <rect x="212" y="720" width="30" height="20" rx="10.0" fill="#15803d"/>
+  <text x="227.0" y="733.96" class="pill" text-anchor="middle" style="font-size:11px">I4</text>
+  <circle cx="44" cy="734" r="17" fill="#15803d"/>
+  <text x="44" y="739" class="pill" text-anchor="middle" style="font-size:13px">15</text>
+  <path d="M253,794.0 L266,794.0" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="267" y="730" width="212" height="128" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="373.0" y="771.48" class="t" text-anchor="middle" style="font-size:14px">virt-launcher starts</text>
+  <text x="373.0" y="789.84" class="s" text-anchor="middle" style="font-size:12px">Pod ...-nqq8c, 2/2 Running</text>
+  <text x="373.0" y="807.84" class="s" text-anchor="middle" style="font-size:12px">pod IP 10.244.0.30</text>
+  <text x="373.0" y="825.84" class="s" text-anchor="middle" style="font-size:12px">virtqemud + qemu-kvm inside</text>
+  <rect x="439" y="720" width="30" height="20" rx="10.0" fill="#15803d"/>
+  <text x="454.0" y="733.96" class="pill" text-anchor="middle" style="font-size:11px">I4</text>
+  <circle cx="271" cy="734" r="17" fill="#15803d"/>
+  <text x="271" y="739" class="pill" text-anchor="middle" style="font-size:13px">16</text>
+  <path d="M480,794.0 L493,794.0" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="494" y="730" width="212" height="128" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="600.0" y="771.48" class="t" text-anchor="middle" style="font-size:14px">QEMU/KVM boots guest</text>
+  <text x="600.0" y="789.84" class="s" text-anchor="middle" style="font-size:12px">OVMF UEFI, q35, vda, enp1s0</text>
+  <text x="600.0" y="807.84" class="s" text-anchor="middle" style="font-size:12px">DHCP 10.0.2.2 via 10.0.2.1</text>
+  <text x="600.0" y="825.84" class="s" text-anchor="middle" style="font-size:12px">agent connected after 16 s</text>
+  <rect x="666" y="720" width="30" height="20" rx="10.0" fill="#15803d"/>
+  <text x="681.0" y="733.96" class="pill" text-anchor="middle" style="font-size:11px">I4</text>
+  <circle cx="498" cy="734" r="17" fill="#15803d"/>
+  <text x="498" y="739" class="pill" text-anchor="middle" style="font-size:13px">17</text>
+  <path d="M707,794.0 L720,794.0" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#m475569)"/>
+  <rect x="721" y="730" width="212" height="128" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="827.0" y="771.48" class="t" text-anchor="middle" style="font-size:14px">nginx via NodePort</text>
+  <text x="827.0" y="789.84" class="s" text-anchor="middle" style="font-size:12px">curl 3.6.94.104:30080: 200</text>
+  <text x="827.0" y="807.84" class="s" text-anchor="middle" style="font-size:12px">267 bytes, b9826e18...0046</text>
+  <text x="827.0" y="825.84" class="s" text-anchor="middle" style="font-size:12px">the same page as the source</text>
+  <rect x="893" y="720" width="30" height="20" rx="10.0" fill="#15803d"/>
+  <text x="908.0" y="733.96" class="pill" text-anchor="middle" style="font-size:11px">I4</text>
+  <circle cx="725" cy="734" r="17" fill="#15803d"/>
+  <text x="725" y="739" class="pill" text-anchor="middle" style="font-size:13px">18</text>
+  <path d="M934,794.0 L947,794.0" fill="none" stroke="#6d28d9" stroke-width="2" stroke-dasharray="9 6" marker-end="url(#m6d28d9)"/>
+  <rect x="948" y="730" width="212" height="128" rx="10" fill="#f1f5f9" stroke="#64748b" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="1054.0" y="771.48" class="t" text-anchor="middle" style="font-size:14px">Gate I5</text>
+  <text x="1054.0" y="789.84" class="s" text-anchor="middle" style="font-size:12px">final validation and</text>
+  <text x="1054.0" y="807.84" class="s" text-anchor="middle" style="font-size:12px">controlled teardown</text>
+  <text x="1054.0" y="825.84" class="s" text-anchor="middle" style="font-size:12px">I5-A to I5-J, not approved</text>
+  <rect x="1056" y="720" width="94" height="20" rx="10.0" fill="#6d28d9"/>
+  <text x="1103.0" y="733.96" class="pill" text-anchor="middle" style="font-size:11px">NOT STARTED</text>
+  <circle cx="952" cy="734" r="17" fill="#6d28d9"/>
+  <text x="952" y="739" class="pill" text-anchor="middle" style="font-size:13px">I5</text>
+  <text x="600" y="312" class="xs halo" text-anchor="middle" style="font-weight:700">laptop: source + conversion</text>
+  <text x="600" y="502" class="xs halo" text-anchor="middle" style="font-weight:700">I3 built the AWS target; I4 starts</text>
+  <text x="600" y="692" class="xs halo" text-anchor="middle" style="font-weight:700">on AWS: Kubernetes + KubeVirt</text>
+  <text x="600" y="912" class="sub" text-anchor="middle" style="font-weight:600">Steps 1-10 ran on the laptop; the I3 platform and steps 11-18 ran on AWS. Step 18 is the primary proof: the same page, end to end.</text>
+</svg>

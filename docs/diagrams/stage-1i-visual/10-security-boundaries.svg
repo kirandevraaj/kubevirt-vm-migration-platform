@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1110" viewBox="0 0 1200 1110" role="img" aria-labelledby="title desc">
+  <title id="title">Security boundaries</title>
+  <desc id="desc">Three lanes. Management: Windows SSH to kvm-learning-01, whose systemd tunnel forwards 127.0.0.1:16443 over TCP 22 (operator /32) to the node's 127.0.0.1:6443 kube-apiserver. Dashboard: browser 127.0.0.1:18080, SSH local forward to the jump host 127.0.0.1:18081, kubectl port-forward to the ClusterIP Service headlamp, Headlamp with a read-only service account. Application: curl to TCP 30080 (operator /32), NodePort, Service, Pod, guest nginx. Closed: public 6443, guest SSH 22, CDI upload proxy, Headlamp, load balancers. Credentials: temporary transfer key destroyed, read-only Headlamp account, no AWS keys on the node; the source VM stays independent.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m15803d" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#15803d"/></marker><marker id="m1d4ed8" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#1d4ed8"/></marker><marker id="m6d28d9" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#6d28d9"/></marker></defs>
+  <rect width="1200" height="1110" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">Security boundaries: what is reachable, and how</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">Public exposure after Gate I4: only TCP 22 and TCP 30080, both from one operator /32</text>
+  <rect x="1097" y="84" width="73" height="20" rx="10.0" fill="#15803d"/>
+  <text x="1133.5" y="97.96" class="pill" text-anchor="middle" style="font-size:11px">OBSERVED</text>
+  <rect x="30" y="108" width="1140" height="196" rx="14" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.6"/>
+  <text x="48" y="132" class="lab" text-anchor="start" style="fill:#1d4ed8">MANAGEMENT</text>
+  <text x="170.0" y="132" class="xs" text-anchor="start" style="font-weight:600">Kubernetes API - never public</text>
+  <rect x="50.0" y="152" width="196.0" height="132" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="148.0" y="195.64" class="t" text-anchor="middle" style="font-size:14.5px">Windows</text>
+  <text x="148.0" y="214.09" class="s" text-anchor="middle" style="font-size:12px">ssh labadmin@</text>
+  <text x="148.0" y="232.09" class="s" text-anchor="middle" style="font-size:12px">192.168.50.30</text>
+  <text x="148.0" y="250.09" class="s" text-anchor="middle" style="font-size:12px">(laptop LAN, key auth)</text>
+  <path d="M248.0,218 L274.0,218" fill="none" stroke="#1d4ed8" stroke-width="2.6" marker-end="url(#m1d4ed8)"/>
+  <rect x="276.0" y="152" width="196.0" height="132" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="374.0" y="195.64" class="t" text-anchor="middle" style="font-size:14.5px">kvm-learning-01</text>
+  <text x="374.0" y="214.09" class="s" text-anchor="middle" style="font-size:12px">kubectl -&gt; 127.0.0.1:16443</text>
+  <text x="374.0" y="232.09" class="s" text-anchor="middle" style="font-size:12px">stage1i-k8s-tunnel.service</text>
+  <text x="374.0" y="250.09" class="s" text-anchor="middle" style="font-size:12px">(systemd user unit)</text>
+  <path d="M474.0,218 L500.0,218" fill="none" stroke="#1d4ed8" stroke-width="2.6" marker-end="url(#m1d4ed8)"/>
+  <rect x="502.0" y="152" width="196.0" height="132" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <text x="600.0" y="195.64" class="t" text-anchor="middle" style="font-size:14.5px">SG: TCP 22</text>
+  <text x="600.0" y="214.09" class="s" text-anchor="middle" style="font-size:12px">from operator /32 only</text>
+  <text x="600.0" y="232.09" class="s" text-anchor="middle" style="font-size:12px">dedicated ed25519 key</text>
+  <text x="600.0" y="250.09" class="s" text-anchor="middle" style="font-size:12px">for the node</text>
+  <path d="M700.0,218 L726.0,218" fill="none" stroke="#1d4ed8" stroke-width="2.6" marker-end="url(#m1d4ed8)"/>
+  <rect x="728.0" y="152" width="196.0" height="132" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="826.0" y="195.64" class="t" text-anchor="middle" style="font-size:14.5px">node sshd</text>
+  <text x="826.0" y="214.09" class="s" text-anchor="middle" style="font-size:12px">local forward</text>
+  <text x="826.0" y="232.09" class="s" text-anchor="middle" style="font-size:12px">16443 -&gt; 127.0.0.1:6443</text>
+  <text x="826.0" y="250.09" class="s" text-anchor="middle" style="font-size:12px">listener: loopback only</text>
+  <path d="M926.0,218 L952.0,218" fill="none" stroke="#1d4ed8" stroke-width="2.6" marker-end="url(#m1d4ed8)"/>
+  <rect x="954.0" y="152" width="196.0" height="132" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="1052.0" y="195.64" class="t" text-anchor="middle" style="font-size:14.5px">kube-apiserver :6443</text>
+  <text x="1052.0" y="214.09" class="s" text-anchor="middle" style="font-size:12px">admin kubeconfig: node +</text>
+  <text x="1052.0" y="232.09" class="s" text-anchor="middle" style="font-size:12px">jump host only (mode 600)</text>
+  <text x="1052.0" y="250.09" class="s" text-anchor="middle" style="font-size:12px">public 6443: timed out</text>
+  <rect x="1053.0" y="142" width="87" height="20" rx="10.0" fill="#b91c1c"/>
+  <text x="1096.5" y="155.96" class="pill" text-anchor="middle" style="font-size:11px">NOT PUBLIC</text>
+  <rect x="30" y="324" width="1140" height="196" rx="14" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.6"/>
+  <text x="48" y="348" class="lab" text-anchor="start" style="fill:#6d28d9">DASHBOARD</text>
+  <text x="159.39999999999998" y="348" class="xs" text-anchor="start" style="font-weight:600">Headlamp - private forwarding only</text>
+  <rect x="50.0" y="368" width="196.0" height="132" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="148.0" y="411.64" class="t" text-anchor="middle" style="font-size:14.5px">Windows browser</text>
+  <text x="148.0" y="430.09" class="s" text-anchor="middle" style="font-size:12px">http://127.0.0.1:18080</text>
+  <text x="148.0" y="448.09" class="s" text-anchor="middle" style="font-size:12px">bound to loopback,</text>
+  <text x="148.0" y="466.09" class="s" text-anchor="middle" style="font-size:12px">not the Windows LAN</text>
+  <path d="M248.0,434 L274.0,434" fill="none" stroke="#6d28d9" stroke-width="2.6" marker-end="url(#m6d28d9)"/>
+  <rect x="276.0" y="368" width="196.0" height="132" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="374.0" y="411.64" class="t" text-anchor="middle" style="font-size:14.5px">SSH local forward</text>
+  <text x="374.0" y="430.09" class="s" text-anchor="middle" style="font-size:12px">-L 127.0.0.1:18080:</text>
+  <text x="374.0" y="448.09" class="s" text-anchor="middle" style="font-size:12px">127.0.0.1:18081</text>
+  <text x="374.0" y="466.09" class="s" text-anchor="middle" style="font-size:12px">to kvm-learning-01</text>
+  <path d="M474.0,434 L500.0,434" fill="none" stroke="#6d28d9" stroke-width="2.6" marker-end="url(#m6d28d9)"/>
+  <rect x="502.0" y="368" width="196.0" height="132" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="600.0" y="411.64" class="t" text-anchor="middle" style="font-size:14.5px">kubectl port-forward</text>
+  <text x="600.0" y="430.09" class="s" text-anchor="middle" style="font-size:12px">127.0.0.1:18081 on jump host</text>
+  <text x="600.0" y="448.09" class="s" text-anchor="middle" style="font-size:12px">stage1i-headlamp-portforward</text>
+  <text x="600.0" y="466.09" class="s" text-anchor="middle" style="font-size:12px">rides the API tunnel</text>
+  <path d="M700.0,434 L726.0,434" fill="none" stroke="#6d28d9" stroke-width="2.6" marker-end="url(#m6d28d9)"/>
+  <rect x="728.0" y="368" width="196.0" height="132" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="826.0" y="411.64" class="t" text-anchor="middle" style="font-size:14.5px">svc/headlamp :80</text>
+  <text x="826.0" y="430.09" class="s" text-anchor="middle" style="font-size:12px">ClusterIP only</text>
+  <text x="826.0" y="448.09" class="s" text-anchor="middle" style="font-size:12px">no NodePort, LB, Ingress</text>
+  <text x="826.0" y="466.09" class="s" text-anchor="middle" style="font-size:12px">no AWS rule</text>
+  <path d="M926.0,434 L952.0,434" fill="none" stroke="#6d28d9" stroke-width="2.6" marker-end="url(#m6d28d9)"/>
+  <rect x="954.0" y="368" width="196.0" height="132" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="1052.0" y="411.64" class="t" text-anchor="middle" style="font-size:14.5px">Headlamp v0.45.0</text>
+  <text x="1052.0" y="430.09" class="s" text-anchor="middle" style="font-size:12px">SA headlamp-viewer:</text>
+  <text x="1052.0" y="448.09" class="s" text-anchor="middle" style="font-size:12px">get, list, watch + pods/log</text>
+  <text x="1052.0" y="466.09" class="s" text-anchor="middle" style="font-size:12px">can-i create/delete: no</text>
+  <rect x="1060.0" y="358" width="80" height="20" rx="10.0" fill="#15803d"/>
+  <text x="1100.0" y="371.96" class="pill" text-anchor="middle" style="font-size:11px">READ-ONLY</text>
+  <rect x="30" y="540" width="1140" height="196" rx="14" fill="#f0fdf4" stroke="#86efac" stroke-width="1.6"/>
+  <text x="48" y="564" class="lab" text-anchor="start" style="fill:#15803d">APPLICATION</text>
+  <text x="180.6" y="564" class="xs" text-anchor="start" style="font-weight:600">the one public data path</text>
+  <rect x="50.0" y="584" width="196.0" height="132" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+  <text x="148.0" y="636.64" class="t" text-anchor="middle" style="font-size:14.5px">Windows curl</text>
+  <text x="148.0" y="655.09" class="s" text-anchor="middle" style="font-size:12px">operator /32</text>
+  <text x="148.0" y="673.09" class="s" text-anchor="middle" style="font-size:12px">(shared laptop egress)</text>
+  <path d="M248.0,650 L274.0,650" fill="none" stroke="#15803d" stroke-width="2.6" marker-end="url(#m15803d)"/>
+  <rect x="276.0" y="584" width="196.0" height="132" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+  <text x="374.0" y="636.64" class="t" text-anchor="middle" style="font-size:14.5px">SG: TCP 30080</text>
+  <text x="374.0" y="655.09" class="s" text-anchor="middle" style="font-size:12px">from operator /32 only</text>
+  <text x="374.0" y="673.09" class="s" text-anchor="middle" style="font-size:12px">public IP 3.6.94.104</text>
+  <path d="M474.0,650 L500.0,650" fill="none" stroke="#15803d" stroke-width="2.6" marker-end="url(#m15803d)"/>
+  <rect x="502.0" y="584" width="196.0" height="132" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="600.0" y="636.64" class="t" text-anchor="middle" style="font-size:14.5px">NodePort 30080</text>
+  <text x="600.0" y="655.09" class="s" text-anchor="middle" style="font-size:12px">the only NodePort</text>
+  <text x="600.0" y="673.09" class="s" text-anchor="middle" style="font-size:12px">in the cluster</text>
+  <path d="M700.0,650 L726.0,650" fill="none" stroke="#15803d" stroke-width="2.6" marker-end="url(#m15803d)"/>
+  <rect x="728.0" y="584" width="196.0" height="132" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="826.0" y="636.64" class="t" text-anchor="middle" style="font-size:14.5px">Service -&gt; Pod</text>
+  <text x="826.0" y="655.09" class="s" text-anchor="middle" style="font-size:12px">10.108.249.186 -&gt; 10.244.0.30</text>
+  <text x="826.0" y="673.09" class="s" text-anchor="middle" style="font-size:12px">masquerade DNAT to 10.0.2.2</text>
+  <path d="M926.0,650 L952.0,650" fill="none" stroke="#15803d" stroke-width="2.6" marker-end="url(#m15803d)"/>
+  <rect x="954.0" y="584" width="196.0" height="132" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="1052.0" y="636.64" class="t" text-anchor="middle" style="font-size:14.5px">nginx in the guest</text>
+  <text x="1052.0" y="655.09" class="s" text-anchor="middle" style="font-size:12px">HTTP 200, 267 bytes</text>
+  <text x="1052.0" y="673.09" class="s" text-anchor="middle" style="font-size:12px">same page sha256</text>
+  <rect x="30" y="760" width="560" height="330" rx="14" fill="#fef2f2" stroke="#b91c1c" stroke-width="1.8"/>
+  <text x="48" y="786" class="lab" text-anchor="start" style="fill:#b91c1c">CLOSED / NOT EXPOSED</text>
+  <path d="M51,811 L65,825 M65,811 L51,825" stroke="#b91c1c" stroke-width="3.5" stroke-linecap="round"/>
+  <text x="78" y="822" class="t" text-anchor="start" style="font-size:13.5px">TCP 6443 Kubernetes API</text>
+  <text x="78" y="839" class="xs" text-anchor="start">no SG rule; public probe timed out</text>
+  <path d="M51,855 L65,869 M65,855 L51,869" stroke="#b91c1c" stroke-width="3.5" stroke-linecap="round"/>
+  <text x="78" y="866" class="t" text-anchor="start" style="font-size:13.5px">guest SSH 22</text>
+  <text x="78" y="883" class="xs" text-anchor="start">no Service, no SG rule; reached via virtctl + API</text>
+  <path d="M51,899 L65,913 M65,899 L51,913" stroke="#b91c1c" stroke-width="3.5" stroke-linecap="round"/>
+  <text x="78" y="910" class="t" text-anchor="start" style="font-size:13.5px">CDI upload proxy</text>
+  <text x="78" y="927" class="xs" text-anchor="start">ClusterIP 10.102.150.105:443 only</text>
+  <path d="M51,943 L65,957 M65,943 L51,957" stroke="#b91c1c" stroke-width="3.5" stroke-linecap="round"/>
+  <text x="78" y="954" class="t" text-anchor="start" style="font-size:13.5px">Headlamp</text>
+  <text x="78" y="971" class="xs" text-anchor="start">ClusterIP :80 only; public 4466 and 80 closed</text>
+  <path d="M51,987 L65,1001 M65,987 L51,1001" stroke="#b91c1c" stroke-width="3.5" stroke-linecap="round"/>
+  <text x="78" y="998" class="t" text-anchor="start" style="font-size:13.5px">LoadBalancer / Ingress / EIP</text>
+  <text x="78" y="1015" class="xs" text-anchor="start">none</text>
+  <path d="M51,1031 L65,1045 M65,1031 L51,1045" stroke="#b91c1c" stroke-width="3.5" stroke-linecap="round"/>
+  <text x="78" y="1042" class="t" text-anchor="start" style="font-size:13.5px">Windows 18080, jump host 16443 + 18081</text>
+  <text x="78" y="1059" class="xs" text-anchor="start">loopback only, not on any LAN</text>
+  <rect x="610" y="760" width="560" height="330" rx="14" fill="#f0fdf4" stroke="#15803d" stroke-width="1.8"/>
+  <text x="628" y="786" class="lab" text-anchor="start" style="fill:#15803d">CREDENTIALS + INDEPENDENCE</text>
+  <path d="M633,818 L637.6666666666666,822.9 L647,812.4" fill="none" stroke="#15803d" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="660" y="822" class="t" text-anchor="start" style="font-size:13.5px">Transfer key: temporary, now destroyed</text>
+  <text x="660" y="839" class="xs" text-anchor="start">sftp-only, from /32; removed from node, shredded</text>
+  <path d="M633,862 L637.6666666666666,866.9 L647,856.4" fill="none" stroke="#15803d" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="660" y="866" class="t" text-anchor="start" style="font-size:13.5px">Headlamp account: read-only</text>
+  <text x="660" y="883" class="xs" text-anchor="start">ClusterRole headlamp-viewer; no cluster-admin</text>
+  <path d="M633,906 L637.6666666666666,910.9 L647,900.4" fill="none" stroke="#15803d" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="660" y="910" class="t" text-anchor="start" style="font-size:13.5px">No AWS keys on the node</text>
+  <text x="660" y="927" class="xs" text-anchor="start">instance profile scoped to the EBS CSI driver</text>
+  <path d="M633,950 L637.6666666666666,954.9 L647,944.4" fill="none" stroke="#15803d" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="660" y="954" class="t" text-anchor="start" style="font-size:13.5px">Guest SSH key never left Windows</text>
+  <text x="660" y="971" class="xs" text-anchor="start">jump host relays encrypted bytes only</text>
+  <path d="M633,994 L637.6666666666666,998.9 L647,988.4" fill="none" stroke="#15803d" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="660" y="998" class="t" text-anchor="start" style="font-size:13.5px">Source VM independent</text>
+  <text x="660" y="1015" class="xs" text-anchor="start">legacy-source-vm still runs on ESXi (.31)</text>
+  <path d="M633,1038 L637.6666666666666,1042.9 L647,1032.4" fill="none" stroke="#15803d" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="660" y="1042" class="t" text-anchor="start" style="font-size:13.5px">Point-in-time copy, not a cutover</text>
+  <text x="660" y="1059" class="xs" text-anchor="start">no sync back, no IP takeover, rollback = source</text>
+</svg>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1274" viewBox="0 0 1200 1274" role="img" aria-labelledby="title desc">
+  <title id="title">Stage 1I mission chain</title>
+  <desc id="desc">From the VMware ESXi VM legacy-source-vm through a cold point-in-time disk copy, offline preparation (Gate I1) and a QEMU/KVM boot test (Gate I2) on conversion-host-01, then to AWS: CDI DataVolume and PVC, VirtualMachine, VMI, virt-launcher Pod, QEMU/KVM, the same Linux guest and nginx returning HTTP 200 through NodePort 30080 (Gate I4). Three environments: source, conversion and AWS/Kubernetes target. All steps observed.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs><marker id="m15803d" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#15803d"/></marker><marker id="m475569" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker></defs>
+  <rect width="1200" height="1274" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">Mission: one VMware VM, now running under KubeVirt on AWS</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">The same Ubuntu + nginx guest, managed by Kubernetes - three environments, eleven links</text>
+  <rect x="1005" y="84" width="165" height="20" rx="10.0" fill="#15803d"/>
+  <text x="1087.5" y="97.96" class="pill" text-anchor="middle" style="font-size:11px">OBSERVED - I1-I4 PASS</text>
+  <rect x="30" y="110" width="1140" height="182" rx="14" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.6"/>
+  <text x="48" y="138" class="lab" text-anchor="start" style="fill:#334155">SOURCE - laptop</text>
+  <text x="48" y="160" class="xs" text-anchor="start">VMware Workstation Pro</text>
+  <text x="48" y="178" class="xs" text-anchor="start">nested ESXi 8.0.3</text>
+  <text x="48" y="196" class="xs" text-anchor="start">esxi-8-lab 192.168.50.11</text>
+  <text x="48" y="214" class="xs" text-anchor="start">VMnet8 192.168.50.0/24</text>
+  <rect x="350" y="128" width="470" height="62" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="585.0" y="145.46" class="t" text-anchor="middle" style="font-size:15.5px">1  VMware ESXi VM</text>
+  <text x="585.0" y="164.5" class="s" text-anchor="middle" style="font-size:12.5px">legacy-source-vm: Ubuntu 24.04.5 + nginx 1.24.0</text>
+  <text x="585.0" y="183.0" class="s" text-anchor="middle" style="font-size:12.5px">PVSCSI disk, VMXNET3 NIC, UEFI, 192.168.50.31</text>
+  <rect x="850" y="136" width="30" height="20" rx="10.0" fill="#15803d"/>
+  <text x="865.0" y="149.96" class="pill" text-anchor="middle" style="font-size:11px">1C</text>
+  <text x="850" y="174" class="xs" text-anchor="start" style="font-weight:600">source keeps running - this is not a cutover</text>
+  <path d="M585,192 L585,210" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="350" y="212" width="470" height="62" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="585.0" y="229.46" class="t" text-anchor="middle" style="font-size:15.5px">2  Cold, point-in-time disk copy</text>
+  <text x="585.0" y="248.5" class="s" text-anchor="middle" style="font-size:12.5px">graceful shutdown, scp, the same SHA256 three times</text>
+  <text x="585.0" y="267.0" class="s" text-anchor="middle" style="font-size:12.5px">golden VMDK kept on Windows, never modified</text>
+  <rect x="850" y="220" width="30" height="20" rx="10.0" fill="#15803d"/>
+  <text x="865.0" y="233.96" class="pill" text-anchor="middle" style="font-size:11px">1E</text>
+  <text x="850" y="258" class="xs" text-anchor="start" style="font-weight:600">then 1F workbench + 1G virt-v2v to qcow2</text>
+  <rect x="30" y="338" width="1140" height="182" rx="14" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.6"/>
+  <text x="48" y="366" class="lab" text-anchor="start" style="fill:#6d28d9">CONVERSION - laptop</text>
+  <text x="48" y="388" class="xs" text-anchor="start">conversion-host-01</text>
+  <text x="48" y="406" class="xs" text-anchor="start">192.168.50.32</text>
+  <text x="48" y="424" class="xs" text-anchor="start">QEMU/KVM + libguestfs</text>
+  <path d="M585,276 L585,354" fill="none" stroke="#15803d" stroke-width="2.6" marker-end="url(#m15803d)"/>
+  <text x="600" y="320.0" class="xs halo" text-anchor="start" style="font-weight:600">working copy of the golden VMDK -&gt; conversion host (1F)</text>
+  <rect x="350" y="356" width="470" height="62" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="585.0" y="373.46" class="t" text-anchor="middle" style="font-size:15.5px">3  Offline guest preparation</text>
+  <text x="585.0" y="392.5" class="s" text-anchor="middle" style="font-size:12.5px">virt-v2v first-boot jobs removed; netplan by driver + DHCP</text>
+  <text x="585.0" y="411.0" class="s" text-anchor="middle" style="font-size:12.5px">qemu-guest-agent installed offline; image 0444 + chattr +i</text>
+  <rect x="850" y="364" width="66" height="20" rx="10.0" fill="#15803d"/>
+  <text x="883.0" y="377.96" class="pill" text-anchor="middle" style="font-size:11px">I1 PASS</text>
+  <text x="850" y="402" class="xs" text-anchor="start" style="font-weight:600">41 of 41 checks; sha256 2b30e195...93b2</text>
+  <path d="M585,420 L585,438" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="350" y="440" width="470" height="62" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="585.0" y="457.46" class="t" text-anchor="middle" style="font-size:15.5px">4  QEMU/KVM boot test</text>
+  <text x="585.0" y="476.5" class="s" text-anchor="middle" style="font-size:12.5px">the exact image through a disposable overlay, UEFI + VirtIO</text>
+  <text x="585.0" y="495.0" class="s" text-anchor="middle" style="font-size:12.5px">DHCP, guest agent, nginx HTTP 200, same page hash</text>
+  <rect x="850" y="448" width="66" height="20" rx="10.0" fill="#15803d"/>
+  <text x="883.0" y="461.96" class="pill" text-anchor="middle" style="font-size:11px">I2 PASS</text>
+  <text x="850" y="486" class="xs" text-anchor="start" style="font-weight:600">54 of 54 checks; the image was never modified</text>
+  <rect x="30" y="566" width="1140" height="602" rx="14" fill="#fff7ed" stroke="#fdba74" stroke-width="1.6"/>
+  <text x="48" y="594" class="lab" text-anchor="start" style="fill:#c2410c">TARGET - AWS ap-south-1</text>
+  <text x="48" y="616" class="xs" text-anchor="start">EC2 m8i.xlarge, nested virt</text>
+  <text x="48" y="634" class="xs" text-anchor="start">Kubernetes v1.36.5 (kubeadm)</text>
+  <text x="48" y="652" class="xs" text-anchor="start">KubeVirt v1.9.0, CDI v1.66.1</text>
+  <text x="48" y="670" class="xs" text-anchor="start">EBS CSI, encrypted gp3</text>
+  <text x="48" y="688" class="xs" text-anchor="start">platform built in Gate I3</text>
+  <path d="M585,504 L585,582" fill="none" stroke="#15803d" stroke-width="2.6" marker-end="url(#m15803d)"/>
+  <text x="600" y="548.0" class="xs halo" text-anchor="start" style="font-weight:600">SFTP straight to the node: 321 s, sha256 matched (I4)</text>
+  <rect x="350" y="584" width="470" height="62" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="585.0" y="601.46" class="t" text-anchor="middle" style="font-size:15.5px">5  CDI DataVolume -&gt; PVC</text>
+  <text x="585.0" y="620.5" class="s" text-anchor="middle" style="font-size:12.5px">virtctl image-upload; CDI converts qcow2 to raw</text>
+  <text x="585.0" y="639.0" class="s" text-anchor="middle" style="font-size:12.5px">40Gi, Block, RWO on encrypted EBS gp3</text>
+  <rect x="850" y="592" width="30" height="20" rx="10.0" fill="#15803d"/>
+  <text x="865.0" y="605.96" class="pill" text-anchor="middle" style="font-size:11px">I4</text>
+  <text x="850" y="630" class="xs" text-anchor="start" style="font-weight:600">DataVolume Succeeded, PVC Bound</text>
+  <path d="M585,648 L585,666" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="350" y="668" width="470" height="62" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="585.0" y="685.46" class="t" text-anchor="middle" style="font-size:15.5px">6  VirtualMachine</text>
+  <text x="585.0" y="704.5" class="s" text-anchor="middle" style="font-size:12.5px">legacy-source-vm-migrated: the desired state</text>
+  <text x="585.0" y="723.0" class="s" text-anchor="middle" style="font-size:12.5px">runStrategy Manual; disk + masquerade NIC</text>
+  <rect x="850" y="676" width="30" height="20" rx="10.0" fill="#15803d"/>
+  <text x="865.0" y="689.96" class="pill" text-anchor="middle" style="font-size:11px">I4</text>
+  <text x="850" y="714" class="xs" text-anchor="start" style="font-weight:600">VM Running, Ready=True</text>
+  <path d="M585,732 L585,750" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="350" y="752" width="470" height="62" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="585.0" y="769.46" class="t" text-anchor="middle" style="font-size:15.5px">7  VirtualMachineInstance (VMI)</text>
+  <text x="585.0" y="788.5" class="s" text-anchor="middle" style="font-size:12.5px">the one running instance of that VM</text>
+  <text x="585.0" y="807.0" class="s" text-anchor="middle" style="font-size:12.5px">Running 5 s after start; AgentConnected</text>
+  <rect x="850" y="760" width="30" height="20" rx="10.0" fill="#15803d"/>
+  <text x="865.0" y="773.96" class="pill" text-anchor="middle" style="font-size:11px">I4</text>
+  <text x="850" y="798" class="xs" text-anchor="start" style="font-weight:600">on node ip-10-40-1-10</text>
+  <path d="M585,816 L585,834" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="350" y="836" width="470" height="62" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="585.0" y="853.46" class="t" text-anchor="middle" style="font-size:15.5px">8  virt-launcher Pod</text>
+  <text x="585.0" y="872.5" class="s" text-anchor="middle" style="font-size:12.5px">virt-launcher-legacy-source-vm-migrated-nqq8c</text>
+  <text x="585.0" y="891.0" class="s" text-anchor="middle" style="font-size:12.5px">2/2 Running, pod IP 10.244.0.30</text>
+  <rect x="850" y="844" width="30" height="20" rx="10.0" fill="#15803d"/>
+  <text x="865.0" y="857.96" class="pill" text-anchor="middle" style="font-size:11px">I4</text>
+  <text x="850" y="882" class="xs" text-anchor="start" style="font-weight:600">the Pod that hosts the VM process</text>
+  <path d="M585,900 L585,918" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="350" y="920" width="470" height="62" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.8"/>
+  <text x="585.0" y="937.46" class="t" text-anchor="middle" style="font-size:15.5px">9  QEMU/KVM</text>
+  <text x="585.0" y="956.5" class="s" text-anchor="middle" style="font-size:12.5px">qemu-kvm 10.1.0 driven by virtqemud (libvirt 11.10.0)</text>
+  <text x="585.0" y="975.0" class="s" text-anchor="middle" style="font-size:12.5px">q35, OVMF UEFI, 2 vCPU, 4 GiB, /dev/kvm</text>
+  <rect x="850" y="928" width="30" height="20" rx="10.0" fill="#15803d"/>
+  <text x="865.0" y="941.96" class="pill" text-anchor="middle" style="font-size:11px">I4</text>
+  <text x="850" y="966" class="xs" text-anchor="start" style="font-weight:600">nested KVM on the EC2 node (VT-x)</text>
+  <path d="M585,984 L585,1002" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="350" y="1004" width="470" height="62" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="585.0" y="1021.46" class="t" text-anchor="middle" style="font-size:15.5px">10  Linux guest</text>
+  <text x="585.0" y="1040.5" class="s" text-anchor="middle" style="font-size:12.5px">the same Ubuntu 24.04.5, kernel 6.8.0-142</text>
+  <text x="585.0" y="1059.0" class="s" text-anchor="middle" style="font-size:12.5px">enp1s0 10.0.2.2 by DHCP; hostname + machine-id kept</text>
+  <rect x="850" y="1012" width="30" height="20" rx="10.0" fill="#15803d"/>
+  <text x="865.0" y="1025.96" class="pill" text-anchor="middle" style="font-size:11px">I4</text>
+  <text x="850" y="1050" class="xs" text-anchor="start" style="font-weight:600">36 of 36 guest checks</text>
+  <path d="M585,1068 L585,1086" fill="none" stroke="#475569" stroke-width="2.2" marker-end="url(#m475569)"/>
+  <rect x="350" y="1088" width="470" height="62" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="585.0" y="1105.46" class="t" text-anchor="middle" style="font-size:15.5px">11  nginx</text>
+  <text x="585.0" y="1124.5" class="s" text-anchor="middle" style="font-size:12.5px">1.24.0 with the same 13 config files</text>
+  <text x="585.0" y="1143.0" class="s" text-anchor="middle" style="font-size:12.5px">HTTP 200 at 3.6.94.104:30080, same page sha256</text>
+  <rect x="850" y="1096" width="66" height="20" rx="10.0" fill="#15803d"/>
+  <text x="883.0" y="1109.96" class="pill" text-anchor="middle" style="font-size:11px">I4 PASS</text>
+  <text x="850" y="1134" class="xs" text-anchor="start" style="font-weight:600">page sha256 b9826e18...0046 = source</text>
+  <rect x="30" y="1188" width="1140" height="62" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="600.0" y="1214.69" class="t" text-anchor="middle" style="font-size:17px">Same guest, new manager: ESXi -&gt; KubeVirt on Kubernetes</text>
+  <text x="600.0" y="1234.82" class="s" text-anchor="middle" style="font-size:13.5px">continuity is proven by content (the same page sha256), not by the old IP 192.168.50.31</text>
+</svg>

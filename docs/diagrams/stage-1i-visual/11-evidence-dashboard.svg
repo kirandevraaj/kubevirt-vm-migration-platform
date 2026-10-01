@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1000" viewBox="0 0 1200 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Evidence dashboard I1 to I5</title>
+  <desc id="desc">Five gate rows: I1 offline preparation PASS (41 of 41), I2 boot test PASS (54 of 54), I3 AWS platform PASS, I4 first KubeVirt migration PASS (36 of 36 guest checks, external HTTP 200), I5 final validation and controlled teardown (I5-A to I5-J) not started. Below, nine Gate I4 runtime checks: DataVolume Succeeded, PVC Bound, EBS attached, VM and VMI Running and Ready, virt-launcher Running, guest agent responsive, nginx HTTP 200 in the guest and external NodePort access.</desc>
+  <style>
+    text { font-family: 'Segoe UI', Arial, sans-serif; }
+    .h { font-size: 24px; font-weight: 700; fill: #0f172a; }
+    .h2 { font-size: 17px; font-weight: 700; fill: #0f172a; }
+    .sub { font-size: 14px; fill: #334155; }
+    .t { font-weight: 600; fill: #0f172a; }
+    .s { fill: #1f2937; }
+    .xs { font-size: 12px; fill: #334155; }
+    .lab { font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1px; }
+    .pill { font-size: 11px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+  </style>
+  <defs></defs>
+  <rect width="1200" height="1000" fill="#ffffff"/>
+  <text x="600.0" y="44" class="h" text-anchor="middle">Evidence dashboard: gates I1 to I5</text>
+  <text x="600.0" y="70" class="sub" text-anchor="middle">Every PASS below is an observed check in the Stage 1I record</text>
+  <rect x="1005" y="84" width="165" height="20" rx="10.0" fill="#6d28d9"/>
+  <text x="1087.5" y="97.96" class="pill" text-anchor="middle" style="font-size:11px">STAGE 1I NOT COMPLETE</text>
+  <rect x="30" y="110" width="1140" height="58" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <circle cx="64" cy="139" r="20" fill="#15803d"/>
+  <text x="64" y="144" class="pill" text-anchor="middle" style="font-size:13px">I1</text>
+  <text x="98" y="135" class="t" text-anchor="start" style="font-size:16px">Offline image preparation</text>
+  <text x="98" y="155" class="xs" text-anchor="start">01:20 - 01:29 UTC</text>
+  <rect x="330" y="128" width="47" height="21" rx="10.5" fill="#15803d"/>
+  <text x="353.5" y="142.82" class="pill" text-anchor="middle" style="font-size:12px">PASS</text>
+  <text x="470" y="144" class="s" text-anchor="start" style="font-size:13px">41 of 41 checks; sha256 2b30e195...93b2; 0444 + chattr +i; source untouched</text>
+  <rect x="30" y="180" width="1140" height="58" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <circle cx="64" cy="209" r="20" fill="#15803d"/>
+  <text x="64" y="214" class="pill" text-anchor="middle" style="font-size:13px">I2</text>
+  <text x="98" y="205" class="t" text-anchor="start" style="font-size:16px">Pre-transfer boot test</text>
+  <text x="98" y="225" class="xs" text-anchor="start">01:38 - 01:55 UTC</text>
+  <rect x="330" y="198" width="47" height="21" rx="10.5" fill="#15803d"/>
+  <text x="353.5" y="212.82" class="pill" text-anchor="middle" style="font-size:12px">PASS</text>
+  <text x="470" y="214" class="s" text-anchor="start" style="font-size:13px">54 of 54 checks; UEFI + VirtIO, DHCP, agent, nginx 200, same page hash</text>
+  <rect x="30" y="250" width="1140" height="58" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <circle cx="64" cy="279" r="20" fill="#15803d"/>
+  <text x="64" y="284" class="pill" text-anchor="middle" style="font-size:13px">I3</text>
+  <text x="98" y="275" class="t" text-anchor="start" style="font-size:16px">AWS destination platform</text>
+  <text x="98" y="295" class="xs" text-anchor="start">01:59 - 02:49 UTC</text>
+  <rect x="330" y="268" width="47" height="21" rx="10.5" fill="#15803d"/>
+  <text x="353.5" y="282.82" class="pill" text-anchor="middle" style="font-size:12px">PASS</text>
+  <text x="470" y="284" class="s" text-anchor="start" style="font-size:13px">Terraform VPC/SG/EC2; kubeadm 1.36.5; KubeVirt 1.9.0; CDI 1.66.1; EBS CSI</text>
+  <rect x="30" y="320" width="1140" height="58" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <circle cx="64" cy="349" r="20" fill="#15803d"/>
+  <text x="64" y="354" class="pill" text-anchor="middle" style="font-size:13px">I4</text>
+  <text x="98" y="345" class="t" text-anchor="start" style="font-size:16px">First KubeVirt migration</text>
+  <text x="98" y="365" class="xs" text-anchor="start">03:47 - 04:28 UTC</text>
+  <rect x="330" y="338" width="47" height="21" rx="10.5" fill="#15803d"/>
+  <text x="353.5" y="352.82" class="pill" text-anchor="middle" style="font-size:12px">PASS</text>
+  <text x="470" y="354" class="s" text-anchor="start" style="font-size:13px">36 of 36 guest checks; external HTTP 200; identity identical; evidence reconciled</text>
+  <rect x="30" y="390" width="1140" height="58" rx="10" fill="#f1f5f9" stroke="#64748b" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <circle cx="64" cy="419" r="20" fill="#6d28d9"/>
+  <text x="64" y="424" class="pill" text-anchor="middle" style="font-size:13px">I5</text>
+  <text x="98" y="415" class="t" text-anchor="start" style="font-size:16px">Validation + teardown</text>
+  <text x="98" y="435" class="xs" text-anchor="start">defined, not approved</text>
+  <rect x="330" y="408" width="101" height="21" rx="10.5" fill="#6d28d9"/>
+  <text x="380.5" y="422.82" class="pill" text-anchor="middle" style="font-size:12px">NOT STARTED</text>
+  <text x="470" y="424" class="s" text-anchor="start" style="font-size:13px">10 sub-gates I5-A to I5-J; none passed; VM, Service, DV, PVC, PV and EBS kept until I5-C/D</text>
+  <text x="48" y="490" class="lab" text-anchor="start" style="fill:#15803d">GATE I4 RUNTIME CHECKLIST  (all OBSERVED in the Stage 1I record, 04:04 - 04:28 UTC)</text>
+  <rect x="30" y="506" width="366" height="112" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="213.0" y="548.12" class="t" text-anchor="middle" style="font-size:16px">DataVolume Succeeded</text>
+  <text x="213.0" y="567.66" class="s" text-anchor="middle" style="font-size:13px">legacy-source-vm-disk</text>
+  <text x="213.0" y="586.66" class="s" text-anchor="middle" style="font-size:13px">Upload Complete, no restarts</text>
+  <path d="M47,530 L53.0,536.3 L65,522.8" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="417" y="506" width="366" height="112" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="600.0" y="548.12" class="t" text-anchor="middle" style="font-size:16px">PVC Bound</text>
+  <text x="600.0" y="567.66" class="s" text-anchor="middle" style="font-size:13px">40Gi, Block, RWO</text>
+  <text x="600.0" y="586.66" class="s" text-anchor="middle" style="font-size:13px">owner: the DataVolume</text>
+  <path d="M434,530 L440.0,536.3 L452,522.8" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="804" y="506" width="366" height="112" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="987.0" y="548.12" class="t" text-anchor="middle" style="font-size:16px">EBS attached</text>
+  <text x="987.0" y="567.66" class="s" text-anchor="middle" style="font-size:13px">vol-0d94fba4ddd3d84d2 in-use</text>
+  <text x="987.0" y="586.66" class="s" text-anchor="middle" style="font-size:13px">/dev/xvdaa, encrypted gp3</text>
+  <path d="M821,530 L827.0,536.3 L839,522.8" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="30" y="632" width="366" height="112" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="213.0" y="674.12" class="t" text-anchor="middle" style="font-size:16px">VM Running, Ready</text>
+  <text x="213.0" y="693.66" class="s" text-anchor="middle" style="font-size:13px">legacy-source-vm-migrated</text>
+  <text x="213.0" y="712.66" class="s" text-anchor="middle" style="font-size:13px">runStrategy Manual</text>
+  <path d="M47,656 L53.0,662.3 L65,648.8" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="417" y="632" width="366" height="112" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="600.0" y="674.12" class="t" text-anchor="middle" style="font-size:16px">VMI Running, Ready</text>
+  <text x="600.0" y="693.66" class="s" text-anchor="middle" style="font-size:13px">UID a12db97b-..., Running in 5 s</text>
+  <text x="600.0" y="712.66" class="s" text-anchor="middle" style="font-size:13px">DataVolumesReady, AgentConnected</text>
+  <path d="M434,656 L440.0,662.3 L452,648.8" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="804" y="632" width="366" height="112" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="987.0" y="674.12" class="t" text-anchor="middle" style="font-size:16px">virt-launcher Running</text>
+  <text x="987.0" y="693.66" class="s" text-anchor="middle" style="font-size:13px">...-nqq8c, 2/2, 0 restarts</text>
+  <text x="987.0" y="712.66" class="s" text-anchor="middle" style="font-size:13px">pod IP 10.244.0.30</text>
+  <path d="M821,656 L827.0,662.3 L839,648.8" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="30" y="758" width="366" height="112" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="213.0" y="800.12" class="t" text-anchor="middle" style="font-size:16px">Guest agent responsive</text>
+  <text x="213.0" y="819.66" class="s" text-anchor="middle" style="font-size:13px">connected 16 s after start</text>
+  <text x="213.0" y="838.66" class="s" text-anchor="middle" style="font-size:13px">ping, osinfo, fsinfo, interfaces</text>
+  <path d="M47,782 L53.0,788.3 L65,774.8" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="417" y="758" width="366" height="112" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="600.0" y="800.12" class="t" text-anchor="middle" style="font-size:16px">nginx HTTP 200 in the guest</text>
+  <text x="600.0" y="819.66" class="s" text-anchor="middle" style="font-size:13px">1.24.0; 13 config files identical</text>
+  <text x="600.0" y="838.66" class="s" text-anchor="middle" style="font-size:13px">267 bytes, b9826e18...0046</text>
+  <path d="M434,782 L440.0,788.3 L452,774.8" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="804" y="758" width="366" height="112" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <text x="987.0" y="800.12" class="t" text-anchor="middle" style="font-size:16px">External NodePort OK</text>
+  <text x="987.0" y="819.66" class="s" text-anchor="middle" style="font-size:13px">curl 3.6.94.104:30080 -&gt; 200</text>
+  <text x="987.0" y="838.66" class="s" text-anchor="middle" style="font-size:13px">re-collected 04:26:34</text>
+  <path d="M821,782 L827.0,788.3 L839,774.8" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="600" y="900" class="xs" text-anchor="middle" style="font-weight:600">Live check (read-only, 10:46 UTC): VM + VMI Running/Ready, DataVolume Succeeded, PVC + PV Bound, endpoint 10.244.0.30 ready.</text>
+  <text x="600" y="924" class="xs" text-anchor="middle">Evidence files live outside the repo: conversion-host-01:/srv/migration-lab/stage-1i/evidence/ (copy on kvm-learning-01).</text>
+  <rect x="30" y="944" width="1140" height="44" rx="10" fill="#f1f5f9" stroke="#64748b" stroke-width="1.8" stroke-dasharray="3 4"/>
+  <text x="600.0" y="970.8" class="t" text-anchor="middle" style="font-size:15px">Stage 1I is NOT complete: I1-I4 PASS, I5 not started</text>
+</svg>
