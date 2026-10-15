@@ -383,6 +383,8 @@ Answers below are backed by the Stage 1G experiments (see [Stage 1G record](../s
 
 Answers below are backed by the Stage 1H design and its sources (see [Stage 1H record](../stage-1/stage-1h-kubevirt-target-feasibility.md)). Nothing was provisioned, so these are design answers, not runtime results.
 
+> Note added 2026-10-15: Stage 1I later built this design and ran the migration (2026-10-01). The answers below are kept as design answers; runtime answers are in [Stage 1I additions](#stage-1i-additions-the-migration-that-was-actually-run).
+
 ### 50. "EKS or self-managed Kubernetes for KubeVirt on AWS?"
 
 **Short answer:** Decide from KubeVirt's host requirements, not from "managed is easier" or "self-managed is more flexible". For the first migration I chose a single-node kubeadm cluster on one nested-virtualization EC2 instance and deferred EKS; EKS was not blocked.
@@ -418,3 +420,49 @@ Answers below are backed by the Stage 1H design and its sources (see [Stage 1H r
 **Short answer:** Do not install it at first boot. Pre-install qemu-guest-agent offline into a disposable copy of the converted disk on the conversion host, remove virt-v2v's first-boot apt job, and treat the agent as optional for passing validation.
 
 **Detail:** In Stage 1G virt-v2v's first-boot job stalled in `apt-get update` on an isolated network. The design downloads the package and its dependencies on the conversion host and installs them offline with libguestfs tools. The exact dependency set is still an unknown. The netplan remediation ([ADR 010](../adr/010-migration-network-remediation.md)) is applied the same way and in the same pass: match by driver `virtio_net`, DHCP.
+
+---
+
+## Stage 1I additions: the migration that was actually run
+
+Answers below are backed by the [Stage 1I record](../stage-1/stage-1i-first-kubevirt-migration.md) (2026-10-01). They describe one cold migration of one VM on a temporary single-node target, not a production service.
+
+### 56. "Walk me through the migration you actually ran."
+
+**Short answer:** I did a cold copy of the VMDK from ESXi, verified it by sha256, converted it with virt-v2v, and prepared the guest offline. I boot-tested it under QEMU/KVM, moved it over SFTP to a Terraform-built EC2 node running kubeadm, KubeVirt and CDI, uploaded it into a DataVolume, started a KubeVirt VM, and validated nginx end to end. Then I tore everything down.
+
+**Detail:** Five approval gates: I1 prepare the image, I2 boot-test it, I3 build the AWS platform, I4 migrate, I5 validate and tear down. The target was one `m8i.xlarge` with nested virtualization in ap-south-1, running CentOS Stream 9, Kubernetes v1.36.5, CRI-O 1.36.6, flannel, KubeVirt v1.9.0, CDI v1.66.1 and the EBS CSI driver. The disk landed raw on a 40 GiB encrypted gp3 Block PVC. The final check from the operator workstation through NodePort 30080 returned HTTP 200 and 267 bytes, with the source page's sha256. Only the AWS layer is in Terraform; the cluster software was installed step by step, as the record documents. Two design details from answers 54 and 55 were settled at runtime. Immediate binding used the DataVolume annotation `cdi.kubevirt.io/storage.bind.immediate.requested` rather than `--force-bind`. The guest agent's only missing dependency was `liburing2`.
+
+### 57. "How did you prove the migrated VM was the same workload?"
+
+**Short answer:** By content and identity, not by IP address.
+
+**Detail:** The same page hash came back over HTTP. The machine-id, filesystem UUIDs, hostname, nginx package and configuration-tree hash all matched the Stage 1C baseline. The guest's host key matched the ED25519 key pinned in Stage 1C under strict host-key checking. The things that were expected to change were recorded as such: NIC `ens192` became `enp1s0`, disk `sda` became virtio `vda`, the MAC changed, the SMBIOS vendor became KubeVirt, and 192.168.50.31 became 10.0.2.2 by DHCP. `DataVolume Succeeded` was treated as proof that CDI finished writing, not that the right bytes arrived.
+
+### 58. "What went wrong, and how did you handle it?"
+
+**Short answer:** Several things, and each one was recorded rather than hidden.
+
+**Detail:**
+
+- The newest AMI named "CentOS Stream 9" booted CentOS Stream 10 in image mode. This was caught before installing anything, and Terraform replaced the instance with the centos.org-listed CentOS Stream 9 AMI.
+- The first pre-transfer boot test was blocked because QEMU user-mode networking with `restrict=on` offers no DHCP router. Nothing was patched; a second run on an isolated network namespace passed.
+- Two SFTP attempts failed before any data moved: the buffer size exceeded the node's limit, and a stale `.partial` file had inherited a read-only mode.
+- Five local evidence logs were deleted because a PowerShell helper was named `rd`, which is a built-in alias of `Remove-Item`. Four were re-collected by re-running the same read-only scripts. The fifth, the post-transfer destination hash check, could not be reproduced, so the record relies on two surviving original records of the same hash and says so.
+
+### 59. "How did you tear it down without leaving billed or orphaned storage?"
+
+**Short answer:** In lifecycle order, verifying each layer before destroying the next.
+
+**Detail:** Delete the VM and Service, and confirm the disk survives because the VM does not own it. Delete the DataVolume; its owner reference removes the PVC, `reclaimPolicy: Delete` removes the PV, and the CSI driver deletes the EBS volume. Confirm `InvalidVolume.NotFound` in AWS and check that no migration objects remain in the cluster. Only then review a `terraform plan -destroy` (exactly 10 resources), apply it, and confirm every resource is gone in AWS. A final detection-only scan for CSI-tagged volumes found nothing. CSI-created volumes are outside Terraform state, which is why this order matters.
+
+### 60. "What does this project not prove?"
+
+**Short answer:** It proves one cold migration of one Linux VM, with validation and a clean teardown. It does not prove a migration product.
+
+**Detail:**
+
+- The workflow ran by hand; there is no migration controller (ADR 005) and no Forklift.
+- Warm migration, live migration, HA, multi-node behaviour, EKS and Windows guests were not tested.
+- There was no cutover, and the source kept serving. The 10.5 minutes of downtime came from the Stage 1E cold copy.
+- The target was a single, temporary node, used for functional rather than performance validation.

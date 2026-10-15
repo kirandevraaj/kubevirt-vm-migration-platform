@@ -7,6 +7,7 @@
   - the meaning of "offline".
 
   Not applied to any disk, and no boot test was performed.
+- **Post-implementation (added 2026-10-15):** applied to a new prepared image in Stage 1I Gate I1, boot-tested in Gate I2 and validated on KubeVirt in Gate I4 (2026-10-01). See [Post-implementation validation](#post-implementation-validation). The lines above are kept as recorded at the time.
 
 ## Context
 
@@ -48,3 +49,16 @@ This deserves its own record because it is a policy for changing the guest durin
 ## Evidence
 
 [Stage 1G record](../stage-1/stage-1g-controlled-conversion.md), sections 13, 14, 17 and 20 (driver match proven; virt-v2v changes and first-boot scripts recorded); [Stage 1H record](../stage-1/stage-1h-kubevirt-target-feasibility.md), sections 14, 15 and 29; [Stage 1H architecture review](../stage-1/stage-1h-architecture-review.md), section 9.
+
+## Post-implementation validation
+
+Added 2026-10-15. The decision and its rationale above are unchanged. All values are OBSERVED in the [Stage 1I record](../stage-1/stage-1i-first-kubevirt-migration.md), sections [5 to 11](../stage-1/stage-1i-first-kubevirt-migration.md#5-prepared-image) (Gate I1), [15](../stage-1/stage-1i-first-kubevirt-migration.md#15-gate-i2-pre-transfer-boot-test) (Gate I2) and [18.5](../stage-1/stage-1i-first-kubevirt-migration.md#185-guest-boot-and-network-36-of-36-checks-pass) (Gate I4).
+
+| Aspect | Outcome |
+|---|---|
+| Design decision | Replace netplan with a `virtio_net` driver match and DHCP, install qemu-guest-agent offline, and remove the virt-v2v first-boot mechanism. Apply all of this offline to a new disposable copy, then hash and protect it |
+| Applied (Gate I1) | A new standalone qcow2 was made from the kept virt-v2v output on `conversion-host-01`. The changes were netplan (new file hash `89ea1ea3...6a3b`), `qemu-guest-agent` `1:8.2.2+ds-0ubuntu1.18` plus its one missing dependency `liburing2`, and removal of all 14 first-boot entries. An offline `virt-diff` showed nothing else changed; 41 of 41 checks passed. The image was set to mode 0444 and `chattr +i`, with sha256 `2b30e195...93b2`. The source, golden artifact and kept Stage 1G images were unchanged |
+| Differences from the design | guestfish was used instead of virt-customize, so that every guest write was explicit (record D2). The pre-transfer boot test's first run on QEMU user-mode networking with `restrict=on` was blocked, because that network offers no DHCP router. The passing run used an isolated network namespace with a DHCP server that offers a router, approved by the user. The image itself was never modified |
+| Validated | Gate I2: 54 of 54 checks, including DHCP lease, default route, guest agent and the nginx page hash. Gate I4 on KubeVirt: the NIC came up as `enp1s0` (driver `virtio_net`), was configured by the driver match, and received 10.0.2.2 by DHCP. 36 of 36 guest boot and network checks passed, `AgentConnected=True`, and machine-id, filesystem UUIDs, SSH host keys and nginx configuration were unchanged |
+| Limitations | Validated with a single virtio NIC only. The guest's stock apt timers came with the image. In Gate I4 one catch-up run installed nothing, and Gate I5-A found 0 package changes before teardown |
+| Destroyed / retained | The migrated VM and its EBS disk were removed in Gate I5. The prepared image remains on `conversion-host-01`, outside Git, read-only and immutable |

@@ -8,6 +8,7 @@
   - clarifications of the DataVolume/PVC lifecycle and session-specific EBS cleanup.
 
   Nothing was deployed or tested for this amendment.
+- **Post-implementation (added 2026-10-15):** deployed and validated in Stage 1I on 2026-10-01, then removed through the designed lifecycle in the same stage. See [Post-implementation validation](#post-implementation-validation). The lines above are kept as recorded at the time.
 
 ## Context
 
@@ -68,3 +69,15 @@ Live migration requires shared ReadWriteMany volumes [E22]. EBS gp3 is RWO and A
 ## Evidence
 
 [Stage 1H record](../stage-1/stage-1h-kubevirt-target-feasibility.md), sections 16 to 18 and 29, sources E14 to E18, E22, E23, E40, E41, E49 to E51, E55, E56; [Stage 1H architecture review](../stage-1/stage-1h-architecture-review.md), section 7.
+
+## Post-implementation validation
+
+Added 2026-10-15. The decision and its rationale above are unchanged. All values are OBSERVED in the [Stage 1I record](../stage-1/stage-1i-first-kubevirt-migration.md), sections [16.9](../stage-1/stage-1i-first-kubevirt-migration.md#169-storage-and-csi-smoke-test), [18.1](../stage-1/stage-1i-first-kubevirt-migration.md#181-transfer), [18.2](../stage-1/stage-1i-first-kubevirt-migration.md#182-cdi-import) and [19](../stage-1/stage-1i-first-kubevirt-migration.md#19-i5--final-validation-and-controlled-teardown).
+
+| Aspect | Outcome |
+|---|---|
+| Design decision | qcow2 in transit; CDI upload into a standalone DataVolume; 40Gi Block RWO PVC on an encrypted gp3 StorageClass; raw at rest; teardown through the DataVolume, followed by detection-only orphan checks |
+| Deployed and validated | [StorageClass](../../infra/kubernetes/stage-1i/storageclass-ebs-gp3-encrypted.yaml) `ebs-gp3-encrypted` as specified. CDI's StorageProfile reported Block and ReadWriteOnce, and the CRI-O `device_ownership_from_security_context` setting was applied ([drop-in](../../infra/kubernetes/stage-1i/crio-kubevirt.conf)). The [DataVolume](../../infra/kubernetes/stage-1i/datavolume-legacy-source-vm-disk.yaml) was filled by `virtctl image-upload` on the node through `kubectl port-forward`, with `cdi-uploadproxy` kept ClusterIP. CDI v1.66.1 used its volume-populator flow: a 40Gi Block prime PVC and a 43Gi Filesystem scratch PVC, then `qemu-img convert -O raw` onto the block device. The result was EBS `vol-0d94fba4ddd3d84d2`, 40 GiB gp3, encrypted. The scratch volume was deleted automatically. The VM disk was attached as a raw virtio block device (`cache=none`, `io=native`) |
+| Decision deferred in the design, made at runtime | Transfer route: SFTP straight from `conversion-host-01` to the node, using a temporary key restricted to `internal-sftp` and removed afterwards. The SHA-256 was checked before and after on the source side and recorded twice on the node; the original post-transfer log was lost and is disclosed in section 18.1 |
+| Limitations | `DataVolume Succeeded` proved only that CDI finished writing. The imported content was proven by guest-level identity and page-hash checks, not by a hash of the raw PVC. RWO and AZ-scoped storage meant KubeVirt reported the VM as not live-migratable (`DisksNotLiveMigratable`), as designed. No snapshots or backup |
+| Destroyed | Deleting the VM left the disk intact (I5-C). Deleting the DataVolume removed the PVC by owner reference, the PV by `reclaimPolicy: Delete` and the EBS volume through the CSI driver, and AWS returned `InvalidVolume.NotFound` (I5-D, I5-E). No volume was deleted by hand. After `terraform destroy`, the detection-only scan found no volume belonging to the session (I5-I) |

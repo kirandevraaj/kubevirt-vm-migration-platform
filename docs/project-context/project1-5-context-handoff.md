@@ -8,6 +8,15 @@ Handoff created: 2026-09-27 ~11:35 IST (06:05 UTC), from the Cursor session run 
 Purpose: this file is the authoritative context for continuing Project 1.5 in a fresh Cursor workspace
 (`C:\Projects\kubevirt-vm-migration-platform`) without relying on chat history.
 
+> **Historical document (note added 2026-10-15).** This handoff records the state on 2026-09-27, before Stage 0. It is no longer the authoritative current state, and its "current", "planned" and "next steps" sections are superseded. Since then:
+>
+> - Stage 0 and Stage 1 (sub-stages 1A to 1I) were completed.
+> - `legacy-source-vm` was built and acquired.
+> - The ESXi reboot persistence test passed in Stage 1A.
+> - Stage 1I built a temporary single-node kubeadm cluster on one nested-virtualization EC2 instance through Terraform (not EKS, not `.metal`), migrated the VM to KubeVirt, validated it, and destroyed the target on 2026-10-01.
+>
+> For the current state, see the [top-level README](../../README.md), the [Stage 1 index](../stage-1/README.md) and the [Stage 1I record](../stage-1/stage-1i-first-kubevirt-migration.md). The text below is kept unchanged as the original project context.
+
 ## Evidence markers
 
 | Marker | Meaning |

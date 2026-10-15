@@ -89,9 +89,9 @@ Both converted disks booted under plain QEMU/KVM, with UEFI and VirtIO storage. 
 
 Finally, with a disk we know boots and a known network fix, we could design the target sensibly. Stage 1H is design only: nothing on AWS or Kubernetes was created. From documentation and release artifacts it chose (ADR 007) a single-node, self-managed kubeadm cluster on one EC2 instance with nested virtualization (`m8i.xlarge`, ap-south-1). The stack is CentOS Stream 9, CRI-O, Kubernetes 1.36, KubeVirt v1.9.0 and CDI v1.66.1, with the CDI pairing still a candidate until tested. EKS was investigated and deferred, not rejected. The network (ADR 008) uses KubeVirt's default pod network with masquerade: the guest will get 10.0.2.2 by DHCP, and a NodePort is the external check. The address 192.168.50.31 is **not** preserved; continuity is proven by content instead. The guest fix (ADR 010) is the 1G netplan change, switched to DHCP. The disk (ADR 009) travels as qcow2, is uploaded through CDI and is stored raw on a 40 GiB gp3 block volume.
 
-The one real blocker is recorded as unknown U15: AWS credentials are not available yet (BLOCKED). Stage 1H is "Done: H1 to H10 PASS, awaiting user review".
+The one real blocker was recorded as unknown U15: AWS credentials were not available yet (BLOCKED). At the end of 1H the stage stood at "Done: H1 to H10 PASS, awaiting user review". U15 was later resolved, and the architecture review corrections were applied on 2026-09-30.
 
-This becomes important later because Stage 1 turns every future step into something already rehearsed. We know what the disk is, how to copy it safely, what conversion changes and what it does not, why the network breaks and how to fix it, and what the target should look like. The next stage (not yet defined) can focus on building the target and running the first real KubeVirt boot, not on discovering basics.
+This becomes important later because Stage 1 turns every future step into something already rehearsed. We know what the disk is, how to copy it safely, what conversion changes and what it does not, why the network breaks and how to fix it, and what the target should look like. That is what let the next stage, 1I, focus on building the target and running the first real KubeVirt migration rather than on discovering basics. It did so on 2026-10-01 (see the [Stage 1I record](stage-1i-first-kubevirt-migration.md)).
 
 ## 5. Stage-by-Stage Journey
 
@@ -387,11 +387,11 @@ It turns "run it on KubeVirt" into a concrete, costed design with a clear data p
 
 #### What came out of the stage?
 
-The Stage 1H record, ADRs 007 to 010, three design diagrams, the Stage 1I entry criteria, and the updated README. No AWS resource, cluster or Kubernetes object exists.
+The Stage 1H record, ADRs 007 to 010, three design diagrams, the Stage 1I entry criteria, and the updated README. No AWS resource, cluster or Kubernetes object existed at the end of 1H.
 
 #### One-sentence takeaway
 
-We know what the target should look like and why, but none of it has been built or proven at runtime yet.
+At the end of 1H we knew what the target should look like and why, but none of it had been built or proven at runtime; Stage 1I did that later.
 
 ## 6. Mental Model
 
@@ -714,28 +714,28 @@ These topics appear in the repository but are deferred, out of scope, or backgro
 
 ## 11. Current Lab State
 
-This table follows the current [Stage 1 README](README.md) ("Current source host state (after Stage 1H)"). It is the documented state. Live power states can differ after ad-hoc operations outside the stages.
+This table follows the current [Stage 1 README](README.md) ("Lab state (as last recorded, Stage 1I, 2026-10-01)"). It is the documented state. Live power states can differ after ad-hoc operations outside the stages.
 
 | Stage | Status | What exists | Purpose |
 |---|---|---|---|
 | 1A | Complete (PASS), 2026-09-27 | ESXi 8.0.3 `esxi-8-lab`, `vmk0` 192.168.50.11, `migration-datastore` (VMFS-6), NTP synced, SSH key login, maintenance mode disabled | The trusted source host |
-| 1B | Complete (PASS), 2026-09-27 | `kvm-learning-01` (Vmid 1), **powered off** per the README, 192.168.50.30 when running | KVM/QEMU/libvirt learning VM |
+| 1B | Complete (PASS), 2026-09-27 | `kvm-learning-01` (Vmid 1), 192.168.50.30; powered off after 1C, then **powered on** in Stage 1I as the Terraform and kubectl jump host | KVM/QEMU/libvirt learning VM |
 | 1C | Complete (PASS), 2026-09-27 | `legacy-source-vm` (Vmid 2), **powered on**, 192.168.50.31, nginx on :80, no snapshots | The migration source |
 | 1D | Complete (PASS), 2026-09-27 | Artifact inventory and acquisition design (documents only) | Know what to copy and how |
 | 1E | Complete (PASS), 2026-09-27 | Golden cold copy at `C:\VMs\legacy-source-vm\stage-1e\` (outside Git, Windows read-only attribute since 1G), sha256 `72ca45c7...c9e7` | Trusted input for all conversion work |
 | 1F | Complete (PASS), 2026-09-27 | `conversion-host-01` (Vmid 3), **powered on**, 192.168.50.32; working copy in `/srv/migration-lab/working/` (read-only, immutable) | Safe Linux workbench and inspection |
 | 1G | Complete (PASS), 2026-09-28 | ADR 006; artifacts in `/srv/migration-lab/stage-1g/`: qemu-img qcow2 (`08c62ac5...5447`), virt-v2v qcow2 + XML (`94bc1cd6...91c6`), remediated copy (`5326b130...d3d6`); ovmf installed; no QEMU guest running | Proven conversion and KVM boot |
-| 1H | Done: H1 to H10 PASS, awaiting user review | ADRs 007 to 010, design record and diagrams. **No AWS resource, cluster or Kubernetes object exists.** | The chosen KubeVirt target, on paper |
+| 1H | Done (design): H1 to H10 PASS, 2026-09-28; review corrections 2026-09-30 | ADRs 007 to 010, design record and diagrams. The design was built in 1I and then destroyed; **no AWS resource, cluster or Kubernetes object exists now.** | The chosen KubeVirt target |
 | 1I | Complete (PASS), 2026-10-01: I1 to I5 PASS | Nothing left running: the temporary AWS target was destroyed and verified in Gate I5; evidence kept outside Git | First KubeVirt migration ([Stage 1I record](stage-1i-first-kubevirt-migration.md)) |
 
 Historical versus current, where older documents describe an earlier moment:
 
-- [kvm-learning-lab.md](kvm-learning-lab.md) describes `kvm-learning-01` as powered on at .30 and says `legacy-source-vm` does not exist yet. That was true at the end of 1B. The README's current state is: powered off since 1C, and `legacy-source-vm` exists.
+- [kvm-learning-lab.md](kvm-learning-lab.md) describes `kvm-learning-01` as powered on at .30 and says `legacy-source-vm` does not exist yet. That was true at the end of 1B. The README later recorded it as powered off after 1C and powered on again as the Stage 1I jump host; `legacy-source-vm` exists.
 - The 1C README paragraph says "The conversion host remains deferred." That was true then. It was built in 1F and recorded as ADR 006 in 1G.
 - The 1D record's original claim about the descriptor `CID` was disproved in 1E, and the 1D record carries the correction.
 - The 1F record deliberately did not change the golden artifact's attributes. In 1G it was given the Windows read-only attribute (content unchanged).
 - 1G's network test used a static test address (10.0.2.15) on an isolated network. The current target design (ADR 010) uses DHCP, with the guest getting 10.0.2.2 under masquerade (ADR 008).
-- Stage 0's one-line architecture mentions S3 staging. The Stage 1H design moves the qcow2 to the node and uses a CDI upload (ADR 009). The route to AWS is left to Stage 1I.
+- Stage 0's one-line architecture mentions S3 staging. The Stage 1H design moves the qcow2 to the node and uses a CDI upload (ADR 009), and left the route to AWS to Stage 1I. Stage 1I used SFTP from `conversion-host-01` to the node; S3 was not used.
 
 ## 12. Why the Stages Were Ordered This Way
 
@@ -754,13 +754,14 @@ Historical versus current, where older documents describe an earlier moment:
 
 **Starting point:** An empty nested ESXi 8.0.3 host on VMware Workstation, plus the Stage 0 theory.
 
-**Destination:** The same Ubuntu + nginx guest running as a KubeVirt `VirtualMachine` on a single-node kubeadm cluster on EC2 (designed in 1H, not built), then a containerized nginx later.
+**Destination:** The same Ubuntu + nginx guest running as a KubeVirt `VirtualMachine` on a single-node kubeadm cluster on EC2 (designed in 1H; built temporarily, validated and destroyed in 1I), then a containerized nginx later (not implemented).
 
 **Stage flow:**
 
 ```
 1A reboot proof -> 1B learn KVM -> 1C build source -> 1D study disk
 -> 1E cold copy -> 1F workbench + inspect -> 1G convert + boot -> 1H design target
+-> 1I build target, migrate, validate, tear down
 ```
 
 **15 key terms:**
@@ -804,12 +805,12 @@ golden VMDK (Windows) -> working copy (read-only) [1F, done]
    | virt-v2v -> qcow2 ; netplan match virtio_net  [1G, done on copies]
    v
 boots on QEMU/KVM + OVMF + VirtIO, same page hash [1G, done]
-   | CDI upload DataVolume -> gp3 Block PVC (raw)  [1H, designed]
+   | CDI upload DataVolume -> gp3 Block PVC (raw)  [1H designed, 1I done]
    v
 KubeVirt VirtualMachine -> virt-launcher Pod -> QEMU/KVM
-   | masquerade 10.0.2.2, NodePort check           [1H, designed]
+   | masquerade 10.0.2.2, NodePort check           [1H designed, 1I done]
    v
-same nginx page, same sha256                      [future stage]
+same nginx page, same sha256                      [1I done, then torn down]
 ```
 
-**Remember this:** Stage 1 did not migrate the VM to Kubernetes yet. It proved, one safe step at a time, every part of the path that could be proven without a cluster. The source host is stable, and the source VM is baselined. Its disk is safely copied and understood, and a converted copy boots under the same hypervisor stack KubeVirt uses and serves the same page once one netplan line is fixed. The Kubernetes target is designed, costed and justified, but not built: that is the next stage's job, once it is defined and AWS credentials are available. A VM on KubeVirt is still a VM; modernization is a separate, later step.
+**Remember this:** Stages 1A to 1H did not migrate the VM to Kubernetes. They proved, one safe step at a time, every part of the path that could be proven without a cluster. The source host is stable, and the source VM is baselined. Its disk is safely copied and understood, and a converted copy boots under the same hypervisor stack KubeVirt uses and serves the same page once one netplan line is fixed. Stage 1H designed, costed and justified the Kubernetes target. Stage 1I then built it temporarily, migrated the VM, validated it and destroyed it. A VM on KubeVirt is still a VM; modernization is a separate, later step.

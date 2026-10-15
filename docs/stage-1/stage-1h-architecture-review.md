@@ -8,6 +8,7 @@
 | Repository state reviewed | `main` at `a9511b6` (Stage 1H itself is commit `43f3b70`) |
 | Upstream sources retrieved | 2026-09-30 (section 2) |
 | Result | **REQUIRES ARCHITECTURAL CORRECTIONS** (section 17). The core architecture is coherent; eight bounded corrections are needed before Stage 1I is proposed for approval |
+| Later outcome | Note added 2026-10-15. The eight corrections were applied on 2026-09-30 ([Stage 1H section 29](stage-1h-kubevirt-target-feasibility.md#29-post-review-corrections-review-r1-to-r8)). Stage 1I then built the corrected design and completed on 2026-10-01 ([Stage 1I record](stage-1i-first-kubevirt-migration.md)). This review is kept as written |
 
 Evidence labels used throughout:
 

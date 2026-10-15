@@ -30,6 +30,8 @@ Cross-reference (Stage 1H): the first-migration target topology, instance family
 - Every session repeats cluster bootstrap, so KubeVirt/CDI install must be automated.
 - Blocker: AWS credentials must be recovered or re-issued first.
 
+**Post-implementation note (added 2026-10-15).** In Stage 1I (2026-10-01), Terraform created all 10 AWS resources of the target and later destroyed exactly those 10. AWS confirmed the removal, and no orphaned volume remained ([Stage 1I record](../stage-1/stage-1i-first-kubevirt-migration.md#16-gate-i3-aws-destination-platform), sections 16 and 19). The credentials blocker was resolved: Terraform ran with the operator's credentials on the jump host, outside Git. The automation consequence above was **not** met in this repository. Terraform ([infra/terraform/stage-1i-target](../../infra/terraform/stage-1i-target/)) covers only the AWS layer. Kubernetes, KubeVirt, CDI and the CSI driver were installed on the node step by step, as recorded in Stage 1I section 16, and the helper scripts used were archived outside Git. A rebuild therefore repeats those recorded steps; it is not a single command.
+
 ## Evidence
 
 [AWS: nested virtualization on EC2](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/amazon-ec2-nested-virtualization.html), [What's New 2026-02-16](https://aws.amazon.com/about-aws/whats-new/2026/02/amazon-ec2-nested-virtualization-on-virtual/), [KubeVirt installation requirements](https://kubevirt.io/user-guide/cluster_admin/installation/), [EKS Kubernetes versions](https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html). Project 1 ADR 001 (Terraform for AWS) precedent.

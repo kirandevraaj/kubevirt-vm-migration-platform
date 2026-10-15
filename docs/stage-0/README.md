@@ -4,6 +4,8 @@
 
 Stage 0 status: **complete, with a technical refinement pass** (2026-09-27), pending user review. Nothing was installed or created. ESXi, VMware networking, Windows virtualization and AWS are unchanged.
 
+> **Later outcome (note added 2026-10-15).** This page records Stage 0 as it stood on 2026-09-27. Stage 1 was then approved and carried out in sub-stages 1A to 1I. Stage 1I completed the first cold migration from ESXi to KubeVirt on a temporary, Terraform-built, single-node kubeadm cluster on AWS EC2, validated it, and destroyed the target (2026-10-01). Several "unvalidated" items below were proven along the way; see the [status table added to the feasibility page](feasibility.md#status-after-stage-1i) and the [Stage 1 index](../stage-1/README.md). The S3 staging step in the one-line architecture was not used: Stage 1I transferred the image over SFTP and used a CDI upload ([ADR 009](../adr/009-kubevirt-storage-model.md)). The migration controller (ADR 005) and the containerized version remain unimplemented.
+
 ## Why Stage 0 exists
 
 Migration tooling hides a long chain of layers: VMware objects, disk formats, guest drivers, KVM/QEMU/libvirt, KubeVirt objects, CDI, Kubernetes storage and networking, and controller design. If we start installing before we understand that chain, every failure becomes guesswork. Stage 0 builds the mental model first, checks current (not remembered) version facts, and identifies what must be proven before any build.

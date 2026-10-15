@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>VM-to-Kubernetes Migration Platform</title>
-<meta name="description" content="Learning portal for the VM-to-Kubernetes Migration Platform: ESXi to KubeVirt migration and VM modernization.">
+<meta name="description" content="Learning portal for the VM-to-Kubernetes Migration Platform: a validated cold migration of one VM from VMware ESXi to KubeVirt.">
 <style>
   :root {
     --ink: #0f172a; --muted: #475569; --line: #e2e8f0; --bg: #f8fafc;
@@ -60,13 +60,12 @@
 <header>
   <div class="wrap hero">
     <h1>VM-to-Kubernetes Migration Platform</h1>
-    <p class="sub">ESXi &#8594; KubeVirt Migration &amp; VM Modernization</p>
+    <p class="sub">VMware ESXi &#8594; KubeVirt</p>
     <div class="status" aria-label="Project status">
       <span class="tag done">STAGE 0: COMPLETE</span>
       <span class="tag done">STAGE 1A &#8211; 1G: DONE</span>
-      <span class="tag design">STAGE 1H: DESIGN, AWAITING REVIEW</span>
-      <span class="tag done">STAGE 1I &#8212; FIRST KUBEVIRT MIGRATION: I1 &#8211; I5 PASS</span>
-      <span class="tag done">STAGE 1I: COMPLETED &#8212; 2026-10-01</span>
+      <span class="tag done">STAGE 1H: TARGET DESIGN DONE</span>
+      <span class="tag done">STAGE 1I &#8212; FIRST KUBEVIRT MIGRATION: I1 &#8211; I5 PASS, 2026-10-01</span>
     </div>
   </div>
 </header>
@@ -76,7 +75,7 @@
   <a class="featured" href="stage-1/stage-1-visual-learning.html">
     <span class="kicker">START HERE</span>
     <h2>Stage 1 Visual Learning</h2>
-    <p>The whole of Stage 1 in 18 diagrams: from a VMware VM on ESXi, through a cold disk copy and conversion to QEMU/KVM, to the designed KubeVirt target. Picture first, with optional short explanations.</p>
+    <p>Stages 1A to 1H in 18 diagrams: from a VMware VM on ESXi, through a cold disk copy and conversion to QEMU/KVM, to the KubeVirt target design. The migration itself (Stage 1I) has its own visual guide below. Picture first, with optional short explanations.</p>
     <span class="go">Open the visual guide &#8594;</span>
   </a>
 
@@ -84,7 +83,7 @@
     <a class="card" href="project-context/project-status-visual.html">
       <span class="n">STATUS</span>
       <h3>Project Status</h3>
-      <p>Visual snapshot of where the migration project stands.</p>
+      <p>Visual snapshot of the project as recorded after Stage 1H (2026-09-28), before the Stage 1I migration, with an updated status strip. For the current status, see the Stage 1I card and the repository README.</p>
       <span class="more">Open the status dashboard &#8594;</span>
     </a>
     <a class="card" href="stage-1/stage-1i-visual-learning.html">
@@ -125,7 +124,7 @@
     </a>
   </div>
 
-  <p class="note">This portal is documentation only. Stage 1I ran a temporary KubeVirt target on AWS for the first migration; Gate I5 (final validation and controlled teardown) removed it, and Stage 1I was completed on 2026-10-01.</p>
+  <p class="note">This portal is documentation only. Stage 1I ran a temporary target for the first migration: a single-node kubeadm cluster with KubeVirt and CDI on one AWS EC2 instance, built with Terraform. Gate I5 (final validation and controlled teardown) removed it, and Stage 1I was completed on 2026-10-01. Nothing from it is running now.</p>
 </main>
 
 <footer>VM-to-Kubernetes Migration Platform &#183; Project 1.5</footer>
