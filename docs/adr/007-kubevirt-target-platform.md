@@ -1,6 +1,7 @@
 # ADR 007: Self-managed kubeadm on one nested-virtualization EC2 instance as the first KubeVirt target
 
 - **Status:** Accepted (Stage 1H, 2026-09-28). Design decision; nothing has been provisioned.
+- **Post-implementation (added 2026-10-15):** built and validated in Stage 1I on 2026-10-01, then destroyed in the same stage. See [Post-implementation validation](#post-implementation-validation). The status line above is kept as recorded at decision time.
 
 ## Context
 
@@ -57,3 +58,17 @@ Not a claim about production suitability.
 ## Evidence
 
 [Stage 1H record](../stage-1/stage-1h-kubevirt-target-feasibility.md), sections 6 to 12 and 22, sources E1 to E9, E25 to E38, E42 to E48.
+
+## Post-implementation validation
+
+Added 2026-10-15. The decision, context and alternatives above are unchanged. Stage 1I built this target with Terraform, used it for the first migration, and destroyed it on 2026-10-01. All values are OBSERVED in the [Stage 1I record](../stage-1/stage-1i-first-kubevirt-migration.md), sections [16](../stage-1/stage-1i-first-kubevirt-migration.md#16-gate-i3-aws-destination-platform) and [19](../stage-1/stage-1i-first-kubevirt-migration.md#19-i5--final-validation-and-controlled-teardown).
+
+| Aspect | Outcome |
+|---|---|
+| Design decision | Self-managed, single-node kubeadm cluster on one nested-virtualization `m8i.xlarge` in ap-south-1, CentOS Stream 9, CRI-O, flannel, EBS CSI, KubeVirt v1.9.0 and CDI v1.66.1 |
+| Deployed and validated | `m8i.xlarge` in ap-south-1a with `NestedVirtualization=enabled`. VT-x and `/dev/kvm` were present and `kvm_intel` loaded with `nested=Y`; `virt-host-validate qemu` passed its hardware-virtualization checks. CentOS Stream 9 (kernel `5.14.0-754.el9`, SELinux enforcing), Kubernetes v1.36.5 via kubeadm, CRI-O 1.36.6, flannel v0.28.9, KubeVirt v1.9.0 (`Available`), CDI v1.66.1 (`Available`), and the EBS CSI driver (v1.66.0 release manifests, driver image v1.65.0). The first migration ran on this tuple ([section 18](../stage-1/stage-1i-first-kubevirt-migration.md#18-gate-i4-first-migration-to-kubevirt)), which resolves the "candidate until the runtime gate" caveat for this one workflow. The record shows equivalent checks; it does not report results against the Stage 0 G1 to G7 labels |
+| Differences from the design | The newest AMI named "CentOS Stream 9 x86_64" booted CentOS Stream 10 in image mode. Terraform replaced it with the centos.org-listed CentOS Stream 9 AMI before anything was installed (record W1). The kubeadm preflight warned that the EL9 kernel version was "unsupported" (W4). The cloud-config hostname did not take effect (W3) |
+| Limitations | One node acting as control plane and worker, so no HA and no live migration. Functional validation only, with no performance measurement. EKS was still not tested |
+| Destroyed | VM, disk and Service removed through Kubernetes (I5-C to I5-F). `terraform destroy` removed exactly the 10 Terraform-managed resources (I5-G), which took the cluster software with the instance. AWS lookups confirmed removal (I5-H), and the orphan-volume scan found nothing (I5-I) |
+
+The consequence "the only unproven element is nested virtualization on the chosen type in ap-south-1" is now proven for this instance type and Region.

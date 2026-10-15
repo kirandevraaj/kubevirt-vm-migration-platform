@@ -156,9 +156,10 @@
     <p>Look first. Turn on <b>Learning Mode</b> only if you want a short explanation under each picture.</p>
     <div class="status">
       <span class="tag done big">1A &#8211; 1G: DONE (PASS)</span>
-      <span class="tag design big">1H: DESIGN ONLY &#8212; awaiting review</span>
+      <span class="tag design big">1H: TARGET DESIGN (H1 &#8211; H10 PASS)</span>
       <span class="tag done big">1I: I1 &#8211; I5 PASS, COMPLETED &#8212; 2026-10-01</span>
     </div>
+    <p>This page explains Stages 1A to 1H. Its diagrams show the state after Stage 1H, when the Kubernetes target was still a design. Stage 1I later built that design on a temporary single-node kubeadm cluster on AWS EC2, migrated the VM to KubeVirt, validated it and destroyed the target. See the <a href="stage-1i-visual-learning.html">Stage 1I visual guide</a>.</p>
     <div class="legend" aria-label="Visual language">
       <span class="k"><span class="sw done"></span>DONE / PROVEN (solid)</span>
       <span class="k"><span class="sw design"></span>DESIGN (dashed)</span>
@@ -205,9 +206,9 @@
 
   <section class="fig" id="lab">
     <div class="fig-head"><span class="num">04</span><h3>Our actual lab</h3>
-      <span class="tags"><span class="tag comp">DOCUMENTED STATE (README)</span><span class="tag design">AWS: DESIGN ONLY</span></span></div>
+      <span class="tags"><span class="tag comp">DOCUMENTED STATE (README)</span><span class="tag design">AWS: DESIGN ONLY AT 1H</span></span></div>
     <a class="img" href="../diagrams/stage-1-visual/04-real-lab.svg" target="_blank"><img src="../diagrams/stage-1-visual/04-real-lab.svg" alt="Windows 11 runs VMware Workstation, which runs nested ESXi with legacy-source-vm, kvm-learning-01 and conversion-host-01; golden artifact on Windows; AWS target design only."></a>
-    <p class="caption">Everything runs on one laptop, three layers deep. There are three VMs with separate jobs: <b>source</b> (legacy-source-vm, running), <b>learning</b> (kvm-learning-01, off) and <b>conversion</b> (conversion-host-01, running). The golden disk copy lives on Windows, outside VMware. The AWS target does not exist yet.</p>
+    <p class="caption">Everything runs on one laptop, three layers deep. There are three VMs with separate jobs: <b>source</b> (legacy-source-vm, running), <b>learning</b> (kvm-learning-01, off after 1H, later used as the Stage 1I jump host) and <b>conversion</b> (conversion-host-01, running). The golden disk copy lives on Windows, outside VMware. The AWS target did not exist at the end of Stage 1H; Stage 1I built it temporarily and then destroyed it.</p>
   </section>
 
   <section class="fig" id="vm-anatomy">
@@ -226,7 +227,7 @@
 
   <section class="fig" id="kubevirt-model">
     <div class="fig-head"><span class="num">13</span><h3>KubeVirt mental model</h3>
-      <span class="tags"><span class="tag design">CONCEPT / DESIGN &#8212; NOT DEPLOYED</span></span></div>
+      <span class="tags"><span class="tag design">CONCEPT / DESIGN AT 1H &#8212; DEPLOYED IN 1I</span></span></div>
     <a class="img" href="../diagrams/stage-1-visual/13-kubevirt-mental-model.svg" target="_blank"><img src="../diagrams/stage-1-visual/13-kubevirt-mental-model.svg" alt="VirtualMachine to VMI to virt-launcher Pod to QEMU to KVM to guest, with CDI filling a PVC used as the VM disk."></a>
     <p class="caption"><b>CDI</b> puts the disk into a PVC (import or upload, stored raw). <b>KubeVirt</b> runs the VM: VirtualMachine, then VMI, then a virt-launcher Pod with QEMU on KVM. The PVC is where one hands over to the other. CDI never runs the VM.</p>
   </section>
@@ -285,16 +286,16 @@
 
   <section class="fig" id="storage-target">
     <div class="fig-head"><span class="num">15</span><h3>Target storage</h3>
-      <span class="tags"><span class="tag design">DESIGN (ADR 009) &#8212; NOTHING PROVISIONED</span></span></div>
+      <span class="tags"><span class="tag design">DESIGN (ADR 009) &#8212; NOTHING PROVISIONED AT 1H</span></span></div>
     <a class="img" href="../diagrams/stage-1-visual/15-storage-target.svg" target="_blank"><img src="../diagrams/stage-1-visual/15-storage-target.svg" alt="VMDK to qcow2 in transit to CDI upload, DataVolume, PVC, 40 GiB Block volume, KubeVirt VM; raw at rest. Design only."></a>
-    <p class="caption">The design moves the prepared qcow2 (about 2.7 GiB) to the node, uploads it through CDI, and stores it <b>raw</b> on a 40 GiB gp3 Block PVC. Only the golden VMDK and the 1G virt-v2v output exist today. Everything else is design.</p>
+    <p class="caption">The design moves the prepared qcow2 (about 2.7 GiB) to the node, uploads it through CDI, and stores it <b>raw</b> on a 40 GiB gp3 Block PVC. At the end of Stage 1H only the golden VMDK and the 1G virt-v2v output existed; everything else was design. Stage 1I then carried out this path, and the PVC and its EBS volume were deleted in the Gate I5 teardown.</p>
   </section>
 
   <section class="fig" id="what-changed">
     <div class="fig-head"><span class="num">17</span><h3>What changed?</h3>
       <span class="tags"><span class="tag done">PROVEN 1G</span><span class="tag design">DESIGN 1H</span></span></div>
     <a class="img" href="../diagrams/stage-1-visual/17-what-changed.svg" target="_blank"><img src="../diagrams/stage-1-visual/17-what-changed.svg" alt="Nine before and after cards from VMware to KVM/KubeVirt, each marked proven or design, plus what stayed unchanged."></a>
-    <p class="caption">The hypervisor, VM process, devices and firmware changes were <b>proven under QEMU/KVM in 1G</b>. The manager, network, VM definition and storage changes are <b>design only</b>. The guest's identity and content stayed the same.</p>
+    <p class="caption">The hypervisor, VM process, devices and firmware changes were <b>proven under QEMU/KVM in 1G</b>. The manager, network, VM definition and storage changes were <b>design only</b> at the end of 1H, and were then carried out in Stage 1I. The guest's identity and content stayed the same.</p>
   </section>
 
   <section class="fig" id="migration-vs-modernization">
@@ -335,6 +336,7 @@
       <li><a href="stage-1f-conversion-host.md">1F conversion host</a></li>
       <li><a href="stage-1g-controlled-conversion.md">1G controlled conversion</a></li>
       <li><a href="stage-1h-kubevirt-target-feasibility.md">1H KubeVirt target feasibility</a></li>
+      <li><a href="stage-1i-first-kubevirt-migration.md">1I first KubeVirt migration</a></li>
       <li><a href="../adr/006-dedicated-conversion-host.md">ADR 006</a>, <a href="../adr/007-kubevirt-target-platform.md">ADR 007</a>, <a href="../adr/008-kubevirt-network-model.md">ADR 008</a>, <a href="../adr/009-kubevirt-storage-model.md">ADR 009</a>, <a href="../adr/010-migration-network-remediation.md">ADR 010</a></li>
     </ul>
   </div>
@@ -384,7 +386,8 @@
     '1H': { t: 'KubeVirt target (design)', s: 'design', go: '#kubevirt-model', rows: [
       ['WHY', 'Design the Kubernetes/KubeVirt destination.'],
       ['DECIDED', 'kubeadm single node on EC2 (nested virt), KubeVirt v1.9.0, CDI v1.66.1 (candidate), masquerade, CDI upload to a gp3 Block PVC.'],
-      ['STATUS', 'DESIGN ONLY: nothing provisioned. AWS credentials BLOCKED.']] }
+      ['STATUS', 'At the end of 1H: design only, nothing provisioned, AWS credentials blocked.'],
+      ['LATER', 'Built in Stage 1I, the VM migrated and validated, then the target destroyed (2026-10-01).']] }
   };
 
   var ov = document.getElementById('overlay'), panel = document.getElementById('panel');

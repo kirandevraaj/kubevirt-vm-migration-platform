@@ -35,6 +35,8 @@ The migration workflow will be owned by a **custom Kubernetes controller** recon
 - Language/framework (for example Go + controller-runtime/kubebuilder, or Python + kopf) is **deferred**.
 - Nothing is implemented or applied in Stage 0.
 
+**Status check (added 2026-10-15).** Implementation is still **deferred**. The first migration (Stage 1I, 2026-10-01) was run step by step under explicit approval gates, and its Gate I4 approval explicitly excluded a migration controller and Forklift. The repository contains no controller code and no `VirtualMachineMigration` CRD manifest. Everything in this ADR remains design.
+
 ## Evidence
 
 Design in [crd-controller-fundamentals.md](../stage-0/crd-controller-fundamentals.md), [migration-state-machine.md](../stage-0/migration-state-machine.md), [migration-architecture.md](../stage-0/migration-architecture.md). References: [Kubernetes controllers](https://kubernetes.io/docs/concepts/architecture/controller/), [Custom resources](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/), [Operator pattern](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/).

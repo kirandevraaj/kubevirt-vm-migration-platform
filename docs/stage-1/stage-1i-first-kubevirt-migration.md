@@ -413,7 +413,7 @@ Approval: explicitly authorized by the user, Gate I3 only. Build and validate th
 
 ### 16.2 Terraform
 
-- The repository had no Terraform layout yet. Gate I3 added `infra/terraform/stage-1i-target/` (`versions.tf`, `variables.tf`, `main.tf`, `outputs.tf`, `user-data.yaml.tftpl`, `.terraform.lock.hcl`). These files are **not committed**, by instruction. The evidence records their sha256 against base commit `fb49917`.
+- The repository had no Terraform layout yet. Gate I3 added `infra/terraform/stage-1i-target/` (`versions.tf`, `variables.tf`, `main.tf`, `outputs.tf`, `user-data.yaml.tftpl`, `.terraform.lock.hcl`). These files are **not committed**, by instruction. The evidence records their sha256 against base commit `fb49917`. (Note added 2026-10-15: they were committed later, together with the Kubernetes manifests, in `c13329e`. No state, variables file or saved plan is in Git.)
 - Terraform 1.16.4 with provider `hashicorp/aws` v6.67.0 ran on `kvm-learning-01` with the operator's credentials. The state is local on that host, outside Git. The AMI ID, the operator /32 and the node's public SSH key came from a variables file there, also outside Git.
 - `terraform fmt -check` was clean, `validate` passed, and the plan showed 10 resources to add. Before applying, I checked the planned instance options, root volume, security-group rules, subnet and route against the approval.
 - Terraform owns exactly these resources: the VPC, subnet, internet gateway, route table, route-table association, security group, IAM role and its policy attachment, instance profile, and the EC2 instance with its root volume.

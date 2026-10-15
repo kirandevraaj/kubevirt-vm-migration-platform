@@ -51,6 +51,25 @@ Nothing in this table may be described as working until it has been tested.
 | N11 | A self-managed Kubernetes node satisfies KubeVirt host requirements | The parallel option | Unvalidated |
 | N12 | Outbound transfer lab -> S3 is fast enough for a disk image | Migration duration | Unvalidated |
 
+### Status after Stage 1I
+
+Added 2026-10-15. The table above is kept as written in Stage 0 (2026-09-27). This table records what later stages established for each item. Sections 2 to 6 below are also kept as written: the Kubernetes topology (F16) was decided in [ADR 007](../adr/007-kubevirt-target-platform.md) (self-managed kubeadm; EKS deferred), the conversion-host question (section 6) in [ADR 006](../adr/006-dedicated-conversion-host.md), and the EKS checklist in section 5 was never run because EKS was not tested.
+
+| # | Later status | Evidence |
+|---|---|---|
+| N1 | Proven: 64-bit L2 guest booted | [Stage 1B](../stage-1/stage-1b-kvm-qemu-fundamentals.md) |
+| N2 | Proven: configuration persisted across a controlled reboot | [Stage 1A](../stage-1/stage-1a-esxi-reboot-validation.md) |
+| N3 | Proven on one `m8i.xlarge` in ap-south-1: VT-x, `/dev/kvm`, `kvm_intel nested=Y` | [Stage 1I section 16.5](../stage-1/stage-1i-first-kubevirt-migration.md#165-node-and-nested-virtualization) |
+| N4 | Proven: KubeVirt v1.9.0 `Available` on the self-managed node | [Stage 1I section 16.7](../stage-1/stage-1i-first-kubevirt-migration.md#167-kubevirt-v190) |
+| N5 | Proven for one tuple: Kubernetes v1.36.5, KubeVirt v1.9.0, CDI v1.66.1, CRI-O 1.36.6. Stage 1I recorded equivalent checks but did not report results against the G1 to G7 labels | [Stage 1I section 16](../stage-1/stage-1i-first-kubevirt-migration.md#16-gate-i3-aws-destination-platform) |
+| N6 | Proven with SSH `scp` of a cold VM. `virt-v2v -i vmx -it ssh` was not tested | [Stage 1E](../stage-1/stage-1e-cold-acquisition.md) |
+| N7 | Proven: `virt-v2v -i disk` conversion of the acquired VMDK | [Stage 1G](../stage-1/stage-1g-controlled-conversion.md) |
+| N8 | Proven: the migrated VM booted on KubeVirt | [Stage 1I section 18](../stage-1/stage-1i-first-kubevirt-migration.md#18-gate-i4-first-migration-to-kubevirt) |
+| N9 | Proven for one VM: HTTP 200, 267 bytes, source page hash from the operator workstation | [Stage 1I sections 18 and 19](../stage-1/stage-1i-first-kubevirt-migration.md#19-i5--final-validation-and-controlled-teardown) |
+| N10 | Not tested: EKS was deferred in [ADR 007](../adr/007-kubevirt-target-platform.md) | - |
+| N11 | Proven: a self-managed CentOS Stream 9 node with CRI-O passed `virt-host-validate qemu` hardware checks and ran the VM | [Stage 1I section 16.5](../stage-1/stage-1i-first-kubevirt-migration.md#165-node-and-nested-virtualization) |
+| N12 | Not tested: S3 was not used. The image was transferred over SFTP from the conversion host to the node (321 s for about 2.9 GB) | [Stage 1I section 18.1](../stage-1/stage-1i-first-kubevirt-migration.md#181-transfer) |
+
 ---
 
 ## 2. Feasibility table

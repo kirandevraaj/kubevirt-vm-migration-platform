@@ -251,6 +251,16 @@ status:
 
 The demo shows **both** paths on the **same** application. Nothing below is created in Stage 0.
 
+> **Later outcome (note added 2026-10-15).** The migration (rehost) half was carried out in [Stage 1I](../stage-1/stage-1i-first-kubevirt-migration.md) on 2026-10-01, by hand under approval gates rather than by a controller. It differed from this sketch in several ways:
+>
+> - The source VM was 2 vCPU, 4 GiB and 40 GB.
+> - Discovery was done manually in Stages 1C and 1D.
+> - Conversion used virt-v2v plus offline guest preparation.
+> - The image travelled over SFTP to the node and was loaded with a CDI upload, not through S3.
+> - The KubeVirt VM used 2 vCPU and 4 GiB, and was validated through a NodePort Service.
+>
+> Demo success criteria 1 and 2 were met. Criterion 3 (containerized version) was not implemented. Criterion 4 was not met as written: phase timings and the Stage 1E downtime were recorded manually in the stage records, because no migration status object exists.
+
 ### Source
 
 ```

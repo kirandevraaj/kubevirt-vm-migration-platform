@@ -215,21 +215,22 @@
     <p class="sub">Where we are, what we proved, and where we're going</p>
   </div>
 
-  <div class="here" role="status" aria-label="Current position: Stage 1H, KubeVirt target design, awaiting review">
-    <span class="k">YOU ARE HERE</span>
-    <span class="s">Stage 1H</span>
-    <span class="d">KubeVirt target design</span>
-    <span class="r">AWAITING REVIEW</span>
+  <div class="here" role="status" aria-label="Current position: Stage 1I, first KubeVirt migration, complete">
+    <span class="k">LATEST STAGE</span>
+    <span class="s">Stage 1I</span>
+    <span class="d">First KubeVirt migration</span>
+    <span class="r">COMPLETE &#8212; 2026-10-01</span>
   </div>
-  <p class="nextdef">Stage 1I is not yet defined.</p>
+  <p class="nextdef">No stage after 1I is defined.</p>
 
   <div class="strip" aria-label="Status at a glance">
       <div class="st complete"><span class="sn">Stage 0</span><b>COMPLETE</b></div>
       <div class="st complete"><span class="sn">Stages 1A to 1G</span><b>COMPLETE / PROVEN</b></div>
-      <div class="st current"><span class="sn">Stage 1H</span><b>DESIGNED / AWAITING REVIEW</b></div>
-      <div class="st notdef"><span class="sn">Stage 1I</span><b>NOT YET DEFINED</b></div>
-      <div class="st notdeployed"><span class="sn">AWS / Kubernetes / KubeVirt / CDI</span><b>NOTHING EXISTS</b></div>
+      <div class="st complete"><span class="sn">Stage 1H</span><b>DESIGNED, THEN BUILT IN 1I</b></div>
+      <div class="st complete"><span class="sn">Stage 1I</span><b>I1 TO I5 PASS</b></div>
+      <div class="st notdeployed"><span class="sn">AWS / Kubernetes / KubeVirt / CDI</span><b>BUILT IN 1I, THEN DESTROYED</b></div>
   </div>
+  <p class="nextdef">Status above updated 2026-10-15. Everything below this line, including the 60-second questions, diagrams 01 to 12 and their captions, is a snapshot of the status recorded after Stage 1H (2026-09-28), before the migration. Where it says &quot;not built&quot;, &quot;designed only&quot; or &quot;nothing exists&quot;, that was true then. Stage 1I later built the target on a single-node kubeadm cluster on AWS EC2, migrated the VM, validated it and destroyed the target. See the <a href="../stage-1/stage-1i-visual-learning.html">Stage 1I visual guide</a> and the <a href="../stage-1/stage-1i-first-kubevirt-migration.md">Stage 1I record</a>.</p>
   <div class="legend" aria-label="Status labels">
       <span class="lg"><span class="tag proven">PROVEN</span>seen working in our lab (PASS stage)</span>
       <span class="lg"><span class="tag designed">DESIGNED</span>written down; nothing built</span>
@@ -241,7 +242,7 @@
   </div>
 
   <section class="block" id="sixty" aria-labelledby="q-h">
-    <h2 id="q-h">ANSWER THESE IN 60 SECONDS</h2>
+    <h2 id="q-h">ANSWER THESE IN 60 SECONDS (AS AT END OF STAGE 1H)</h2>
     <p class="lead">Think of your answer, then click to check.</p>
     <div class="qgrid">
       <div class="qc"><button type="button" class="qb" aria-expanded="false" aria-controls="qa-0"><span class="qn">1</span><span class="qt">Where are we?</span><span class="qi" aria-hidden="true">+</span></button><div class="qa" id="qa-0" hidden><p>Stage 1H: the KubeVirt target is designed and awaiting your review. Stage 0 and 1A to 1G are complete. Stage 1I is not yet defined.</p><a href="#fig-02">See diagram 02 &#8594;</a></div></div>
@@ -376,9 +377,9 @@
 
   <section class="block one" id="one-screen" aria-labelledby="one-h">
     <h2 id="one-h">THE ONE SCREEN I SHOULD REMEMBER</h2>
-    <div class="flow"><span class="step p">VMware</span><span class="arr" aria-hidden="true">&#8594;</span><span class="step p">legacy-source-vm</span><span class="arr" aria-hidden="true">&#8594;</span><span class="step p">VMDK</span><span class="arr" aria-hidden="true">&#8594;</span><span class="step p">cold acquisition</span><span class="arr" aria-hidden="true">&#8594;</span><span class="step p">golden artifact</span><span class="arr" aria-hidden="true">&#8594;</span><span class="step p">conversion host</span><span class="arr" aria-hidden="true">&#8594;</span><span class="step p">qemu-img / virt-v2v</span><span class="arr" aria-hidden="true">&#8594;</span><span class="step p">KVM boot proven</span><span class="arr" aria-hidden="true">&#8594;</span><span class="step d">KubeVirt target designed</span><span class="arr" aria-hidden="true">&#8594;</span><span class="step h">YOU ARE HERE</span></div>
-    <p class="next">NEXT: Stage 1I &#8212; not yet defined</p>
-    <p class="warn">NO KUBERNETES / KUBEVIRT / CDI DEPLOYMENT EXISTS YET.</p>
+    <div class="flow"><span class="step p">VMware</span><span class="arr" aria-hidden="true">&#8594;</span><span class="step p">legacy-source-vm</span><span class="arr" aria-hidden="true">&#8594;</span><span class="step p">VMDK</span><span class="arr" aria-hidden="true">&#8594;</span><span class="step p">cold acquisition</span><span class="arr" aria-hidden="true">&#8594;</span><span class="step p">golden artifact</span><span class="arr" aria-hidden="true">&#8594;</span><span class="step p">conversion host</span><span class="arr" aria-hidden="true">&#8594;</span><span class="step p">qemu-img / virt-v2v</span><span class="arr" aria-hidden="true">&#8594;</span><span class="step p">KVM boot proven</span><span class="arr" aria-hidden="true">&#8594;</span><span class="step d">KubeVirt target designed</span><span class="arr" aria-hidden="true">&#8594;</span><span class="step h">END OF STAGE 1H</span></div>
+    <p class="next">THEN: Stage 1I &#8212; the design was built, the VM was migrated to KubeVirt and validated, and the target was destroyed (2026-10-01)</p>
+    <p class="warn">NO KUBERNETES / KUBEVIRT / CDI DEPLOYMENT EXISTS NOW: THE STAGE 1I TARGET WAS DESTROYED.</p>
   </section>
 
   <section class="block" id="links" aria-labelledby="l-h">
@@ -388,14 +389,15 @@
       <a class="lk" href="../stage-0/stage-0-visual-learning.html"><b>Stage 0 Visual Learning</b><span>24 diagrams: the architecture</span></a>
       <a class="lk" href="../stage-1/stage-1-visual-learning.html"><b>Stage 1 Visual Learning</b><span>18 diagrams: what we built and proved</span></a>
       <a class="lk" href="../stage-0/"><b>Stage 0 Technical Docs</b><span>theory, architecture, feasibility</span></a>
-      <a class="lk" href="../stage-1/"><b>Stage 1 Technical Docs</b><span>records for 1A to 1H</span></a>
+      <a class="lk" href="../stage-1/stage-1i-visual-learning.html"><b>Stage 1I Visual Learning</b><span>13 diagrams: the first KubeVirt migration</span></a>
+      <a class="lk" href="../stage-1/"><b>Stage 1 Technical Docs</b><span>records for 1A to 1I</span></a>
       <a class="lk" href="../adr/"><b>ADRs</b><span>decisions 001 to 010</span></a>
       <a class="lk" href="project-status-and-next-steps.md"><b>Project Status Markdown</b><span>the full status sheet (source of truth for this page)</span></a>
     </div>
     <p><a href="../index.html">&#8592; Learning portal home</a></p>
   </section>
 </main>
-<footer>Status as recorded after Stage 1H (2026-09-28). Self-contained page: no external scripts, styles, fonts or images.</footer>
+<footer>Diagrams and captions: status as recorded after Stage 1H (2026-09-28). Header status strip updated 2026-10-15 after Stage 1I. Self-contained page: no external scripts, styles, fonts or images.</footer>
 
 <div id="followbar" role="region" aria-label="Follow the project">
   <div class="where" id="fWhere" aria-live="polite"></div>
